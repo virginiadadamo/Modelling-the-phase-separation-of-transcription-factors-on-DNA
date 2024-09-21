@@ -6,93 +6,46 @@ Created on Tue Aug  6 15:56:31 2024
 """
 
 import numpy as np
-import os 
 
-
-def step_MC (time_step, list_DNA, E_ad, E_aa, nA_currently_bound, nA_total):
-    '''
-    Description 
-
-    Parameters
-    ----------
-    time_step : integer
-        current time step in the simulation
-    list_DNA : list
-        list representing the DNA. The value can be either 1 (site occupied by A protein) or 0 (if the site is empty)
-    energy_factor : TYPE
-        DESCRIPTION.
-
-    Returns
-    -------
-    time_step : TYPE
-        DESCRIPTION.
-    list_DNA : TYPE
-        DESCRIPTION.
-
-    '''
+def step_MC (time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa):
     
- 
-    random_site = np.random.randint(0, len(list_DNA))# Return random integers from low (inclusive) to high (exclusive).   
- 
+    random_A = np.random.randint(0, len(list_A))
+    random_site = np.random.randint(0, len(list_empty_DNA))# Return random integers from low (inclusive) to high (exclusive).   
+    empty_random_site = list_empty_DNA [random_site] #select an empty site 
     #Randomly select between AddA or RemoveA   
     random_event = np.random.random()  #draw a random number between 0 and 1
     if random_event < 0.5:  
         #The adding event is selected 
-        if list_DNA [random_site] == 0 and nA_currently_bound <= nA_total : #if the site is empty  and there are still free As
-            list_DNA [random_site] = 1  #always add because it lowers the energy 
+        if list_A[random_A] == (-1): #A is free
+        
+            list_DNA [empty_random_site] = 1  #always add because it lowers the energy 
+            list_A [random_A] = empty_random_site 
+            list_empty_DNA.remove (empty_random_site)
             
-    else:
-        #Remove event is selected 
-        if list_DNA [random_site] == 1:  #if the site is occupied 
-            random_binding = np.random.random()  #draw a random number between 0 and 1
-            energy = energy_function (random_site, list_DNA, E_aa, E_ad)
-            
-            if random_binding < 1/np.exp(energy):
                 
-                list_DNA [random_site] = 0 #A is removed  
-            
-        
-    time_step = time_step + 1
-    return time_step, list_DNA
-
-def step_MC_2 (time_step, list_DNA, list_A,  E_ad, E_aa) :# list_empty_DNA, E_ad, E_aa):
-    
-    random_A = np.random.randint(0, len(list_A))
-    random_site = np.random.randint(0, len(list_DNA)) #len(list_empty_DNA))# Return random integers from low (inclusive) to high (exclusive).   
-    
-    #select an empty site empty_random_site = list_empty_DNA [random_site] 
-    #Randomly select between AddA or RemoveA   
-    random_event = np.random.random()  #draw a random number between 0 and 1
-    if random_event < 0.5:  
-            #The adding event is selected 
-        if list_DNA [random_site] == 0 and list_A[random_A] == (-1): #if the site is empty  and there are still free As
-        
-            list_DNA [random_site] = 1  #always add because it lowers the energy 
-            list_A [random_A] = random_site #ATTENZIONE AL PRIMO SITO 
-            #list_empty_DNA.remove (random_site)
-                #print (list_A)
     else:
         
-        #fai anche occupied list 
         #Remove event is selected 
         if list_A [random_A] != (-1):  #if the site is occupied 
             random_binding = np.random.random()  #draw a random number between 0 and 1
             energy = energy_function (list_A [random_A], list_DNA, E_aa, E_ad)
             
             if random_binding < 1/np.exp(energy):
-                #print (random_site)
                 list_DNA [list_A [random_A]] = 0 #A is removed 
-                list_A [random_A] = -1
-            
+                list_empty_DNA.append(list_A [random_A])
+                list_A [random_A] = -1 #A becomes unbound state
+                
+                
+                
         
     time_step = time_step + 1
-    return time_step, list_DNA, list_A #, list_empty_DNA
+    return time_step, list_DNA, list_A, list_empty_DNA
         
 def energy_function (index,list_DNA, E_ad, E_aa): 
     
     if index == 0: #first site
         energy = list_DNA [index + 1] * E_aa + list_DNA [index]*E_ad
-        print ('primo')
+        
     elif index == (len(list_DNA)-1) : #last site 
         energy = list_DNA [index-1]*E_aa + list_DNA [index]*E_ad
     
