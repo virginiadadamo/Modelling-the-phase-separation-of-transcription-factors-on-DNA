@@ -6,9 +6,12 @@ Created on Tue Aug  6 15:56:31 2024
 """
 
 import numpy as np
+import time 
+import random
 
-def step_MC (time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa):
+def step_MC (time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa, residence_times, times_variables):
     
+    random.seed(time.time())
     random_A = np.random.randint(0, len(list_A))
     random_site = np.random.randint(0, len(list_empty_DNA))# Return random integers from low (inclusive) to high (exclusive).   
     empty_random_site = list_empty_DNA [random_site] #select an empty site 
@@ -20,7 +23,9 @@ def step_MC (time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa):
         
             list_DNA [empty_random_site] = 1  #always add because it lowers the energy 
             list_A [random_A] = empty_random_site 
+            residence_times[random_A] = time_step
             list_empty_DNA.remove (empty_random_site)
+            
             
                 
     else:
@@ -28,18 +33,22 @@ def step_MC (time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa):
         #Remove event is selected 
         if list_A [random_A] != (-1):  #if the site is occupied 
             random_binding = np.random.random()  #draw a random number between 0 and 1
-            energy = energy_function (list_A [random_A], list_DNA, E_aa, E_ad)
+            energy = energy_function (list_A [random_A], list_DNA, E_ad, E_aa)
             
             if random_binding < 1/np.exp(energy):
                 list_DNA [list_A [random_A]] = 0 #A is removed 
                 list_empty_DNA.append(list_A [random_A])
                 list_A [random_A] = -1 #A becomes unbound state
+                time_binding = residence_times[random_A]
+                residence_times[random_A] = time_step-time_binding
+                times_variables[random_A]['Residence times'].append(residence_times[random_A] )
+                residence_times[random_A]  = 0
                 
                 
                 
         
     time_step = time_step + 1
-    return time_step, list_DNA, list_A, list_empty_DNA
+    return time_step, list_DNA, list_A, list_empty_DNA, times_variables 
         
 def energy_function (index,list_DNA, E_ad, E_aa): 
     
