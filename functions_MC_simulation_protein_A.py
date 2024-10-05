@@ -11,6 +11,7 @@ import random
 
 def step_MC (time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa, residence_times, times_variables):
     
+   
     random.seed(time.time())
     random_A = np.random.randint(0, len(list_A))
     random_site = np.random.randint(0, len(list_empty_DNA))# Return random integers from low (inclusive) to high (exclusive).   
@@ -25,6 +26,8 @@ def step_MC (time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa, residence_
             list_A [random_A] = empty_random_site 
             residence_times[random_A] = time_step
             list_empty_DNA.remove (empty_random_site)
+            times_variables[random_A]['Count binding events'] += 1
+            
             
             
                 
@@ -42,15 +45,16 @@ def step_MC (time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa, residence_
                 time_binding = residence_times[random_A]
                 residence_times[random_A] = time_step-time_binding
                 times_variables[random_A]['Residence times'].append(residence_times[random_A] )
-                residence_times[random_A]  = 0
+                residence_times[random_A]  = 0 
                 
                 
-                
+              
         
     time_step = time_step + 1
     return time_step, list_DNA, list_A, list_empty_DNA, times_variables 
         
 def energy_function (index,list_DNA, E_ad, E_aa): 
+    
     
     if index == 0: #first site
         energy = list_DNA [index + 1] * E_aa + list_DNA [index]*E_ad

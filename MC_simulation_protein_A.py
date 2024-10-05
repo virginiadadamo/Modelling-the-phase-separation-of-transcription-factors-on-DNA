@@ -11,41 +11,62 @@ import os
 import functions_MC_simulation_protein_A
 
 
-#Histograms residence time vs cluster size 
-#Residence time of a cluster ???
-#range (energy 0.2)
-#Fit mic ment does it fit 
-# first 10000 steps 
-#capire questa cosa degli istogrammi 
-
 #PARAMETERS 
 
-#alfa chenge the ratio put N and alfa 
-nA = 1000 #number of As
-N = 5000 #total number of binding sites in the DNA 
 
-# alfa = 0.25 #ratio between nA/N 
-# N = 5000 #total number of binding sites in the DNA
-# nA = N*alfa #number of As
+#mean cluster size and mean residence time 
+#max residence time 
+#stdeviation of the mean residence time 
+#handling of binding and unbinding 
+
+#million steps (ead 0-4, eaa 0 and 2.5 ) 
+
+
+
+alfa = 0.15 #ratio between nA/N 
+N = 3000 #total number of binding sites in the DNA
+
+nA = int (N*alfa) #number of As
  
-stop_time = 10000
+stop_time = 2000000
 
-ignoring_steps = 1000
-m = 100
+ignoring_steps = 10000
+m = 50
 
 if (stop_time - ignoring_steps) % m != 0 :
     raise ValueError(f"Error: m ({m}) is not a divisor of {stop_time - ignoring_steps}")
 
 folder_name = 'Simulations_protein_A'
 
+subfolder_name = f'nA_{nA}_n_{N}'
+subfolder_path = os.path.join(folder_name, subfolder_name)
+os.makedirs(subfolder_path, exist_ok=True)
+
+txt_filename = os.path.join(subfolder_path, 'simulation_parameters.txt')
+
+
+# Write parameters to the txt file
+with open(txt_filename, 'a') as f:
+    f.write("# Simulation Parameters\n")
+    f.write(f"nA = {nA}  # Number of As\n")
+    f.write(f"N = {N}  # Total number of binding sites in the DNA\n")
+    #f.write(f"alfa = {alfa}  # Ratio between nA and N\n")
+    f.write(f"stop_time = {stop_time}  # Simulation stop time\n")
+    f.write(f"ignoring_steps = {ignoring_steps}  # Steps to ignore\n")
+    #f.write(f"m = {m}  # Some parameter m\n")
+    
+
 #nA_values = range(0, 100000, 10000)
-E_ad_values = np.arange(0, 4, 0.2)
+E_ad_values = np.arange(0, 4, 1)
+
  
 
 E_aa_values = [0, 2.5]
 no_change_time = 500 #time from which I start computing mean and standard deviation #ricorda che in verità lo calcoli SAMPLING TIME 2000
 
 residence_times_for_different_E_aa = []
+std_devs_for_different_E_aa = []
+
 
 for E_aa in E_aa_values: 
     
@@ -55,6 +76,8 @@ for E_aa in E_aa_values:
     mean_no_changes = []
     stdv_no_changes = []
     mean_residence_times = []
+    max_residence_times = []
+    binding_events_lists = []
     
     for E_ad in E_ad_values:
         
@@ -65,6 +88,7 @@ for E_aa in E_aa_values:
         list_DNA = [0] * N #at the initial state there is no bound A to the DNA 
         list_A = [-1]*nA #-1 for unbound 1 for bound 
         list_empty_DNA  = list(range (0,len(list_DNA),1)) #list containing all the indexes of empty sites in the DNA
+        
         time_step = 0 #initial time step
         time_step_sampled = [] #To store the time step that are being sampled 
         nA_bound_snapshots = [] # To store the number of A bound for each time step
@@ -76,8 +100,14 @@ for E_aa in E_aa_values:
         residence_times = [0]*nA
         times_variables = [{'Index of Transcription Factor': i, 
                         'Residence times': [],
-                        'Mean residence time': 0} for i in range(nA)] #ex. nA empty dictionaries to store variables related to time for each TF, for example for residence time
+                        'Mean residence time' : 0 ,
+                        'Standard deviation':0,
+                        'Max residence time' : 0,
+                        'Count binding events': 0} for i in range (nA)]
         
+        average_cluster_sizes = []
+        index_tfs = []
+        stdv_each_tf = []
         
         while time_step < stop_time:
             
@@ -98,6 +128,7 @@ for E_aa in E_aa_values:
                 
                     group_sizes, max_count, positions_first_clusters, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time, max_cluster_sizes, rate_counter, all_group_sizes_histogram = functions_MC_simulation_protein_A.take_sample(list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time,max_cluster_sizes, rate_counter, all_group_sizes_histogram)
                     time_step_sampled.append(time_step)
+                    average_cluster_sizes.append(np.mean (group_sizes))
                     
                  
             
@@ -105,45 +136,115 @@ for E_aa in E_aa_values:
             
                 group_sizes, max_count, positions_first_clusters, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time, max_cluster_sizes, rate_counter, all_group_sizes_histogram = functions_MC_simulation_protein_A.take_sample(list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time, max_cluster_sizes, rate_counter, all_group_sizes_histogram)
                 time_step_sampled.append(time_step)
-           
+                average_cluster_sizes.append(np.mean (group_sizes))
         
         #print ((f'Residence times for Eaa {E_aa} and Ead {E_ad} is ', times_variables))
         
+        count_never_unbind = np.count_nonzero(residence_times)
+        times_never_unbind =  [x for x in residence_times if x != 0]
+        
+        # with open(txt_filename, 'a') as f:
+        #     f.write(f" For Eaa = {E_aa} and Ead = {E_ad} The number of Tfs that never unbinds is = {count_never_unbind}  \n") 
+        #     f.write(f" For Eaa = {E_aa} and Ead = {E_ad} Time steps at which it happens = {times_never_unbind}  \n") 
+        
+        # print ('The number of Tfs that never unbinds is', count_never_unbind )
+        # print ('Time steps at which it happens', times_never_unbind)
+        
         mean_residence_time = 0
         count_residence_time= 0 
+        mean_residence_list = [] 
+        count_binding_events_list = []
+        
         for i in range (nA):
+            count_binding_events_list.append (times_variables[i]['Count binding events'])
             if len (times_variables[i]['Residence times']) != 0: 
                 times_variables[i]['Mean residence time'] = np.mean (times_variables[i]['Residence times'])
+                times_variables[i]['Standard deviation'] = np.std (times_variables[i]['Residence times'])
+                stdv_each_tf.append (times_variables[i]['Standard deviation'])
+                times_variables[i]['Max residence time'] = np.max (times_variables[i]['Residence times'])
+                
+                index_tfs.append (times_variables[i]['Index of Transcription Factor'])
             if times_variables[i]['Mean residence time'] != 0 :
-                mean_residence_time =+ times_variables[i]['Mean residence time'] 
+                mean_residence_time += times_variables[i]['Mean residence time'] 
                 count_residence_time = count_residence_time +1
+                mean_residence_list.append (times_variables[i]['Mean residence time'] )
+        
+        
+        binding_events_lists.append (count_binding_events_list)
+        std_mean_residence_times = np.std(mean_residence_list)
+        std_devs_for_different_E_aa.append(std_mean_residence_times)
+        #print ('Max residence times', [times_variables[i]['Max residence time'] for i in range(nA)])
+        max_residence_time = np.max([times_variables[i]['Max residence time'] for i in range(nA)])
+        #print('Max of max', max_residence_time)
         
         mean_residence_times.append(mean_residence_time/ count_residence_time)
+        max_residence_times.append (max_residence_time)
         nA_bound_for_different_energies.append(nA_bound_snapshots)
         mean_cluster_sizes.append(np.mean(mean_cluster_sizes_over_time)) #taking the mean of custer sizes for each energy value
         mean_max_cluster_sizes.append(np.mean(max_cluster_sizes)) #taking the mean of maximum sized cluster for each energy value 
         
+        unique_idx = np.unique(index_tfs)
+        if len(unique_idx) != len(index_tfs):
+            raise ValueError("Error: the index of TFS are not unique")
         
-        stdv = np.std(nA_bound_snapshots[no_change_time:])
-        mean = np.mean(nA_bound_snapshots[no_change_time:])
-        print ((f'Standard deviation, when there are no more visible changes for Eaa {E_aa} and Ead {E_ad} is ', stdv))
-        print ((f'Mean, when there are no more visible changes for Eaa {E_aa} and Ead {E_ad} is ', mean))
+        plt.scatter(index_tfs, stdv_each_tf, color='r', label=f'TF Index {i}')
         
-        mean_no_changes.append(mean)
-        stdv_no_changes.append(stdv)
+        plt.xlabel('Index of TF')
+        plt.ylabel('Standard Deviation of Residence Times')
+        plt.title(f'Standard deviation of Residence times for different TFs (E_aa={E_aa}, E_ad={E_ad})')
+        
+        plt.text(0.95, 0.05, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
+                 horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+        
+        
+        
+        plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_stdv_rt_tf__Eaa_{E_aa}_Ead_{E_ad}.png')
+        plt.savefig(plot_filename)
+        
+        plt.show()
+        
+        bin_width = 1
+        max_value = max(count_binding_events_list)
+        
+        bin_edges = np.arange(1, max_value + bin_width, bin_width)  
+        counts, bins = np.histogram(count_binding_events_list, bins=bin_edges)
+        plt.stairs(counts, bins, fill = True)
+    
+        plt.title (f'Histogram of distribution of binding events Eaa {E_aa} Ead {E_ad}')
+        plt.text(0.95, 0.05, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
+                  horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+        
+        plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_histogram_binding_events_Eaa_{E_aa}_Ead_{E_ad}.png')
+        plt.savefig(plot_filename)
+        plt.show() 
+        
+                
+        # stdv = np.std(nA_bound_snapshots[no_change_time:])
+        # mean = np.mean(nA_bound_snapshots[no_change_time:])
+        # print ((f'Standard deviation, when there are no more visible changes for Eaa {E_aa} and Ead {E_ad} is ', stdv))
+        # print ((f'Mean, when there are no more visible changes for Eaa {E_aa} and Ead {E_ad} is ', mean))
+        
+        # mean_no_changes.append(mean)
+        # stdv_no_changes.append(stdv)
     
         
         bin_width = 1
         max_value = max(all_group_sizes_histogram)
+        min_value = min(all_group_sizes_histogram)
         
-        bin_edges = np.arange(1, max_value + bin_width, bin_width)  # Bins of width 10
+        bin_edges = np.arange(min_value, max_value + bin_width, bin_width)  
         counts, bins = np.histogram(all_group_sizes_histogram, bins=bin_edges)
         counts = counts / len(time_step_sampled)
         plt.stairs(counts, bins, fill = True)
-        plt.title (f'cluster histogram Eaa {E_aa} Ead {E_ad}')
-        plot_filename = os.path.join(folder_name, f'nA_{nA}_n_{N}_cluster_histogram_Eaa_{E_aa}_Ead_{E_ad}.png')
+        plt.title (f'Cluster histogram Eaa {E_aa} Ead {E_ad}')
+        plt.text(0.95, 0.05, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
+                  horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+        
+        plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_cluster_histogram_Eaa_{E_aa}_Ead_{E_ad}.png')
         plt.savefig(plot_filename)
-        plt.show()    
+        plt.show() 
+      
+           
     
     residence_times_for_different_E_aa.append (mean_residence_times)
     
@@ -156,15 +257,78 @@ for E_aa in E_aa_values:
         plt.plot(time_step_sampled, nA_bound_snapshots, label=f'E_ad={E_ad}', color=color, marker='o')
     
     
+    
+    
     plt.xlabel('Time Steps')
     plt.ylabel('Number of A bound to DNA')
     plt.title(f'Number of A bound to DNA vs. Time Steps (E_aa={E_aa})')
+    plt.text(0.95, 0.05, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
+              horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
     plt.legend()
-    plot_filename = os.path.join(folder_name, f'nA_{nA}_n_{N}_bound_in_time_Eaa_{E_aa}_Ead_{E_ad}.png')
+    plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_bound_in_time_Eaa_{E_aa}_Ead_{E_ad}.png')
     plt.savefig(plot_filename)
     plt.show()
     
+    # Set up the figure and colormap
+    plt.figure(figsize=(8, 6))
+    cmap = plt.get_cmap('viridis')
+
+    
+    for i, (count_binding_events_list, E_ad) in enumerate(zip(binding_events_lists, E_ad_values)):
+
+        bin_width = 1
+        bin_edges = np.arange(min(count_binding_events_list), max(count_binding_events_list) + bin_width, bin_width)
+        counts, bins = np.histogram(count_binding_events_list, bins=bin_edges)
         
+        color = cmap(i/len(E_ad_values))  
+    
+        plt.stairs(counts, bins, fill=True, color=color, label=f'E_aa={E_aa}, E_ad={E_ad}')
+    
+    plt.title('Histogram of Distribution of Binding Events for Different E_aa and E_ad')
+    plt.text(0.95, 0.05, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
+             horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+    
+    plt.xlabel('Binding Events')
+    plt.ylabel('Frequency')
+    plt.legend()
+    
+    # Save the combined plot
+    plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_combined_histogram_binding_events.png')
+    plt.savefig(plot_filename)
+    
+    # Show the plot
+    plt.show()
+    
+    # cmap = plt.get_cmap('viridis')
+    # plt.figure(figsize=(8, 6))
+    
+    # for i, (nA_bound_snapshots, E_ad) in enumerate(zip(nA_bound_for_different_energies, E_ad_values)):
+        
+    #     inverse_nA =  [1 / nA for nA in nA_bound_snapshots]
+    #     inverse_time = [1 / time for time in time_step_sampled ]
+    
+    #     color = cmap(i / len(E_ad_values))
+    #     plt.plot(inverse_time, inverse_nA, label=f'E_ad={E_ad}', color=color, marker='o') 
+        
+    # plt.xlabel('Inverse Time Steps')
+    # plt.ylabel('Inverse Number of A bound to DNA')
+    # plt.title(f'Lineweaver–Burk plot (E_aa={E_aa})')
+    # plt.text(0.95, 0.05, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
+    #           horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+    # plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_bound_in_time_Eaa_{E_aa}_Ead_{E_ad}.png')
+    # plt.legend()
+    # plt.savefig(plot_filename)
+    # plt.show()
+    
+    plt.figure(figsize=(8, 6))
+    plt.plot(max_residence_times, mean_cluster_sizes, color='r')
+    plt.xlabel('Max residence times')
+    plt.ylabel('Mean Cluster Size')
+    plt.title('Mean Cluster Size vs Max Cluster size')
+    plt.ylim(min (mean_cluster_sizes), max(mean_cluster_sizes))  # Set y-axis limits from 0 to max value
+    plt.grid(True)
+    plt.show()
+    
     
     # plt.figure(figsize=(8, 6))
     # plt.plot(E_ad_values, mean_cluster_sizes, color='r')
@@ -207,17 +371,27 @@ for E_aa in E_aa_values:
     
            
     
- 
+
 cmap = plt.get_cmap('viridis')
 plt.figure(figsize=(8, 6))
 
 for i, (mean_residence_times, E_aa) in enumerate(zip(residence_times_for_different_E_aa, E_aa_values)):
 
     color = cmap(i / len(E_aa_values))
-    plt.plot(E_ad_values, mean_residence_times, label=f'E_aa={E_aa}', color=color, marker='o')
+    print ('Log value of mean residence times: ', np.log(mean_residence_times) )
+    plt.plot(E_ad_values, np.log(mean_residence_times), 
+             label=f'E_aa={E_aa}', color=color, marker='o')
 
 plt.xlabel('E ad values')
-plt.ylabel('Mean Residence Time')
-plt.title(f'Mean Residence Time vs. E ad values')
+plt.ylabel('Log (Mean Residence Time)')
+plt.title('Log Mean Residence Time vs. E ad values')
+
+plt.text(0.5, 0.95, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
+         horizontalalignment='center', verticalalignment='top', transform=plt.gca().transAxes)
+
 plt.legend()
+
+plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_log_mean_residence_time_Eaa_{E_aa_values[0]}_Ead_{E_ad_values[0]}.png')
+plt.savefig(plot_filename)
+
 plt.show()
