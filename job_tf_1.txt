@@ -1,6 +1,5 @@
-#!/bin/bash
-
-#SBATCH --reservation hpc-courses-bio-501-2024
+#SBATCH --reservation=Course-bio-501-2024
+#SBATCH --account=bio-501-2024
 #SBATCH --job-name="TF versus Eaa, Ead"
 #SBATCH --nodes 1
 #SBATCH --ntasks-per-core 1
@@ -9,7 +8,3 @@
 #SBATCH --time 10:00:00
 #SBATCH --output out-%J.txt
 #SBATCH --error err-%J.txt
-
-
- python3 MC_simulation_protein_A
-wait

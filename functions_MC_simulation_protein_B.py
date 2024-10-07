@@ -1,22 +1,28 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Aug  6 15:56:31 2024
+Created on Mon Oct  7 10:16:22 2024
 
 @author: virgi
 """
-
 import numpy as np
 import time 
 import random
-import functions_MC_simulation_both
 
-def step_MC (time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa, residence_times, times_variables):
+
+
+
+def step_MC (time_step, list_DNA, list_A, list_B, k, list_empty_DNA, E_ad, E_aa, E_ab, E_bb, residence_times, times_variables):
     
    
     random.seed(time.time())
     random_A = np.random.randint(0, len(list_A))
-    random_site = np.random.randint(0, len(list_empty_DNA))# Return random integers from low (inclusive) to high (exclusive).   
-    empty_random_site = list_empty_DNA [random_site] #select an empty site 
+    random_B = np.random.randint(0, len(list_B))
+    
+    random_site_A = np.random.randint(0, len(list_empty_DNA))# Return random integers from low (inclusive) to high (exclusive). 
+    random_site_B = np.random.randint(0, k)
+    
+    empty_random_site = list_empty_DNA [random_site_A] #select an empty site 
+    
     #Randomly select between AddA or RemoveA   
     random_event = np.random.random()  #draw a random number between 0 and 1
     if random_event < 0.5:  
@@ -67,9 +73,3 @@ def energy_function (index,list_DNA, E_ad, E_aa):
         energy = list_DNA [index + 1] * E_aa + list_DNA [index-1]*E_aa + list_DNA [index]*E_ad
     return energy 
     
-
-
-
-#def correlation_times:
-    
- 

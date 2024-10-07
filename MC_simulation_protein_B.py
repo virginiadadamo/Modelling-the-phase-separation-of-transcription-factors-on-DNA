@@ -1,23 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Sep 19 21:09:15 2024
+Created on Mon Oct  7 10:13:54 2024
 
 @author: virgi
 """
 
 import numpy as np
+import functions_MC_simulation_both
+import functions_MC_simulation_protein_B
 import matplotlib.pyplot as plt
-import os 
-import functions_MC_simulation_protein_A
-import functions_MC_simulation_both 
+import os
 
 #PARAMETERS 
-
 
 alfa = 0.15 #ratio between nA/N 
 N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
-
 
 nB = 0 #number of Bs
 k = 0 #number of B interacting sites with A  
@@ -37,7 +35,7 @@ E_ad_values = np.arange(0, 4, 1)
 E_aa_values = [0, 2.5]
 
 #CREATING FOLDERS 
-folder_name = 'Simulations_protein_A'
+folder_name = 'Simulations_protein_B'
 subfolder_path = functions_MC_simulation_both.create_folders(folder_name, alfa)
 functions_MC_simulation_both.create_txt_parameters(subfolder_path, alfa, stop_time, ignoring_steps)
 
@@ -92,7 +90,7 @@ for E_aa in E_aa_values:
         while time_step < stop_time:
             
                             
-            time_step, list_DNA, list_A, list_empty_DNA, times_variables = functions_MC_simulation_protein_A.step_MC(time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa, residence_times, times_variables)
+            time_step, list_DNA, list_A, list_empty_DNA, times_variables = functions_MC_simulation_protein_B.step_MC(time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa, residence_times, times_variables)
             
             nA_bound_list_A= functions_MC_simulation_both.count_A(list_A)
             nA_bound_DNA = functions_MC_simulation_both.count_consecutive_ones(list_DNA)
@@ -173,7 +171,7 @@ for E_aa in E_aa_values:
         plt.ylabel('Standard Deviation of Residence Times')
         plt.title(f'Standard deviation of Residence times for different TFs (E_aa={E_aa}, E_ad={E_ad})')
         
-        plt.text(0.95, 0.05, legend, 
+        plt.text(0.95, 0.05, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
                  horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
         
         
@@ -219,7 +217,7 @@ for E_aa in E_aa_values:
     plt.xlabel('Time Steps')
     plt.ylabel('Number of A bound to DNA')
     plt.title(f'Number of A bound to DNA vs. Time Steps (E_aa={E_aa})')
-    plt.text(0.95, 0.05, legend, 
+    plt.text(0.95, 0.05, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
               horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
     plt.legend()
     plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_bound_in_time_Eaa_{E_aa}_Ead_{E_ad}.png')
@@ -242,16 +240,18 @@ for E_aa in E_aa_values:
         plt.stairs(counts, bins, fill=True, color=color, label=f'E_aa={E_aa}, E_ad={E_ad}')
     
     plt.title('Histogram of Distribution of Binding Events for Different E_aa and E_ad')
-    plt.text(0.95, 0.05, legend, 
+    plt.text(0.95, 0.05, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
              horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
     
     plt.xlabel('Binding Events')
     plt.ylabel('Frequency')
     plt.legend()
     
+    # Save the combined plot
     plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_combined_histogram_binding_events.png')
     plt.savefig(plot_filename)
-
+    
+    # Show the plot
     plt.show()
     
     # cmap = plt.get_cmap('viridis')
@@ -280,7 +280,7 @@ for E_aa in E_aa_values:
     plt.xlabel('Max residence times')
     plt.ylabel('Mean Cluster Size')
     plt.title('Mean Cluster Size vs Max Cluster size')
-    plt.ylim(min (mean_cluster_sizes), max(mean_cluster_sizes))  
+    plt.ylim(min (mean_cluster_sizes), max(mean_cluster_sizes))  # Set y-axis limits from 0 to max value
     plt.grid(True)
     plt.show()
     
@@ -350,3 +350,7 @@ plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_log_mean_residence_
 plt.savefig(plot_filename)
 
 plt.show()
+
+list_B = [[-1]*k for _ in range(nA)]
+
+# -1 if B site is empty, 1 if bound to A, other number if bound to another B 
