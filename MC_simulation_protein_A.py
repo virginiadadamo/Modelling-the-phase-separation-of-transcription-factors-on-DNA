@@ -88,6 +88,7 @@ for E_aa in E_aa_values:
         average_cluster_sizes = []
         index_tfs = []
         stdv_each_tf = []
+        mean_each_tf = []
         
         while time_step < stop_time:
             
@@ -135,10 +136,12 @@ for E_aa in E_aa_values:
         mean_residence_list = [] 
         count_binding_events_list = []
         
+        
         for i in range (nA):
             count_binding_events_list.append (times_variables[i]['Count binding events'])
             if len (times_variables[i]['Residence times']) != 0: 
                 times_variables[i]['Mean residence time'] = np.mean (times_variables[i]['Residence times'])
+                mean_each_tf.append(times_variables[i]['Mean residence time'])
                 times_variables[i]['Standard deviation'] = np.std (times_variables[i]['Residence times'])
                 stdv_each_tf.append (times_variables[i]['Standard deviation'])
                 times_variables[i]['Max residence time'] = np.max (times_variables[i]['Residence times'])
@@ -176,6 +179,15 @@ for E_aa in E_aa_values:
         plt.text(0.95, 0.05, legend, 
                  horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
         
+        plt.scatter(index_tfs, mean_each_tf, color='r', label=f'TF Index {i}')
+        
+        plt.xlabel('Index of TF')
+        plt.ylabel('Mean of Residence Times')
+        plt.title(f'Mean of Residence times for different TFs (E_aa={E_aa}, E_ad={E_ad})')
+        
+        plt.text(0.95, 0.05, legend, 
+                 horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+        
         
         
         plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_stdv_rt_tf__Eaa_{E_aa}_Ead_{E_ad}.png')
@@ -185,7 +197,7 @@ for E_aa in E_aa_values:
         
         histogram_title = f'Histogram of distribution of binding events Eaa {E_aa} Ead {E_ad}'
         saving_histogram_name = f'nA_{nA}_n_{N}_histogram_binding_events_Eaa_{E_aa}_Ead_{E_ad}.png'
-        functions_MC_simulation_both(count_binding_events_list, histogram_title, legend, subfolder_path, saving_histogram_name, time_step_sampled )
+        functions_MC_simulation_both.plot_histogram(count_binding_events_list, histogram_title, legend, subfolder_path, saving_histogram_name, time_step_sampled )
         
                 
         # stdv = np.std(nA_bound_snapshots[no_change_time:])
@@ -198,7 +210,7 @@ for E_aa in E_aa_values:
     
         histogram_title = f'Cluster histogram Eaa {E_aa} Ead {E_ad}'
         saving_histogram_name = f'nA_{nA}_n_{N}_cluster_histogram_Eaa_{E_aa}_Ead_{E_ad}.png'
-        functions_MC_simulation_both(count_binding_events_list, histogram_title, legend, subfolder_path, saving_histogram_name, time_step_sampled, True )
+        functions_MC_simulation_both.plot_histogram(count_binding_events_list, histogram_title, legend, subfolder_path, saving_histogram_name, time_step_sampled, True )
         
       
            
