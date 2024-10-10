@@ -179,7 +179,11 @@ for E_aa in E_aa_values:
         plt.text(0.95, 0.05, legend, 
                  horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
         
+        plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_stdv_rt_tf__Eaa_{E_aa}_Ead_{E_ad}.png')
+        plt.savefig(plot_filename)
+        
         plt.show()
+        
         plt.clf()
         
         plt.scatter(index_tfs, mean_each_tf, color='r', label=f'TF Index {i}')
@@ -193,7 +197,7 @@ for E_aa in E_aa_values:
         
         
         
-        plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_stdv_rt_tf__Eaa_{E_aa}_Ead_{E_ad}.png')
+        plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_mean_rt_tf__Eaa_{E_aa}_Ead_{E_ad}.png')
         plt.savefig(plot_filename)
         
         plt.clf()
