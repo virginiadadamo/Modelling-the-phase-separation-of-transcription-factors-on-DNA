@@ -15,7 +15,7 @@ import functions_MC_simulation_both
 
 
 alfa = 0.15 #ratio between nA/N 
-N = 6000 #total number of binding sites in the DNA
+N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
