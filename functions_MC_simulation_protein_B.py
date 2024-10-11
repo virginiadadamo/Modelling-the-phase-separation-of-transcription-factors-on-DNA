@@ -15,14 +15,12 @@ def step_MC (time_step, list_DNA, list_A, list_B, k, list_empty_DNA, E_ad, E_aa,
     
    
     random.seed(time.time())
-    random_A = np.random.randint(0, len(list_A))
-    random_B = np.random.randint(0, len(list_B))
     
-    random_site_A = np.random.randint(0, len(list_empty_DNA))# Return random integers from low (inclusive) to high (exclusive). 
-    random_site_B = np.random.randint(0, k)
+    #A part 
+    random_A = np.random.randint(0, len(list_A))
+    random_site_A = np.random.randint(0, len(list_empty_DNA))# Return random integers from low (inclusive) to high (exclusive).
     
     empty_random_site = list_empty_DNA [random_site_A] #select an empty site 
-    
     #Randomly select between AddA or RemoveA   
     random_event = np.random.random()  #draw a random number between 0 and 1
     if random_event < 0.5:  
@@ -35,11 +33,10 @@ def step_MC (time_step, list_DNA, list_A, list_B, k, list_empty_DNA, E_ad, E_aa,
             list_empty_DNA.remove (empty_random_site)
             times_variables[random_A]['Count binding events'] += 1
             
-            
-            
-                
+               
     else:
         
+        #check if A protein is bound to B for different energy 
         #Remove event is selected 
         if list_A [random_A] != (-1):  #if the site is occupied 
             random_binding = np.random.random()  #draw a random number between 0 and 1
@@ -53,6 +50,19 @@ def step_MC (time_step, list_DNA, list_A, list_B, k, list_empty_DNA, E_ad, E_aa,
                 residence_times[random_A] = time_step-time_binding
                 times_variables[random_A]['Residence times'].append(residence_times[random_A] )
                 residence_times[random_A]  = 0 
+    
+    #B part 
+    random_B = np.random.randint(0, len(list_B))
+    
+    random_site_B = np.random.randint(0, k)
+    
+    random_event = np.random.random()  #draw a random number between 0 and 1
+    
+    if random_event < 0.5:  
+        #Adding B event is selected 
+    
+    
+    
                 
                 
               

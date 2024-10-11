@@ -82,6 +82,7 @@ def plot_histogram (list_to_plot, title, legend, subfolder_path, name_to_save, t
      
     counts, bins = np.histogram(list_to_plot, bins=bin_edges)
     if mean:
+            print ('Title', title)
             counts = counts / len(time_step_sampled)
     plt.stairs(counts, bins, fill = True)
     
