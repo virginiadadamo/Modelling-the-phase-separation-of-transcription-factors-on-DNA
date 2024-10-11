@@ -93,6 +93,7 @@ def plot_histogram (list_to_plot, title, legend, subfolder_path, name_to_save, t
     plot_filename = os.path.join(subfolder_path, name_to_save)
     plt.savefig(plot_filename)
     plt.show()
+    plt.clf()
 
 def count_A (list_A):
     return len([x for x in list_A if x != (-1)])

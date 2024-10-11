@@ -196,7 +196,7 @@ for E_aa in E_aa_values:
         plt.savefig(plot_filename)
         
         plt.show()
-        
+        plt.clf()
         
         plt.figure(figsize=(12, 8)) 
         
@@ -215,6 +215,7 @@ for E_aa in E_aa_values:
         plt.savefig(plot_filename)
         
         plt.show()
+        plt.clf()
         
         histogram_title = f'Histogram of distribution of binding events Eaa {E_aa} Ead {E_ad}'
         saving_histogram_name = f'nA_{nA}_n_{N}_histogram_binding_events_Eaa_{E_aa}_Ead_{E_ad}.png'
