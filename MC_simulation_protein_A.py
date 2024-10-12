@@ -24,7 +24,7 @@ k = 0 #number of B interacting sites with A
 
 #TIME PARAMETERS
 stop_time = 2000000
-ignoring_steps = 3000
+ignoring_steps = 10000
 m = 50
 no_change_time = 500 #time from which I start computing mean and standard deviation #ricorda che in verità lo calcoli SAMPLING TIME 2000
 
@@ -156,18 +156,10 @@ for E_aa in E_aa_values:
         saving_histogram_name = f'nA_{nA}_n_{N}_histogram_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}.png'
         functions_MC_simulation_both.plot_histogram(mean_residence_list, histogram_title, legend, subfolder_path, saving_histogram_name, time_step_sampled, 100)
         
-        print (len(index_tfs))
-        print (len(stdv_each_tf), len (mean_each_tf))
-        
-        if mean_each_tf == stdv_each_tf:
-            raise ValueError("Error: Stdv and mean are equal")
-        
         binding_events_lists.append (count_binding_events_list)
         std_mean_residence_times = np.std(mean_residence_list)
         std_devs_for_different_E_aa.append(std_mean_residence_times)
-        #print ('Max residence times', [times_variables[i]['Max residence time'] for i in range(nA)])
         max_residence_time = np.max([times_variables[i]['Max residence time'] for i in range(nA)])
-        #print('Max of max', max_residence_time)
         
         mean_residence_times.append(mean_residence_time/ count_residence_time)
         max_residence_times.append (max_residence_time)
@@ -179,10 +171,9 @@ for E_aa in E_aa_values:
         if len(unique_idx) != len(index_tfs):
             raise ValueError("Error: the index of TFS are not unique")
         
-        plt.figure(figsize=(12, 8))  # Set the figure size (width=12, height=8)
-
-        # Adjust scatter plot with larger markers
+        plt.figure(figsize=(12, 8))
         plt.scatter(index_tfs, stdv_each_tf, color='r', label=f'TF Index {i}', s=100)  # s=100 increases marker size
+        plt.xlim(min(index_tfs), max(index_tfs))
         
         plt.xlabel('Index of TF')
         plt.ylabel('Standard Deviation of Residence Times')
@@ -191,17 +182,16 @@ for E_aa in E_aa_values:
         plt.text(0.95, 0.05, legend, 
                  horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
         
-        # Save the plot
         plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_stdv_rt_tf__Eaa_{E_aa}_Ead_{E_ad}.png')
         plt.savefig(plot_filename)
         
         plt.show()
-        plt.clf()
+        plt.close() 
         
         plt.figure(figsize=(12, 8)) 
         
         plt.scatter(index_tfs, mean_each_tf, color='r', label=f'TF Index {i}')
-        
+        plt.xlim(min(index_tfs), max(index_tfs))
         plt.xlabel('Index of TF')
         plt.ylabel('Mean of Residence Times')
         plt.title(f'Mean of Residence times for different TFs (E_aa={E_aa}, E_ad={E_ad})')
@@ -215,7 +205,7 @@ for E_aa in E_aa_values:
         plt.savefig(plot_filename)
         
         plt.show()
-        plt.clf()
+        plt.close() 
         
         histogram_title = f'Histogram of distribution of binding events Eaa {E_aa} Ead {E_ad}'
         saving_histogram_name = f'nA_{nA}_n_{N}_histogram_binding_events_Eaa_{E_aa}_Ead_{E_ad}.png'
@@ -232,7 +222,9 @@ for E_aa in E_aa_values:
     
         histogram_title = f'Cluster histogram Eaa {E_aa} Ead {E_ad}'
         saving_histogram_name = f'nA_{nA}_n_{N}_cluster_histogram_Eaa_{E_aa}_Ead_{E_ad}.png'
-        functions_MC_simulation_both.plot_histogram(group_sizes, histogram_title, legend, subfolder_path, saving_histogram_name, time_step_sampled, True )
+        print ('all_group_sizes_histogram', len(all_group_sizes_histogram))
+        print ('all_group_sizes_histogram', len(time_step_sampled))
+        functions_MC_simulation_both.plot_histogram(all_group_sizes_histogram, histogram_title, legend, subfolder_path, saving_histogram_name, time_step_sampled, True )
         
       
            

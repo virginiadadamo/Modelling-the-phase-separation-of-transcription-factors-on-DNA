@@ -82,8 +82,11 @@ def plot_histogram (list_to_plot, title, legend, subfolder_path, name_to_save, t
      
     counts, bins = np.histogram(list_to_plot, bins=bin_edges)
     if mean:
-            print ('Title', title)
+        print(f'Title: {title}')
+        if len(time_step_sampled) > 0:
             counts = counts / len(time_step_sampled)
+        else:
+            print("Warning: time_step_sampled is empty. No mean normalization applied.")
     plt.stairs(counts, bins, fill = True)
     
     plt.title (title)
@@ -93,7 +96,7 @@ def plot_histogram (list_to_plot, title, legend, subfolder_path, name_to_save, t
     plot_filename = os.path.join(subfolder_path, name_to_save)
     plt.savefig(plot_filename)
     plt.show()
-    plt.clf()
+    plt.close() 
 
 def count_A (list_A):
     return len([x for x in list_A if x != (-1)])
