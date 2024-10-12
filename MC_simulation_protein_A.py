@@ -154,7 +154,8 @@ for E_aa in E_aa_values:
         
         histogram_title = f'Histogram of distribution of Mean residence times Eaa {E_aa} Ead {E_ad}'
         saving_histogram_name = f'nA_{nA}_n_{N}_histogram_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}.png'
-        functions_MC_simulation_both.plot_histogram(mean_residence_list, histogram_title, legend, subfolder_path, saving_histogram_name, time_step_sampled, 100)
+        print ('Mean residence list', mean_residence_list)
+        functions_MC_simulation_both.plot_histogram(mean_residence_list, histogram_title, legend, subfolder_path, saving_histogram_name, time_step_sampled, False, 100)
         
         binding_events_lists.append (count_binding_events_list)
         std_mean_residence_times = np.std(mean_residence_list)
@@ -222,8 +223,7 @@ for E_aa in E_aa_values:
     
         histogram_title = f'Cluster histogram Eaa {E_aa} Ead {E_ad}'
         saving_histogram_name = f'nA_{nA}_n_{N}_cluster_histogram_Eaa_{E_aa}_Ead_{E_ad}.png'
-        print ('all_group_sizes_histogram', len(all_group_sizes_histogram))
-        print ('all_group_sizes_histogram', len(time_step_sampled))
+        
         functions_MC_simulation_both.plot_histogram(all_group_sizes_histogram, histogram_title, legend, subfolder_path, saving_histogram_name, time_step_sampled, True )
         
       
