@@ -15,7 +15,7 @@ import functions_MC_simulation_both
 
 
 alfa = 0.15 #ratio between nA/N 
-N = 10000 #total number of binding sites in the DNA
+N = 6000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
@@ -24,7 +24,7 @@ k = 0 #number of B interacting sites with A
 
 #TIME PARAMETERS
 stop_time = 2000000
-ignoring_steps = 6000
+ignoring_steps = 10000
 m = 50
 no_change_time = 500 #time from which I start computing mean and standard deviation #ricorda che in verità lo calcoli SAMPLING TIME 2000
 
