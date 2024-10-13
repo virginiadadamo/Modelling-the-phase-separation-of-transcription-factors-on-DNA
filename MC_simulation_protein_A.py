@@ -17,7 +17,7 @@ import functions_MC_simulation_both
 
 
 alfa = 0.15 #ratio between nA/N 
-N = 10000 #total number of binding sites in the DNA
+N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
@@ -148,7 +148,7 @@ for E_aa in E_aa_values:
                 count_residence_time = count_residence_time +1
                 mean_residence_list.append (times_variables[i]['Mean residence time'] )
         
-        histogram_title_mean = f'Histogram of distribution of Mean residence times Eaa {E_aa} Ead {E_ad}'
+        histogram_title_mean = f'Histogram of distribution of mean residence times Eaa {E_aa} Ead {E_ad}'
         saving_histogram_name = f'nA_{nA}_n_{N}_histogram_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}.png'
         functions_MC_simulation_both.plot_histogram(mean_residence_list, histogram_title_mean, legend, subfolder_path, saving_histogram_name, time_step_sampled, False, 100)
         
