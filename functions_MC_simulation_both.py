@@ -7,6 +7,7 @@ Created on Mon Oct  7 10:16:30 2024
 import os 
 import numpy as np
 import matplotlib.pyplot as plt
+import cluster_class
 
 def create_folders (folder_name, alfa): 
 
@@ -48,29 +49,35 @@ def count_consecutive_ones(DNA_list, return_only_nA= True):
     group_sizes = []
     current_count = 0
     
-    positions_first_clusters = []
+    #positions_first_clusters = []
+    clusters = []
     
     for i in range(len(DNA_list)):
         if DNA_list[i] == 1:
             if current_count == 0: 
-                positions_first_clusters.append(i)
+                #positions_first_clusters.append(i)
+                cluster = cluster_class.Cluster (i)
                 
             current_count += 1
             
         else:
             if current_count > 0:
                 group_sizes.append(current_count)
+                cluster.set_size (current_count)
+                clusters.append(cluster)
                 current_count = 0
 
     if current_count > 0:
         group_sizes.append(current_count)
+        cluster.set_size (current_count)
+        clusters.append(cluster)
 
     max_count = max(group_sizes) if group_sizes else 0
     
     if return_only_nA:
         return sum (group_sizes)
     else:
-        return group_sizes, max_count, positions_first_clusters, sum (group_sizes)
+        return group_sizes, max_count, clusters, sum (group_sizes)
     
 
 def plot_histogram (list_to_plot, title, legend, subfolder_path, name_to_save, time_step_sampled, mean = False, bin_width = 1): 
@@ -102,11 +109,11 @@ def count_A (list_A):
     return len([x for x in list_A if x != (-1)])
 
 
-def take_sample (list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time,max_cluster_sizes, rate_counter, all_group_sizes_histogram):
+def take_sample (list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time,max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled):
     
     return_only_nA= False #we want to take samples of all the variables
     
-    group_sizes, max_count, positions_first_clusters, nA_bound = count_consecutive_ones(list_DNA, return_only_nA)
+    group_sizes, max_count, clusters, nA_bound = count_consecutive_ones(list_DNA, return_only_nA)
     if not group_sizes: #if the group_sizes is empty 
         group_sizes = [0]
     nA_bound_snapshots.append(nA_bound)
@@ -115,7 +122,7 @@ def take_sample (list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, me
     
     mean_cluster_sizes_over_time.append(np.mean(group_sizes))
     max_cluster_sizes.append(max_count)
-    
+    clusters_each_time_sampled.append(clusters)
     rate_counter =1 #everytime take a sample put the counter back to one 
     
     # print(f"Group sizes: {group_sizes}") 
@@ -126,4 +133,4 @@ def take_sample (list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, me
     
     
    
-    return  group_sizes, max_count, positions_first_clusters, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time, max_cluster_sizes, rate_counter, all_group_sizes_histogram
+    return  group_sizes, max_count, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time, max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled

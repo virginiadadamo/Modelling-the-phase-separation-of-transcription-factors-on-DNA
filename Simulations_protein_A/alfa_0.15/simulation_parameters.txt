@@ -122,3 +122,55 @@ ignoring_steps = 100  # Steps to ignore
 alfa = 0.15  # Ratio between nA and N
 stop_time = 3000  # Simulation stop time
 ignoring_steps = 100  # Steps to ignore
+# Simulation Parameters
+alfa = 0.15  # Ratio between nA and N
+stop_time = 50000  # Simulation stop time
+ignoring_steps = 100  # Steps to ignore
+# Simulation Parameters
+alfa = 0.15  # Ratio between nA and N
+stop_time = 50000  # Simulation stop time
+ignoring_steps = 100  # Steps to ignore
+# Simulation Parameters
+alfa = 0.15  # Ratio between nA and N
+stop_time = 50000  # Simulation stop time
+ignoring_steps = 100  # Steps to ignore
+# Simulation Parameters
+alfa = 0.15  # Ratio between nA and N
+stop_time = 50000  # Simulation stop time
+ignoring_steps = 100  # Steps to ignore
+# Simulation Parameters
+alfa = 0.15  # Ratio between nA and N
+stop_time = 50000  # Simulation stop time
+ignoring_steps = 100  # Steps to ignore
+# Simulation Parameters
+alfa = 0.15  # Ratio between nA and N
+stop_time = 50000  # Simulation stop time
+ignoring_steps = 100  # Steps to ignore
+# Simulation Parameters
+alfa = 0.15  # Ratio between nA and N
+stop_time = 50000  # Simulation stop time
+ignoring_steps = 100  # Steps to ignore
+# Simulation Parameters
+alfa = 0.15  # Ratio between nA and N
+stop_time = 50000  # Simulation stop time
+ignoring_steps = 100  # Steps to ignore
+# Simulation Parameters
+alfa = 0.15  # Ratio between nA and N
+stop_time = 50000  # Simulation stop time
+ignoring_steps = 100  # Steps to ignore
+# Simulation Parameters
+alfa = 0.15  # Ratio between nA and N
+stop_time = 50000  # Simulation stop time
+ignoring_steps = 100  # Steps to ignore
+# Simulation Parameters
+alfa = 0.15  # Ratio between nA and N
+stop_time = 50000  # Simulation stop time
+ignoring_steps = 100  # Steps to ignore
+# Simulation Parameters
+alfa = 0.15  # Ratio between nA and N
+stop_time = 50000  # Simulation stop time
+ignoring_steps = 100  # Steps to ignore
+# Simulation Parameters
+alfa = 0.15  # Ratio between nA and N
+stop_time = 50000  # Simulation stop time
+ignoring_steps = 100  # Steps to ignore

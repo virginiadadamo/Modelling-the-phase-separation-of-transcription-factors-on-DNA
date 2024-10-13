@@ -11,6 +11,8 @@ import os
 import functions_MC_simulation_protein_A
 import functions_MC_simulation_both 
 
+
+
 #PARAMETERS 
 
 
@@ -84,7 +86,8 @@ for E_aa in E_aa_values:
                         'Standard deviation':0,
                         'Max residence time' : 0,
                         'Count binding events': 0} for i in range (nA)]
-        
+         
+        clusters_each_time_sampled = []
         average_cluster_sizes = []
         index_tfs = []
         stdv_each_tf = []
@@ -107,7 +110,7 @@ for E_aa in E_aa_values:
                 
                 if rate_counter == m: 
                 
-                    group_sizes, max_count, positions_first_clusters, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time, max_cluster_sizes, rate_counter, all_group_sizes_histogram = functions_MC_simulation_both.take_sample(list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time,max_cluster_sizes, rate_counter, all_group_sizes_histogram)
+                    group_sizes, max_count, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time, max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled = functions_MC_simulation_both.take_sample(list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time,max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled)
                     time_step_sampled.append(time_step)
                     average_cluster_sizes.append(np.mean (group_sizes))
                     
@@ -115,21 +118,14 @@ for E_aa in E_aa_values:
             
             elif time_step == ignoring_steps :
             
-                group_sizes, max_count, positions_first_clusters, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time, max_cluster_sizes, rate_counter, all_group_sizes_histogram = functions_MC_simulation_both.take_sample(list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time, max_cluster_sizes, rate_counter, all_group_sizes_histogram)
+                group_sizes, max_count, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time, max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled = functions_MC_simulation_both.take_sample(list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time, max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled)
                 time_step_sampled.append(time_step)
                 average_cluster_sizes.append(np.mean (group_sizes))
         
-        #print ((f'Residence times for Eaa {E_aa} and Ead {E_ad} is ', times_variables))
+        
         
         count_never_unbind = np.count_nonzero(residence_times)
         times_never_unbind =  [x for x in residence_times if x != 0]
-        
-        # with open(txt_filename, 'a') as f:
-        #     f.write(f" For Eaa = {E_aa} and Ead = {E_ad} The number of Tfs that never unbinds is = {count_never_unbind}  \n") 
-        #     f.write(f" For Eaa = {E_aa} and Ead = {E_ad} Time steps at which it happens = {times_never_unbind}  \n") 
-        
-        # print ('The number of Tfs that never unbinds is', count_never_unbind )
-        # print ('Time steps at which it happens', times_never_unbind)
         
         mean_residence_time = 0
         count_residence_time= 0 
@@ -152,10 +148,9 @@ for E_aa in E_aa_values:
                 count_residence_time = count_residence_time +1
                 mean_residence_list.append (times_variables[i]['Mean residence time'] )
         
-        histogram_title = f'Histogram of distribution of Mean residence times Eaa {E_aa} Ead {E_ad}'
+        histogram_title_mean = f'Histogram of distribution of Mean residence times Eaa {E_aa} Ead {E_ad}'
         saving_histogram_name = f'nA_{nA}_n_{N}_histogram_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}.png'
-        print ('Mean residence list', mean_residence_list)
-        functions_MC_simulation_both.plot_histogram(mean_residence_list, histogram_title, legend, subfolder_path, saving_histogram_name, time_step_sampled, False, 100)
+        functions_MC_simulation_both.plot_histogram(mean_residence_list, histogram_title_mean, legend, subfolder_path, saving_histogram_name, time_step_sampled, False, 100)
         
         binding_events_lists.append (count_binding_events_list)
         std_mean_residence_times = np.std(mean_residence_list)
@@ -172,8 +167,8 @@ for E_aa in E_aa_values:
         if len(unique_idx) != len(index_tfs):
             raise ValueError("Error: the index of TFS are not unique")
         
-        plt.figure(figsize=(12, 8))
-        plt.scatter(index_tfs, stdv_each_tf, color='r', label=f'TF Index {i}', s=100)  # s=100 increases marker size
+
+        plt.scatter(index_tfs, stdv_each_tf, color='r', label=f'TF Index {i}', s=5) 
         plt.xlim(min(index_tfs), max(index_tfs))
         
         plt.xlabel('Index of TF')
@@ -187,11 +182,10 @@ for E_aa in E_aa_values:
         plt.savefig(plot_filename)
         
         plt.show()
-        plt.close() 
+        plt.close()
         
-        plt.figure(figsize=(12, 8)) 
-        
-        plt.scatter(index_tfs, mean_each_tf, color='r', label=f'TF Index {i}')
+
+        plt.scatter(index_tfs, mean_each_tf, color='r', label=f'TF Index {i}', s=5)
         plt.xlim(min(index_tfs), max(index_tfs))
         plt.xlabel('Index of TF')
         plt.ylabel('Mean of Residence Times')
@@ -208,9 +202,9 @@ for E_aa in E_aa_values:
         plt.show()
         plt.close() 
         
-        histogram_title = f'Histogram of distribution of binding events Eaa {E_aa} Ead {E_ad}'
+        histogram_title_be = f'Histogram of distribution of binding events Eaa {E_aa} Ead {E_ad}'
         saving_histogram_name = f'nA_{nA}_n_{N}_histogram_binding_events_Eaa_{E_aa}_Ead_{E_ad}.png'
-        functions_MC_simulation_both.plot_histogram(count_binding_events_list, histogram_title, legend, subfolder_path, saving_histogram_name, time_step_sampled )
+        functions_MC_simulation_both.plot_histogram(count_binding_events_list, histogram_title_be, legend, subfolder_path, saving_histogram_name, time_step_sampled )
         
                 
         # stdv = np.std(nA_bound_snapshots[no_change_time:])
@@ -221,10 +215,10 @@ for E_aa in E_aa_values:
         # mean_no_changes.append(mean)
         # stdv_no_changes.append(stdv)
     
-        histogram_title = f'Cluster histogram Eaa {E_aa} Ead {E_ad}'
+        histogram_title_cluster = f'Cluster histogram Eaa {E_aa} Ead {E_ad}'
         saving_histogram_name = f'nA_{nA}_n_{N}_cluster_histogram_Eaa_{E_aa}_Ead_{E_ad}.png'
         
-        functions_MC_simulation_both.plot_histogram(all_group_sizes_histogram, histogram_title, legend, subfolder_path, saving_histogram_name, time_step_sampled, True )
+        functions_MC_simulation_both.plot_histogram(all_group_sizes_histogram, histogram_title_cluster, legend, subfolder_path, saving_histogram_name, time_step_sampled, True )
         
       
            
@@ -301,14 +295,14 @@ for E_aa in E_aa_values:
     # plt.savefig(plot_filename)
     # plt.show()
     
-    plt.figure(figsize=(8, 6))
-    plt.scatter(max_residence_times, mean_cluster_sizes, color='r')
-    plt.xlabel('Max residence times')
-    plt.ylabel('Mean Cluster Size')
-    plt.title('Mean Cluster Size vs Max Cluster size')
-    plt.ylim(min (mean_cluster_sizes), max(mean_cluster_sizes))  
-    plt.grid(True)
-    plt.show()
+    # plt.figure(figsize=(8, 6))
+    # plt.scatter(max_residence_times, mean_cluster_sizes, color='r')
+    # plt.xlabel('Max residence times')
+    # plt.ylabel('Mean Cluster Size')
+    # plt.title('Mean Cluster Size vs Max Cluster size')
+    # plt.ylim(min (mean_cluster_sizes), max(mean_cluster_sizes))  
+    # plt.grid(True)
+    # plt.show()
     
     
     # plt.figure(figsize=(8, 6))
