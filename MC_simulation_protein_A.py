@@ -17,7 +17,7 @@ import functions_MC_simulation_both
 
 
 alfa = 0.15 #ratio between nA/N 
-N = 6000 #total number of binding sites in the DNA
+N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
@@ -245,7 +245,7 @@ for E_aa in E_aa_values:
     plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_bound_in_time_Eaa_{E_aa}_Ead_{E_ad}.png')
     plt.savefig(plot_filename)
     plt.show()
-    
+    plt.close()
     
     plt.figure(figsize=(8, 6))
     cmap = plt.get_cmap('viridis')
@@ -273,6 +273,7 @@ for E_aa in E_aa_values:
     plt.savefig(plot_filename)
 
     plt.show()
+    plt.close()
     
     # cmap = plt.get_cmap('viridis')
     # plt.figure(figsize=(8, 6))
