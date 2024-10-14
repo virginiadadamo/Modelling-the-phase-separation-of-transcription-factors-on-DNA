@@ -11,8 +11,7 @@ import cluster_class
 
 def create_folders (folder_name, alfa): 
 
-    subfolder_name = 'System_size_analysis'
-    #subfolder_name = f'alfa_{alfa}'
+    subfolder_name = f'alfa_{alfa}'
     subfolder_path = os.path.join(folder_name, subfolder_name)
     os.makedirs(subfolder_path, exist_ok=True)
     return subfolder_path

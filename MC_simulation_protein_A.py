@@ -41,6 +41,7 @@ E_aa_values = [0, 2.5]
 #CREATING FOLDERS 
 folder_name = 'Simulations_protein_A'
 subfolder_path = functions_MC_simulation_both.create_folders(folder_name, alfa)
+print (subfolder_path)
 functions_MC_simulation_both.create_txt_parameters(subfolder_path, alfa, stop_time, ignoring_steps)
 
 legend = f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}'
@@ -149,7 +150,7 @@ for E_aa in E_aa_values:
                 mean_residence_list.append (times_variables[i]['Mean residence time'] )
         
         histogram_title_mean = f'Histogram of distribution of mean residence times Eaa {E_aa} Ead {E_ad}'
-        saving_histogram_name = f'nA_{nA}_n_{N}_histogram_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}.png'
+        saving_histogram_name = f'nA_{nA}_n_{N}_histo_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}.png'
         functions_MC_simulation_both.plot_histogram(mean_residence_list, histogram_title_mean, legend, subfolder_path, saving_histogram_name, time_step_sampled, False, 100)
         
         binding_events_lists.append (count_binding_events_list)
@@ -178,7 +179,7 @@ for E_aa in E_aa_values:
         plt.text(0.95, 0.05, legend, 
                  horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
         
-        plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_stdv_rt_tf__Eaa_{E_aa}_Ead_{E_ad}.png')
+        plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_stdv_res_times_tf__Eaa_{E_aa}_Ead_{E_ad}.png')
         plt.savefig(plot_filename)
         
         plt.show()
@@ -196,14 +197,14 @@ for E_aa in E_aa_values:
         
         
         
-        plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_mean_rt_tf__Eaa_{E_aa}_Ead_{E_ad}.png')
+        plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_mean_res_times_tf__Eaa_{E_aa}_Ead_{E_ad}.png')
         plt.savefig(plot_filename)
         
         plt.show()
         plt.close() 
         
         histogram_title_be = f'Histogram of distribution of binding events Eaa {E_aa} Ead {E_ad}'
-        saving_histogram_name = f'nA_{nA}_n_{N}_histogram_binding_events_Eaa_{E_aa}_Ead_{E_ad}.png'
+        saving_histogram_name = f'nA_{nA}_n_{N}_histo_binding_events_Eaa_{E_aa}_Ead_{E_ad}.png'
         functions_MC_simulation_both.plot_histogram(count_binding_events_list, histogram_title_be, legend, subfolder_path, saving_histogram_name, time_step_sampled )
         
                 
@@ -216,7 +217,7 @@ for E_aa in E_aa_values:
         # stdv_no_changes.append(stdv)
     
         histogram_title_cluster = f'Cluster histogram Eaa {E_aa} Ead {E_ad}'
-        saving_histogram_name = f'nA_{nA}_n_{N}_cluster_histogram_Eaa_{E_aa}_Ead_{E_ad}.png'
+        saving_histogram_name = f'nA_{nA}_n_{N}_cluster_histo_Eaa_{E_aa}_Ead_{E_ad}.png'
         
         functions_MC_simulation_both.plot_histogram(all_group_sizes_histogram, histogram_title_cluster, legend, subfolder_path, saving_histogram_name, time_step_sampled, True )
         
@@ -269,7 +270,7 @@ for E_aa in E_aa_values:
     plt.ylabel('Frequency')
     plt.legend()
     
-    plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_combined_histogram_binding_events.png')
+    plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_combined_histo_binding_events.png')
     plt.savefig(plot_filename)
 
     plt.show()
