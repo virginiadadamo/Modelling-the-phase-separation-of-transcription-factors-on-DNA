@@ -25,7 +25,7 @@ nB = 0 #number of Bs
 k = 0 #number of B interacting sites with A  
 
 #TIME PARAMETERS
-stop_time = 100000#2000000
+stop_time = 2000000
 ignoring_steps = 10000
 m = 50
 no_change_time = 500 #time from which I start computing mean and standard deviation #ricorda che in verità lo calcoli SAMPLING TIME 2000
