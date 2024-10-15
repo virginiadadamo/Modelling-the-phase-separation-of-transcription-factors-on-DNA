@@ -61,6 +61,8 @@ for E_aa in E_aa_values:
     mean_residence_times = []
     max_residence_times = []
     binding_events_lists = []
+    stdv_list = []
+    mean_residence_list_for_different_E_aa = []
     
     for E_ad in E_ad_values:
         
@@ -149,13 +151,15 @@ for E_aa in E_aa_values:
                 count_residence_time = count_residence_time +1
                 mean_residence_list.append (times_variables[i]['Mean residence time'] )
         
+        mean_residence_list_for_different_E_aa.append(mean_residence_list)
+        
         histogram_title_mean = f'Histogram of distribution of mean residence times Eaa {E_aa} Ead {E_ad}'
         saving_histogram_name = f'nA_{nA}_n_{N}_histo_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}.png'
         functions_MC_simulation_both.plot_histogram(mean_residence_list, histogram_title_mean, legend, subfolder_path, saving_histogram_name, time_step_sampled, False, 100)
         
         binding_events_lists.append (count_binding_events_list)
         std_mean_residence_times = np.std(mean_residence_list)
-        std_devs_for_different_E_aa.append(std_mean_residence_times)
+        stdv_list.append(std_mean_residence_times)
         max_residence_time = np.max([times_variables[i]['Max residence time'] for i in range(nA)])
         
         mean_residence_times.append(mean_residence_time/ count_residence_time)
@@ -222,8 +226,7 @@ for E_aa in E_aa_values:
         functions_MC_simulation_both.plot_histogram(all_group_sizes_histogram, histogram_title_cluster, legend, subfolder_path, saving_histogram_name, time_step_sampled, True )
         
       
-           
-    
+    std_devs_for_different_E_aa.append(stdv_list)       
     residence_times_for_different_E_aa.append (mean_residence_times)
     
     cmap = plt.get_cmap('viridis')
@@ -275,6 +278,35 @@ for E_aa in E_aa_values:
 
     plt.show()
     plt.close()
+    
+    
+    plt.figure(figsize=(8, 6))
+    cmap = plt.get_cmap('viridis')
+
+    
+    # for i, (mean_residence_time_list, E_ad) in enumerate(zip(mean_residence_list_for_different_E_aa, E_ad_values)):
+
+    #     bin_width = 1
+    #     bin_edges = np.arange(min(mean_residence_time_list), max(mean_residence_time_list) + bin_width, bin_width)
+    #     counts, bins = np.histogram(mean_residence_time_list, bins=bin_edges)
+        
+    #     color = cmap(i/len(E_ad_values))  
+    
+    #     plt.stairs(counts, bins, fill=True, color=color, label=f'E_aa={E_aa}, E_ad={E_ad}')
+    
+    # plt.title('Histogram of Distribution of Mean residence time for Different E_aa and E_ad')
+    # plt.text(0.95, 0.05, legend, 
+    #          horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+    
+    # plt.xlabel('Binding Events')
+    # plt.ylabel('Frequency')
+    # plt.legend()
+    
+    # plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_combined_histo_residence_times.png')
+    # plt.savefig(plot_filename)
+
+    # plt.show()
+    # plt.close()
     
     # cmap = plt.get_cmap('viridis')
     # plt.figure(figsize=(8, 6))
@@ -358,6 +390,9 @@ for i, (mean_residence_times, E_aa) in enumerate(zip(residence_times_for_differe
     print ('Log value of mean residence times: ', np.log(mean_residence_times) )
     plt.plot(E_ad_values, np.log(mean_residence_times), 
              label=f'E_aa={E_aa}', color=color, marker='o')
+    
+    for x, y in zip(E_ad_values,  np.log(mean_residence_times)):
+        plt.text(x, y, f'{y:.3f}', fontsize=8, ha='left', va='bottom', color=color)
 
 plt.xlabel('E ad values')
 plt.ylabel('Log (Mean Residence Time)')
@@ -368,7 +403,67 @@ plt.text(0.5, 0.95, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm=
 
 plt.legend()
 
-plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_log_mean_residence_time_Eaa_{E_aa_values[0]}_Ead_{E_ad_values[0]}.png')
+plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_log_mean_residence_time.png')
+plt.savefig(plot_filename)
+
+plt.show()
+
+
+print (std_devs_for_different_E_aa)
+cmap = plt.get_cmap('viridis')
+plt.figure(figsize=(8, 6))
+
+for i, (stdv_res_times, E_aa) in enumerate(zip(std_devs_for_different_E_aa, E_aa_values)):
+
+    color = cmap(i / len(E_aa_values))
+    
+    plt.plot(E_ad_values, stdv_res_times, 
+             label=f'E_aa={E_aa}', color=color, marker='o')
+    
+    for x, y in zip(E_ad_values, stdv_res_times):
+        plt.text(x, y, f'{y:.3f}', fontsize=8, ha='left', va='bottom', color=color)
+    
+ 
+
+plt.xlabel('E ad values')
+plt.ylabel('Stdv residence times')
+plt.title('Mean standard deviation of residence times vs. E ad values')
+
+
+plt.text(0.5, 0.95, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
+         horizontalalignment='center', verticalalignment='top', transform=plt.gca().transAxes)
+
+plt.legend()
+plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_mean_stdv_residence_times.png')
+plt.savefig(plot_filename)
+
+plt.show()
+
+
+ratio_mean_stdv = [[mean / stdv for mean, stdv in zip(res_times, std_devs)]
+                   for res_times, std_devs in zip(residence_times_for_different_E_aa, std_devs_for_different_E_aa)]
+
+
+for i, (ratio, E_aa) in enumerate(zip(ratio_mean_stdv, E_aa_values)):
+
+    color = cmap(i / len(E_aa_values))
+    
+    plt.plot(E_ad_values, ratio, 
+             label=f'E_aa={E_aa}', color=color, marker='o')
+    
+    for x, y in zip(E_ad_values, ratio):
+        plt.text(x, y, f'{y:.3f}', fontsize=8, ha='left', va='bottom', color=color)  #f'{y:.3f}' converts the value of y into a string with exactly two digits after the decimal point.
+
+plt.xlabel('E ad values')
+plt.ylabel('Mean/standard devation')
+plt.title('Ratio Mean and standard devation of residence times vs. E ad values')
+
+
+plt.text(0.5, 0.95, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
+         horizontalalignment='center', verticalalignment='top', transform=plt.gca().transAxes)
+
+plt.legend()
+plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_ratio_mean_stdv_residence_times.png')
 plt.savefig(plot_filename)
 
 plt.show()
