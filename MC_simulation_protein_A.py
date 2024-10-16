@@ -125,7 +125,7 @@ for E_aa in E_aa_values:
                 time_step_sampled.append(time_step)
                 average_cluster_sizes.append(np.mean (group_sizes))
         
-        
+        print (E_ad)
         
 #         count_never_unbind = np.count_nonzero(residence_times)
 #         times_never_unbind =  [x for x in residence_times if x != 0]
