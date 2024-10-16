@@ -98,6 +98,9 @@ for E_aa in E_aa_values:
         
         while time_step < stop_time:
             
+            
+            if time_step % 10000 == 0:
+                print (time_step)
                             
             time_step, list_DNA, list_A, list_empty_DNA, times_variables = functions_MC_simulation_protein_A.step_MC(time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa, residence_times, times_variables)
             
