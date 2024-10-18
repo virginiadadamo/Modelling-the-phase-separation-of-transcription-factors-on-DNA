@@ -17,7 +17,7 @@ import functions_MC_simulation_both
 
 
 alfa = 0.15 #ratio between nA/N 
-N = 6000#10000 #total number of binding sites in the DNA
+N = 6000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
@@ -99,8 +99,6 @@ for E_aa in E_aa_values:
         while time_step < stop_time:
             
             
-            if time_step % 10 == 0:
-                print (time_step)
                             
             time_step, list_DNA, list_A, list_empty_DNA, times_variables = functions_MC_simulation_protein_A.step_MC(time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa, residence_times, times_variables)
             
@@ -110,7 +108,7 @@ for E_aa in E_aa_values:
             if nA_bound_DNA != nA_bound_list_A:
                 raise ValueError(f"Error: nA_bound_DNA ({nA_bound_DNA}) and nA_bound ({nA_bound_list_A}) are not equal")
             
-            if time_step > ignoring_steps:
+            if time_step > ignoring_steps: #<=
                 
                 rate_counter = rate_counter + 1
                 
@@ -128,346 +126,345 @@ for E_aa in E_aa_values:
                 time_step_sampled.append(time_step)
                 average_cluster_sizes.append(np.mean (group_sizes))
         
-        print (E_ad)
+       
         
-#         count_never_unbind = np.count_nonzero(residence_times)
-#         times_never_unbind =  [x for x in residence_times if x != 0]
+        count_never_unbind = np.count_nonzero(residence_times)
+        times_never_unbind =  [x for x in residence_times if x != 0]
         
-#         mean_residence_time = 0
-#         count_residence_time= 0 
-#         mean_residence_list = [] 
-#         count_binding_events_list = []
+        mean_residence_time = 0
+        count_residence_time= 0 
+        mean_residence_list = [] 
+        count_binding_events_list = []
         
         
-#         for i in range (nA):
-#             count_binding_events_list.append (times_variables[i]['Count binding events'])
-#             if len (times_variables[i]['Residence times']) != 0: 
-#                 times_variables[i]['Mean residence time'] = np.mean (times_variables[i]['Residence times'])
-#                 mean_each_tf.append(times_variables[i]['Mean residence time'])
-#                 times_variables[i]['Standard deviation'] = np.std (times_variables[i]['Residence times'])
-#                 stdv_each_tf.append (times_variables[i]['Standard deviation'])
-#                 times_variables[i]['Max residence time'] = np.max (times_variables[i]['Residence times'])
+        for i in range (nA):
+            count_binding_events_list.append (times_variables[i]['Count binding events'])
+            if len (times_variables[i]['Residence times']) != 0: 
+                times_variables[i]['Mean residence time'] = np.mean (times_variables[i]['Residence times'])
+                mean_each_tf.append(times_variables[i]['Mean residence time'])
+                times_variables[i]['Standard deviation'] = np.std (times_variables[i]['Residence times'])
+                stdv_each_tf.append (times_variables[i]['Standard deviation'])
+                times_variables[i]['Max residence time'] = np.max (times_variables[i]['Residence times'])
                 
-#                 index_tfs.append (times_variables[i]['Index of Transcription Factor'])
-#             if times_variables[i]['Mean residence time'] != 0 :
-#                 mean_residence_time += times_variables[i]['Mean residence time'] 
-#                 count_residence_time = count_residence_time +1
-#                 mean_residence_list.append (times_variables[i]['Mean residence time'] )
+                index_tfs.append (times_variables[i]['Index of Transcription Factor'])
+            if times_variables[i]['Mean residence time'] != 0 :
+                mean_residence_time += times_variables[i]['Mean residence time'] 
+                count_residence_time = count_residence_time +1
+                mean_residence_list.append (times_variables[i]['Mean residence time'] )
         
-#         mean_residence_list_for_different_E_aa.append(mean_residence_list)
+        mean_residence_list_for_different_E_aa.append(mean_residence_list)
         
-#         histogram_title_mean = f'Histogram of distribution of mean residence times Eaa {E_aa} Ead {E_ad}'
-#         saving_histogram_name = f'nA_{nA}_n_{N}_histo_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}.png'
-#         functions_MC_simulation_both.plot_histogram(mean_residence_list, histogram_title_mean, legend, subfolder_path, saving_histogram_name, time_step_sampled, False, 100)
+        histogram_title_mean = f'Histogram of distribution of mean residence times Eaa {E_aa} Ead {E_ad}'
+        saving_histogram_name = f'nA_{nA}_n_{N}_histo_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}.png'
+        functions_MC_simulation_both.plot_histogram(mean_residence_list, histogram_title_mean, legend, subfolder_path, saving_histogram_name, time_step_sampled, False, 100)
         
-#         binding_events_lists.append (count_binding_events_list)
-#         std_mean_residence_times = np.std(mean_residence_list)
-#         stdv_list.append(std_mean_residence_times)
-#         max_residence_time = np.max([times_variables[i]['Max residence time'] for i in range(nA)])
+        binding_events_lists.append (count_binding_events_list)
+        std_mean_residence_times = np.std(mean_residence_list)
+        stdv_list.append(std_mean_residence_times)
+        max_residence_time = np.max([times_variables[i]['Max residence time'] for i in range(nA)])
         
-#         mean_residence_times.append(mean_residence_time/ count_residence_time)
-#         max_residence_times.append (max_residence_time)
-#         nA_bound_for_different_energies.append(nA_bound_snapshots)
-#         mean_cluster_sizes.append(np.mean(mean_cluster_sizes_over_time)) #taking the mean of custer sizes for each energy value
-#         mean_max_cluster_sizes.append(np.mean(max_cluster_sizes)) #taking the mean of maximum sized cluster for each energy value 
+        mean_residence_times.append(mean_residence_time/ count_residence_time)
+        max_residence_times.append (max_residence_time)
+        nA_bound_for_different_energies.append(nA_bound_snapshots)
+        mean_cluster_sizes.append(np.mean(mean_cluster_sizes_over_time)) #taking the mean of custer sizes for each energy value
+        mean_max_cluster_sizes.append(np.mean(max_cluster_sizes)) #taking the mean of maximum sized cluster for each energy value 
         
-#         unique_idx = np.unique(index_tfs)
-#         if len(unique_idx) != len(index_tfs):
-#             raise ValueError("Error: the index of TFS are not unique")
+        unique_idx = np.unique(index_tfs)
+        if len(unique_idx) != len(index_tfs):
+            raise ValueError("Error: the index of TFS are not unique")
         
 
-#         plt.scatter(index_tfs, stdv_each_tf, color='r', label=f'TF Index {i}', s=5) 
-#         plt.xlim(min(index_tfs), max(index_tfs))
+        plt.scatter(index_tfs, stdv_each_tf, color='r', label=f'TF Index {i}', s=5) 
+        plt.xlim(min(index_tfs), max(index_tfs))
         
-#         plt.xlabel('Index of TF')
-#         plt.ylabel('Standard Deviation of Residence Times')
-#         plt.title(f'Standard deviation of Residence times for different TFs (E_aa={E_aa}, E_ad={E_ad})')
+        plt.xlabel('Index of TF')
+        plt.ylabel('Standard Deviation of Residence Times')
+        plt.title(f'Standard deviation of Residence times for different TFs (E_aa={E_aa}, E_ad={E_ad})')
         
-#         plt.text(0.95, 0.05, legend, 
-#                  horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+        plt.text(0.95, 0.05, legend, 
+                  horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
         
-#         plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_stdv_res_times_tf__Eaa_{E_aa}_Ead_{E_ad}.png')
-#         plt.savefig(plot_filename)
+        plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_stdv_res_times_tf__Eaa_{E_aa}_Ead_{E_ad}.png')
+        plt.savefig(plot_filename)
         
-#         plt.show()
-#         plt.close()
+        plt.show()
+        plt.close()
         
 
-#         plt.scatter(index_tfs, mean_each_tf, color='r', label=f'TF Index {i}', s=5)
-#         plt.xlim(min(index_tfs), max(index_tfs))
-#         plt.xlabel('Index of TF')
-#         plt.ylabel('Mean of Residence Times')
-#         plt.title(f'Mean of Residence times for different TFs (E_aa={E_aa}, E_ad={E_ad})')
+        plt.scatter(index_tfs, mean_each_tf, color='r', label=f'TF Index {i}', s=5)
+        plt.xlim(min(index_tfs), max(index_tfs))
+        plt.xlabel('Index of TF')
+        plt.ylabel('Mean of Residence Times')
+        plt.title(f'Mean of Residence times for different TFs (E_aa={E_aa}, E_ad={E_ad})')
         
-#         plt.text(0.95, 0.05, legend, 
-#                  horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+        plt.text(0.95, 0.05, legend, 
+                  horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
         
         
         
-#         plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_mean_res_times_tf__Eaa_{E_aa}_Ead_{E_ad}.png')
-#         plt.savefig(plot_filename)
+        plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_mean_res_times_tf__Eaa_{E_aa}_Ead_{E_ad}.png')
+        plt.savefig(plot_filename)
         
-#         plt.show()
-#         plt.close() 
+        plt.show()
+        plt.close() 
         
-#         histogram_title_be = f'Histogram of distribution of binding events Eaa {E_aa} Ead {E_ad}'
-#         saving_histogram_name = f'nA_{nA}_n_{N}_histo_binding_events_Eaa_{E_aa}_Ead_{E_ad}.png'
-#         functions_MC_simulation_both.plot_histogram(count_binding_events_list, histogram_title_be, legend, subfolder_path, saving_histogram_name, time_step_sampled )
+        histogram_title_be = f'Histogram of distribution of binding events Eaa {E_aa} Ead {E_ad}'
+        saving_histogram_name = f'nA_{nA}_n_{N}_histo_binding_events_Eaa_{E_aa}_Ead_{E_ad}.png'
+        functions_MC_simulation_both.plot_histogram(count_binding_events_list, histogram_title_be, legend, subfolder_path, saving_histogram_name, time_step_sampled )
         
                 
-#         # stdv = np.std(nA_bound_snapshots[no_change_time:])
-#         # mean = np.mean(nA_bound_snapshots[no_change_time:])
-#         # print ((f'Standard deviation, when there are no more visible changes for Eaa {E_aa} and Ead {E_ad} is ', stdv))
-#         # print ((f'Mean, when there are no more visible changes for Eaa {E_aa} and Ead {E_ad} is ', mean))
+        # stdv = np.std(nA_bound_snapshots[no_change_time:])
+        # mean = np.mean(nA_bound_snapshots[no_change_time:])
+        # print ((f'Standard deviation, when there are no more visible changes for Eaa {E_aa} and Ead {E_ad} is ', stdv))
+        # print ((f'Mean, when there are no more visible changes for Eaa {E_aa} and Ead {E_ad} is ', mean))
         
-#         # mean_no_changes.append(mean)
-#         # stdv_no_changes.append(stdv)
+        # mean_no_changes.append(mean)
+        # stdv_no_changes.append(stdv)
     
-#         histogram_title_cluster = f'Cluster histogram Eaa {E_aa} Ead {E_ad}'
-#         saving_histogram_name = f'nA_{nA}_n_{N}_cluster_histo_Eaa_{E_aa}_Ead_{E_ad}.png'
+        histogram_title_cluster = f'Cluster histogram Eaa {E_aa} Ead {E_ad}'
+        saving_histogram_name = f'nA_{nA}_n_{N}_cluster_histo_Eaa_{E_aa}_Ead_{E_ad}.png'
         
-#         functions_MC_simulation_both.plot_histogram(all_group_sizes_histogram, histogram_title_cluster, legend, subfolder_path, saving_histogram_name, time_step_sampled, True )
+        functions_MC_simulation_both.plot_histogram(all_group_sizes_histogram, histogram_title_cluster, legend, subfolder_path, saving_histogram_name, time_step_sampled, True )
         
       
-#     std_devs_for_different_E_aa.append(stdv_list)       
-#     residence_times_for_different_E_aa.append (mean_residence_times)
+    std_devs_for_different_E_aa.append(stdv_list)       
+    residence_times_for_different_E_aa.append (mean_residence_times)
     
-#     cmap = plt.get_cmap('viridis')
-#     plt.figure(figsize=(8, 6))
+    cmap = plt.get_cmap('viridis')
+    plt.figure(figsize=(8, 6))
     
-#     for i, (nA_bound_snapshots, E_ad) in enumerate(zip(nA_bound_for_different_energies, E_ad_values)):
+    for i, (nA_bound_snapshots, E_ad) in enumerate(zip(nA_bound_for_different_energies, E_ad_values)):
     
-#         color = cmap(i / len(E_ad_values))
-#         plt.plot(time_step_sampled, nA_bound_snapshots, label=f'E_ad={E_ad}', color=color, marker='o')
-    
-    
+        color = cmap(i / len(E_ad_values))
+        plt.plot(time_step_sampled, nA_bound_snapshots, label=f'E_ad={E_ad}', color=color, marker='o')
     
     
-#     plt.xlabel('Time Steps')
-#     plt.ylabel('Number of A bound to DNA')
-#     plt.title(f'Number of A bound to DNA vs. Time Steps (E_aa={E_aa})')
-#     plt.text(0.95, 0.05, legend, 
-#               horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
-#     plt.legend()
-#     plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_bound_in_time_Eaa_{E_aa}_Ead_{E_ad}.png')
-#     plt.savefig(plot_filename)
-#     plt.show()
-#     plt.close()
     
-#     plt.figure(figsize=(8, 6))
-#     cmap = plt.get_cmap('viridis')
+    
+    plt.xlabel('Time Steps')
+    plt.ylabel('Number of A bound to DNA')
+    plt.title(f'Number of A bound to DNA vs. Time Steps (E_aa={E_aa})')
+    plt.text(0.95, 0.05, legend, 
+              horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+    plt.legend()
+    plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_bound_in_time_Eaa_{E_aa}_Ead_{E_ad}.png')
+    plt.savefig(plot_filename)
+    plt.show()
+    plt.close()
+    
+    plt.figure(figsize=(8, 6))
+    cmap = plt.get_cmap('viridis')
 
     
-#     for i, (count_binding_events_list, E_ad) in enumerate(zip(binding_events_lists, E_ad_values)):
+    for i, (count_binding_events_list, E_ad) in enumerate(zip(binding_events_lists, E_ad_values)):
 
-#         bin_width = 1
-#         bin_edges = np.arange(min(count_binding_events_list), max(count_binding_events_list) + bin_width, bin_width)
-#         counts, bins = np.histogram(count_binding_events_list, bins=bin_edges)
+        bin_width = 1
+        bin_edges = np.arange(min(count_binding_events_list), max(count_binding_events_list) + bin_width, bin_width)
+        counts, bins = np.histogram(count_binding_events_list, bins=bin_edges)
         
-#         color = cmap(i/len(E_ad_values))  
+        color = cmap(i/len(E_ad_values))  
     
-#         plt.stairs(counts, bins, fill=True, color=color, label=f'E_aa={E_aa}, E_ad={E_ad}')
+        plt.stairs(counts, bins, fill=True, color=color, label=f'E_aa={E_aa}, E_ad={E_ad}')
     
-#     plt.title('Histogram of Distribution of Binding Events for Different E_aa and E_ad')
-#     plt.text(0.95, 0.05, legend, 
-#              horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+    plt.title('Histogram of Distribution of Binding Events for Different E_aa and E_ad')
+    plt.text(0.95, 0.05, legend, 
+              horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
     
-#     plt.xlabel('Binding Events')
-#     plt.ylabel('Frequency')
-#     plt.legend()
+    plt.xlabel('Binding Events')
+    plt.ylabel('Frequency')
+    plt.legend()
     
-#     plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_combined_histo_binding_events.png')
-#     plt.savefig(plot_filename)
+    plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_combined_histo_binding_events.png')
+    plt.savefig(plot_filename)
 
-#     plt.show()
-#     plt.close()
+    plt.show()
+    plt.close()
     
     
-#     plt.figure(figsize=(8, 6))
-#     cmap = plt.get_cmap('viridis')
+    plt.figure(figsize=(8, 6))
+    cmap = plt.get_cmap('viridis')
 
     
-#     # for i, (mean_residence_time_list, E_ad) in enumerate(zip(mean_residence_list_for_different_E_aa, E_ad_values)):
+    for i, (mean_residence_time_list, E_ad) in enumerate(zip(mean_residence_list_for_different_E_aa, E_ad_values)):
 
-#     #     bin_width = 1
-#     #     bin_edges = np.arange(min(mean_residence_time_list), max(mean_residence_time_list) + bin_width, bin_width)
-#     #     counts, bins = np.histogram(mean_residence_time_list, bins=bin_edges)
+        bin_width = 1
+        bin_edges = np.arange(min(mean_residence_time_list), max(mean_residence_time_list) + bin_width, bin_width)
+        counts, bins = np.histogram(mean_residence_time_list, bins=bin_edges)
         
-#     #     color = cmap(i/len(E_ad_values))  
+        color = cmap(i/len(E_ad_values))  
     
-#     #     plt.stairs(counts, bins, fill=True, color=color, label=f'E_aa={E_aa}, E_ad={E_ad}')
+        plt.stairs(counts, bins, fill=True, color=color, label=f'E_aa={E_aa}, E_ad={E_ad}')
     
-#     # plt.title('Histogram of Distribution of Mean residence time for Different E_aa and E_ad')
-#     # plt.text(0.95, 0.05, legend, 
-#     #          horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+    plt.title('Histogram of Distribution of Mean residence time for Different E_aa and E_ad')
+    plt.text(0.95, 0.05, legend, 
+              horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
     
-#     # plt.xlabel('Binding Events')
-#     # plt.ylabel('Frequency')
-#     # plt.legend()
+    plt.xlabel('Binding Events')
+    plt.ylabel('Frequency')
+    plt.legend()
     
-#     # plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_combined_histo_residence_times.png')
-#     # plt.savefig(plot_filename)
+    plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_combined_histo_residence_times.png')
+    plt.savefig(plot_filename)
 
-#     # plt.show()
-#     # plt.close()
+    plt.show()
+    plt.close()
     
-#     # cmap = plt.get_cmap('viridis')
-#     # plt.figure(figsize=(8, 6))
+    # cmap = plt.get_cmap('viridis')
+    # plt.figure(figsize=(8, 6))
     
-#     # for i, (nA_bound_snapshots, E_ad) in enumerate(zip(nA_bound_for_different_energies, E_ad_values)):
+    # for i, (nA_bound_snapshots, E_ad) in enumerate(zip(nA_bound_for_different_energies, E_ad_values)):
         
-#     #     inverse_nA =  [1 / nA for nA in nA_bound_snapshots]
-#     #     inverse_time = [1 / time for time in time_step_sampled ]
+    #     inverse_nA =  [1 / nA for nA in nA_bound_snapshots]
+    #     inverse_time = [1 / time for time in time_step_sampled ]
     
-#     #     color = cmap(i / len(E_ad_values))
-#     #     plt.plot(inverse_time, inverse_nA, label=f'E_ad={E_ad}', color=color, marker='o') 
+    #     color = cmap(i / len(E_ad_values))
+    #     plt.plot(inverse_time, inverse_nA, label=f'E_ad={E_ad}', color=color, marker='o') 
         
-#     # plt.xlabel('Inverse Time Steps')
-#     # plt.ylabel('Inverse Number of A bound to DNA')
-#     # plt.title(f'Lineweaver–Burk plot (E_aa={E_aa})')
-#     # plt.text(0.95, 0.05, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
-#     #           horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
-#     # plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_bound_in_time_Eaa_{E_aa}_Ead_{E_ad}.png')
-#     # plt.legend()
-#     # plt.savefig(plot_filename)
-#     # plt.show()
+    # plt.xlabel('Inverse Time Steps')
+    # plt.ylabel('Inverse Number of A bound to DNA')
+    # plt.title(f'Lineweaver–Burk plot (E_aa={E_aa})')
+    # plt.text(0.95, 0.05, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
+    #           horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+    # plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_bound_in_time_Eaa_{E_aa}_Ead_{E_ad}.png')
+    # plt.legend()
+    # plt.savefig(plot_filename)
+    # plt.show()
     
-#     # plt.figure(figsize=(8, 6))
-#     # plt.scatter(max_residence_times, mean_cluster_sizes, color='r')
-#     # plt.xlabel('Max residence times')
-#     # plt.ylabel('Mean Cluster Size')
-#     # plt.title('Mean Cluster Size vs Max Cluster size')
-#     # plt.ylim(min (mean_cluster_sizes), max(mean_cluster_sizes))  
-#     # plt.grid(True)
-#     # plt.show()
-    
-    
-#     # plt.figure(figsize=(8, 6))
-#     # plt.plot(E_ad_values, mean_cluster_sizes, color='r')
-#     # plt.xlabel('E_ad')
-#     # plt.ylabel('Mean Cluster Size')
-#     # plt.title('Mean Cluster Size vs. E_ad for E_aa = {E_aa}')
-#     # plt.ylim(0, max(mean_cluster_sizes))  # Set y-axis limits from 0 to max value
-#     # plt.grid(True)
-#     # plt.show()
+    # plt.figure(figsize=(8, 6))
+    # plt.scatter(max_residence_times, mean_cluster_sizes, color='r')
+    # plt.xlabel('Max residence times')
+    # plt.ylabel('Mean Cluster Size')
+    # plt.title('Mean Cluster Size vs Max Cluster size')
+    # plt.ylim(min (mean_cluster_sizes), max(mean_cluster_sizes))  
+    # plt.grid(True)
+    # plt.show()
     
     
-#     # plt.figure(figsize=(8, 6))
-#     # plt.plot(E_ad_values, mean_max_cluster_sizes, marker='o', color='r')
-#     # plt.xlabel('E_ad')
-#     # plt.ylabel('Mean Max Cluster Size')
-#     # plt.title('Mean Max Cluster Size vs. E_ad for E_aa = {E_aa}')
-#     # plt.ylim(0, max(mean_max_cluster_sizes))  # Set y-axis limits from 0 to max value
-#     # plt.grid(True)
-#     # plt.show()
+    # plt.figure(figsize=(8, 6))
+    # plt.plot(E_ad_values, mean_cluster_sizes, color='r')
+    # plt.xlabel('E_ad')
+    # plt.ylabel('Mean Cluster Size')
+    # plt.title('Mean Cluster Size vs. E_ad for E_aa = {E_aa}')
+    # plt.ylim(0, max(mean_cluster_sizes))  # Set y-axis limits from 0 to max value
+    # plt.grid(True)
+    # plt.show()
+    
+    
+    # plt.figure(figsize=(8, 6))
+    # plt.plot(E_ad_values, mean_max_cluster_sizes, marker='o', color='r')
+    # plt.xlabel('E_ad')
+    # plt.ylabel('Mean Max Cluster Size')
+    # plt.title('Mean Max Cluster Size vs. E_ad for E_aa = {E_aa}')
+    # plt.ylim(0, max(mean_max_cluster_sizes))  # Set y-axis limits from 0 to max value
+    # plt.grid(True)
+    # plt.show()
       
     
-#     # plt.figure(figsize=(8, 6))
-#     # plt.plot(E_ad_values, stdv_no_changes, color='r')
-#     # plt.xlabel('E_ad')
-#     # plt.ylabel('Stdv')
-#     # plt.title(f'Stdv of A bound after time {no_change_time} for E_aa = {E_aa} ')
-#     # plt.ylim(0, max(stdv_no_changes))  # Set y-axis limits from 0 to max value
-#     # plt.grid(True)
-#     # plt.show()
+    # plt.figure(figsize=(8, 6))
+    # plt.plot(E_ad_values, stdv_no_changes, color='r')
+    # plt.xlabel('E_ad')
+    # plt.ylabel('Stdv')
+    # plt.title(f'Stdv of A bound after time {no_change_time} for E_aa = {E_aa} ')
+    # plt.ylim(0, max(stdv_no_changes))  # Set y-axis limits from 0 to max value
+    # plt.grid(True)
+    # plt.show()
     
     
-#     # plt.figure(figsize=(8, 6))
-#     # plt.plot(E_ad_values, mean_no_changes, color='r')
-#     # plt.xlabel('E_ad')
-#     # plt.ylabel('Mean')
-#     # plt.title(f'Mean of A bound after time {no_change_time} for E_aa = {E_aa} ')
-#     # plt.ylim(0, max(mean_no_changes))  # Set y-axis limits from 0 to max value
-#     # plt.grid(True)
-#     # plt.show() 
+    # plt.figure(figsize=(8, 6))
+    # plt.plot(E_ad_values, mean_no_changes, color='r')
+    # plt.xlabel('E_ad')
+    # plt.ylabel('Mean')
+    # plt.title(f'Mean of A bound after time {no_change_time} for E_aa = {E_aa} ')
+    # plt.ylim(0, max(mean_no_changes))  # Set y-axis limits from 0 to max value
+    # plt.grid(True)
+    # plt.show() 
     
            
     
 
-# cmap = plt.get_cmap('viridis')
-# plt.figure(figsize=(8, 6))
+cmap = plt.get_cmap('viridis')
+plt.figure(figsize=(8, 6))
 
-# for i, (mean_residence_times, E_aa) in enumerate(zip(residence_times_for_different_E_aa, E_aa_values)):
+for i, (mean_residence_times, E_aa) in enumerate(zip(residence_times_for_different_E_aa, E_aa_values)):
 
-#     color = cmap(i / len(E_aa_values))
-#     print ('Log value of mean residence times: ', np.log(mean_residence_times) )
-#     plt.plot(E_ad_values, np.log(mean_residence_times), 
-#              label=f'E_aa={E_aa}', color=color, marker='o')
+    color = cmap(i / len(E_aa_values))
+    print ('Log value of mean residence times: ', np.log(mean_residence_times) )
+    plt.plot(E_ad_values, np.log(mean_residence_times), 
+              label=f'E_aa={E_aa}', color=color, marker='o')
     
-#     for x, y in zip(E_ad_values,  np.log(mean_residence_times)):
-#         plt.text(x, y, f'{y:.3f}', fontsize=8, ha='left', va='bottom', color=color)
+    for x, y in zip(E_ad_values,  np.log(mean_residence_times)):
+        plt.text(x, y, f'{y:.3f}', fontsize=8, ha='left', va='bottom', color=color)
 
-# plt.xlabel('E ad values')
-# plt.ylabel('Log (Mean Residence Time)')
-# plt.title('Log Mean Residence Time vs. E ad values')
+plt.xlabel('E ad values')
+plt.ylabel('Log (Mean Residence Time)')
+plt.title('Log Mean Residence Time vs. E ad values')
 
-# plt.text(0.5, 0.95, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
-#          horizontalalignment='center', verticalalignment='top', transform=plt.gca().transAxes)
+plt.text(0.5, 0.95, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
+          horizontalalignment='center', verticalalignment='top', transform=plt.gca().transAxes)
 
-# plt.legend()
+plt.legend()
 
-# plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_log_mean_residence_time.png')
-# plt.savefig(plot_filename)
+plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_log_mean_residence_time.png')
+plt.savefig(plot_filename)
 
-# plt.show()
+plt.show()
 
 
-# print (std_devs_for_different_E_aa)
-# cmap = plt.get_cmap('viridis')
-# plt.figure(figsize=(8, 6))
+print (std_devs_for_different_E_aa)
+cmap = plt.get_cmap('viridis')
+plt.figure(figsize=(8, 6))
 
-# for i, (stdv_res_times, E_aa) in enumerate(zip(std_devs_for_different_E_aa, E_aa_values)):
+for i, (stdv_res_times, E_aa) in enumerate(zip(std_devs_for_different_E_aa, E_aa_values)):
 
-#     color = cmap(i / len(E_aa_values))
+    color = cmap(i / len(E_aa_values))
     
-#     plt.plot(E_ad_values, stdv_res_times, 
-#              label=f'E_aa={E_aa}', color=color, marker='o')
+    plt.plot(E_ad_values, stdv_res_times, 
+              label=f'E_aa={E_aa}', color=color, marker='o')
     
-#     for x, y in zip(E_ad_values, stdv_res_times):
-#         plt.text(x, y, f'{y:.3f}', fontsize=8, ha='left', va='bottom', color=color)
+    for x, y in zip(E_ad_values, stdv_res_times):
+        plt.text(x, y, f'{y:.3f}', fontsize=8, ha='left', va='bottom', color=color)
     
  
 
-# plt.xlabel('E ad values')
-# plt.ylabel('Stdv residence times')
-# plt.title('Mean standard deviation of residence times vs. E ad values')
+plt.xlabel('E ad values')
+plt.ylabel('Stdv residence times')
+plt.title('Mean standard deviation of residence times vs. E ad values')
 
 
-# plt.text(0.5, 0.95, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
-#          horizontalalignment='center', verticalalignment='top', transform=plt.gca().transAxes)
+plt.text(0.5, 0.95, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
+          horizontalalignment='center', verticalalignment='top', transform=plt.gca().transAxes)
 
-# plt.legend()
-# plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_mean_stdv_residence_times.png')
-# plt.savefig(plot_filename)
+plt.legend()
+plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_mean_stdv_residence_times.png')
+plt.savefig(plot_filename)
 
-# plt.show()
-
-
-# ratio_mean_stdv = [[mean / stdv for mean, stdv in zip(res_times, std_devs)]
-#                    for res_times, std_devs in zip(residence_times_for_different_E_aa, std_devs_for_different_E_aa)]
+plt.show()
 
 
-# for i, (ratio, E_aa) in enumerate(zip(ratio_mean_stdv, E_aa_values)):
+ratio_mean_stdv = [[mean / stdv for mean, stdv in zip(res_times, std_devs)]
+                    for res_times, std_devs in zip(residence_times_for_different_E_aa, std_devs_for_different_E_aa)]
 
-#     color = cmap(i / len(E_aa_values))
+
+for i, (ratio, E_aa) in enumerate(zip(ratio_mean_stdv, E_aa_values)):
+
+    color = cmap(i / len(E_aa_values))
     
-#     plt.plot(E_ad_values, ratio, 
-#              label=f'E_aa={E_aa}', color=color, marker='o')
+    plt.plot(E_ad_values, ratio, 
+              label=f'E_aa={E_aa}', color=color, marker='o')
     
-#     for x, y in zip(E_ad_values, ratio):
-#         plt.text(x, y, f'{y:.3f}', fontsize=8, ha='left', va='bottom', color=color)  #f'{y:.3f}' converts the value of y into a string with exactly two digits after the decimal point.
+    for x, y in zip(E_ad_values, ratio):
+        plt.text(x, y, f'{y:.3f}', fontsize=8, ha='left', va='bottom', color=color)  #f'{y:.3f}' converts the value of y into a string with exactly two digits after the decimal point.
 
-# plt.xlabel('E ad values')
-# plt.ylabel('Mean/standard devation')
-# plt.title('Ratio Mean and standard devation of residence times vs. E ad values')
+plt.xlabel('E ad values')
+plt.ylabel('Mean/standard devation')
+plt.title('Ratio Mean and standard devation of residence times vs. E ad values')
 
 
-# plt.text(0.5, 0.95, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
-#          horizontalalignment='center', verticalalignment='top', transform=plt.gca().transAxes)
+plt.text(0.5, 0.95, f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\n{N}', 
+          horizontalalignment='center', verticalalignment='top', transform=plt.gca().transAxes)
 
-# plt.legend()
-# plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_ratio_mean_stdv_residence_times.png')
-# plt.savefig(plot_filename)
+plt.legend()
+plot_filename = os.path.join(subfolder_path, f'nA_{nA}_n_{N}_ratio_mean_stdv_residence_times.png')
+plt.savefig(plot_filename)
 
-# plt.show()
-print ('done')
+plt.show()
