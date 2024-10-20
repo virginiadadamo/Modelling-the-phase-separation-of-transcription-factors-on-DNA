@@ -9,6 +9,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cluster_class
 
+###FUNCTIONS CREATE FOLDERS AND TXT FILES ###
+
 def create_folders (folder_name, alfa): 
 
     subfolder_name = f'alfa_{alfa}'
@@ -25,6 +27,9 @@ def create_txt_parameters (subfolder_path, alfa, stop_time, ignoring_steps):
         f.write(f"alfa = {alfa}  # Ratio between nA and N\n")
         f.write(f"stop_time = {stop_time}  # Simulation stop time\n")
         f.write(f"ignoring_steps = {ignoring_steps}  # Steps to ignore\n")
+        
+
+### SAMPLING FUNCTIONS ###
 
 def count_consecutive_ones(DNA_list, return_only_nA= True):
     '''
@@ -78,6 +83,36 @@ def count_consecutive_ones(DNA_list, return_only_nA= True):
     else:
         return group_sizes, max_count, clusters, sum (group_sizes)
     
+def count_A (list_A):
+    return len([x for x in list_A if x != (-1)])
+
+
+def take_sample (list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, average_cluster_sizes,max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled):
+    
+    return_only_nA= False #we want to take samples of all the variables
+    
+    group_sizes, max_count, clusters, nA_bound = count_consecutive_ones(list_DNA, return_only_nA)
+    if not group_sizes: #if the group_sizes is empty 
+        group_sizes = [0]
+    nA_bound_snapshots.append(nA_bound)
+    group_sizes_snapshots.append(group_sizes)
+    all_group_sizes_histogram = all_group_sizes_histogram + group_sizes
+    
+    average_cluster_sizes.append(np.mean(group_sizes))
+    max_cluster_sizes.append(max_count)
+    clusters_each_time_sampled.append(clusters)
+    rate_counter =1 #everytime take a sample put the counter back to one 
+    
+    # print(f"Group sizes: {group_sizes}") 
+    # print(f"Max count: {max_count}") 
+    # print(f"Position of the first member of each cluster: {positions_first_clusters}") 
+    
+    return  group_sizes, max_count, nA_bound_snapshots, group_sizes_snapshots, average_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled    
+    
+    
+    
+### PLOTS FUNCTIONS ###
+    
 
 def plot_histogram (list_to_plot, title, legend, subfolder_path, x_label, y_label, name_to_save, time_step_sampled, mean = False, bin_width = 1): 
     
@@ -112,7 +147,7 @@ def scatter_plot (x,y, legend, subfolder_path, x_label, y_label, title, saving_n
     plt.scatter(x, y, color='r', s=5) 
     plt.xlim(min(x), max(x))
     
-    mean_y = np.mean(y)
+    #mean_y = np.mean(y)
     
     plt.xlabel(x_label)
     plt.ylabel(y_label)
@@ -236,32 +271,3 @@ def plot_figure (x,y,xlabel,ylabel,title,subfolder_path,saving_name) :
     plt.close()
 
     
-def count_A (list_A):
-    return len([x for x in list_A if x != (-1)])
-
-
-def take_sample (list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, average_cluster_sizes,max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled):
-    
-    return_only_nA= False #we want to take samples of all the variables
-    
-    group_sizes, max_count, clusters, nA_bound = count_consecutive_ones(list_DNA, return_only_nA)
-    if not group_sizes: #if the group_sizes is empty 
-        group_sizes = [0]
-    nA_bound_snapshots.append(nA_bound)
-    group_sizes_snapshots.append(group_sizes)
-    all_group_sizes_histogram = all_group_sizes_histogram + group_sizes
-    
-    average_cluster_sizes.append(np.mean(group_sizes))
-    max_cluster_sizes.append(max_count)
-    clusters_each_time_sampled.append(clusters)
-    rate_counter =1 #everytime take a sample put the counter back to one 
-    
-    # print(f"Group sizes: {group_sizes}") 
-    # print(f"Max count: {max_count}") 
-    # print(f"Position of the first member of each cluster: {positions_first_clusters}") 
-    
-    
-    
-    
-   
-    return  group_sizes, max_count, nA_bound_snapshots, group_sizes_snapshots, average_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled

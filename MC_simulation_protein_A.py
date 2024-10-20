@@ -14,13 +14,14 @@ import functions_MC_simulation_both
 ASSUMPTIONS:
     -For the residence times: Difference between unbinding and binding event of the transcription factor. If a TF binds but never
     unbinds the residence time will not be computed. These trasncription factors will be ignored when computing the mean residence times over all transcription factors 
+    -If an A is free and there is an empty site of DNA, protein A will always find that site 
 
 '''
 
 ###PARAMETERS###
 
 alfa = 0.15 #ratio between nA/N 
-N = 10000 #total number of binding sites in the DNA
+N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
@@ -28,7 +29,7 @@ nB = 0 #number of Bs
 k = 0 #number of B interacting sites with A  
 
 #Time parameters
-stop_time = 2000000
+stop_time = 1000000
 ignoring_steps = 10000
 m = 50
 
@@ -124,7 +125,7 @@ for E_aa in E_aa_values:
         clusters_each_time_sampled = [] #List containing the cluster objects at each time sampled 
         
         #Transcription factors parameters 
-        list_A = [-1]*nA #List representing the transcription factors: -1 for unbound 1 for bound 
+        list_A = [-1]*nA #List representing the transcription factors: -1 for unbound, will store the position of the site on the DNA when bound 
         nA_bound_list_A = 0 #As that are bound in the list of A- will be used to check that the number of transcription factors bound in the list of transcription factors is the same as the number of bound transcription factors in the DNA
         nA_bound_snapshots = [] # To store the number of A bound for each time step
         
