@@ -8,7 +8,7 @@ Created on Tue Aug  6 15:56:31 2024
 import numpy as np
 import time 
 import random
-import functions_MC_simulation_both
+
 
 def step_MC (time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa, residence_times, times_variables):
     

@@ -79,7 +79,7 @@ def count_consecutive_ones(DNA_list, return_only_nA= True):
         return group_sizes, max_count, clusters, sum (group_sizes)
     
 
-def plot_histogram (list_to_plot, title, legend, subfolder_path, name_to_save, time_step_sampled, mean = False, bin_width = 1): 
+def plot_histogram (list_to_plot, title, legend, subfolder_path, x_label, y_label, name_to_save, time_step_sampled, mean = False, bin_width = 1): 
     
     max_value = max(list_to_plot)
     min_value = min(list_to_plot)
@@ -88,27 +88,159 @@ def plot_histogram (list_to_plot, title, legend, subfolder_path, name_to_save, t
      
     counts, bins = np.histogram(list_to_plot, bins=bin_edges)
     if mean:
-        print(f'Title: {title}')
+        
         if len(time_step_sampled) > 0:
             counts = counts / len(time_step_sampled)
         else:
             print("Warning: time_step_sampled is empty. No mean normalization applied.")
     plt.stairs(counts, bins, fill = True)
     
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
     plt.title (title)
-    plt.text(0.95, 0.05, legend, 
-              horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+    plt.text(1, 1, legend, 
+         horizontalalignment='right', verticalalignment='top', 
+         transform=plt.gca().transAxes)
     
     plot_filename = os.path.join(subfolder_path, name_to_save)
     plt.savefig(plot_filename)
     plt.show()
     plt.close() 
 
+
+def scatter_plot (x,y, legend, subfolder_path, x_label, y_label, title, saving_name):
+    plt.scatter(x, y, color='r', s=5) 
+    plt.xlim(min(x), max(x))
+    
+    mean_y = np.mean(y)
+    
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.title(title)
+    
+    
+    # plt.text(0.05, 0.95, f'Mean of y axis: {mean_y:.2f}', 
+    #          horizontalalignment='left', verticalalignment='top', 
+    #          transform=plt.gca().transAxes, fontsize=10, color='blue')
+    
+    plt.text(1, 1, legend, 
+         horizontalalignment='right', verticalalignment='top', 
+         transform=plt.gca().transAxes)
+    
+    plot_filename = os.path.join(subfolder_path, saving_name )
+    plt.savefig(plot_filename)
+    
+    plt.show()
+    plt.close()
+
+def plot_different_Ead_in_time (element_for_different_energies, E_ad_values, time_step_sampled, xlabel, ylabel,title,legend,subfolder_path,saving_name, inverse = False):
+        
+    cmap = plt.get_cmap('viridis')
+    plt.figure(figsize=(8, 6))
+    
+    for i, (element, E_ad) in enumerate(zip(element_for_different_energies, E_ad_values)):
+        
+        color = cmap(i / len(E_ad_values))
+        
+        if inverse :
+            inverse_element = [1 / item for item in element]
+            inverse_time = [1 / time for time in time_step_sampled ]
+            plt.plot(inverse_time, inverse_element, label=f'E_ad={E_ad}', color=color, marker='o')
+        else:
+            plt.plot(time_step_sampled, element, label=f'E_ad={E_ad}', color=color, marker='o')
+    
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.text(0.95, 0.05, legend, 
+              horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+    plt.legend()
+    plot_filename = os.path.join(subfolder_path,saving_name)
+    plt.savefig(plot_filename)
+    plt.show()
+    plt.close()
+    
+def plot_histogram_distribution_different_E_ad (list_to_plot,E_ad_values, E_aa, xlabel, ylabel,title,legend,subfolder_path,saving_name):
+
+    plt.figure(figsize=(8, 6))
+    cmap = plt.get_cmap('viridis')
+
+    
+    for i, (list_, E_ad) in enumerate(zip(list_to_plot, E_ad_values)):
+
+        bin_width = 1
+        bin_edges = np.arange(min(list_), max(list_) + bin_width, bin_width)
+        counts, bins = np.histogram(list_, bins=bin_edges)
+        
+        color = cmap(i/len(E_ad_values))  
+    
+        plt.stairs(counts, bins, fill=True, color=color, label = f'E_aa={E_aa}, E_ad={E_ad}')
+    
+    plt.title(title)
+    plt.text(0.95, 0.05, legend, 
+              horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+    
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.legend()
+    
+    plot_filename = os.path.join(subfolder_path, saving_name)
+    plt.savefig(plot_filename)
+
+    plt.show()
+    plt.close()
+
+def comparison_plots_different_E_aa(list_to_plot, E_aa_values, E_ad_values, xlabel,ylabel,title,legend,subfolder_path,saving_name):
+    cmap = plt.get_cmap('viridis')
+    plt.figure(figsize=(12,8))
+    
+    for i, (element, E_aa) in enumerate(zip(list_to_plot, E_aa_values)):
+    
+        color = cmap(i / len(E_aa_values))
+        
+        
+        plt.plot(E_ad_values, element, 
+                  label=f'E_aa={E_aa}', color=color, marker='o')
+        
+        for x, y in zip(E_ad_values, element):
+            plt.text(x, y, f'{y:.3f}', fontsize=8, ha='left', va='bottom', color=color)  #f'{y:.3f}' converts the value of y into a string with exactly two digits after the decimal point.
+    
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    
+    
+    
+    plt.text(0.5, 0.95, legend, 
+              horizontalalignment='center', verticalalignment='top', transform=plt.gca().transAxes)
+    
+    plt.legend()
+    plot_filename = os.path.join(subfolder_path, saving_name)
+    plt.savefig(plot_filename)
+    
+    plt.show()
+    plt.close()
+
+def plot_figure (x,y,xlabel,ylabel,title,subfolder_path,saving_name) :
+    
+    plt.figure(figsize=(8, 6))
+    plt.plot(x, y, color='r')
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.ylim(0, max(y))
+    plot_filename = os.path.join(subfolder_path, saving_name)
+    plt.savefig(plot_filename)
+    plt.grid(True)
+    plt.show()
+    plt.close()
+
+    
 def count_A (list_A):
     return len([x for x in list_A if x != (-1)])
 
 
-def take_sample (list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time,max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled):
+def take_sample (list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, average_cluster_sizes,max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled):
     
     return_only_nA= False #we want to take samples of all the variables
     
@@ -119,7 +251,7 @@ def take_sample (list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, me
     group_sizes_snapshots.append(group_sizes)
     all_group_sizes_histogram = all_group_sizes_histogram + group_sizes
     
-    mean_cluster_sizes_over_time.append(np.mean(group_sizes))
+    average_cluster_sizes.append(np.mean(group_sizes))
     max_cluster_sizes.append(max_count)
     clusters_each_time_sampled.append(clusters)
     rate_counter =1 #everytime take a sample put the counter back to one 
@@ -132,4 +264,4 @@ def take_sample (list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, me
     
     
    
-    return  group_sizes, max_count, nA_bound_snapshots, group_sizes_snapshots, mean_cluster_sizes_over_time, max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled
+    return  group_sizes, max_count, nA_bound_snapshots, group_sizes_snapshots, average_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled
