@@ -20,7 +20,7 @@ ASSUMPTIONS:
 ###PARAMETERS###
 
 alfa = 0.15 #ratio between nA/N 
-N = 10000#6000 #total number of binding sites in the DNA
+N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
@@ -28,9 +28,9 @@ nB = 0 #number of Bs
 k = 0 #number of B interacting sites with A  
 
 #Time parameters
-stop_time = 15000#1000000
-ignoring_steps = 10#10000
-m = 10 #50
+stop_time = 2000000
+ignoring_steps = 10000
+m = 50
 
 if (stop_time - ignoring_steps) % m != 0 :
     raise ValueError(f"Error: m ({m}) is not a divisor of {stop_time - ignoring_steps}")
