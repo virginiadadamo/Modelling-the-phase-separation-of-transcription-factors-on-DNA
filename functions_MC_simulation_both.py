@@ -56,8 +56,8 @@ def count_consecutive_ones(DNA_list, return_only_nA= True):
     #positions_first_clusters = []
     clusters = []
     
-    for i in range(len(DNA_list)):
-        if DNA_list[i] == 1:
+    for i in range(DNA_list.shape[1]):
+        if DNA_list[0,i] == 1:
             if current_count == 0: 
                 #positions_first_clusters.append(i)
                 cluster = cluster_class.Cluster (i)
@@ -84,7 +84,7 @@ def count_consecutive_ones(DNA_list, return_only_nA= True):
         return group_sizes, max_count, clusters, sum (group_sizes)
     
 def count_A (list_A):
-    return len([x for x in list_A if x != (-1)])
+    return len([x for x in list_A[0,:] if x != (-1)])
 
 
 def take_sample (list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, average_cluster_sizes,max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled):
