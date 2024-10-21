@@ -21,7 +21,7 @@ ASSUMPTIONS:
 ###PARAMETERS###
 
 alfa = 0.15 #ratio between nA/N 
-N = 10000 #total number of binding sites in the DNA
+N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
@@ -186,14 +186,13 @@ for E_aa in E_aa_values:
         
         ### PLOTS FOR EACH COMBINATION OF E_AA AND E_AD ###
         
-        y_label_histogram = 'Frequency'
         
         if histogram_mean_residence_time:
             histogram_title_mean = f'Histogram of distribution of mean residence times (E_aa={E_aa}, E_ad={E_ad})'
             saving_histogram_name = f'nA_{nA}_n_{N}_histo_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}.png'
             x_label_histogram_mean = 'Mean Residence Time'
             
-            functions_MC_simulation_both.plot_histogram(mean_each_tf, histogram_title_mean, legend, subfolder_path, x_label_histogram_mean, y_label_histogram, saving_histogram_name, time_step_sampled, False, 100)
+            functions_MC_simulation_both.plot_histogram(mean_each_tf, histogram_title_mean, legend, subfolder_path, x_label_histogram_mean, 'Frequency', saving_histogram_name, time_step_sampled, False, 100)
         
         unique_idx = np.unique(index_tfs)
         
@@ -221,14 +220,14 @@ for E_aa in E_aa_values:
             saving_histogram_name_be = f'nA_{nA}_n_{N}_histo_binding_events_Eaa_{E_aa}_Ead_{E_ad}.png'
             x_label_histogram_be = 'Binding Events'
             
-            functions_MC_simulation_both.plot_histogram(count_binding_events_list, histogram_title_be, legend, subfolder_path,x_label_histogram_be,y_label_histogram, saving_histogram_name_be, time_step_sampled )
+            functions_MC_simulation_both.plot_histogram(count_binding_events_list, histogram_title_be, legend, subfolder_path,x_label_histogram_be,'Frequency', saving_histogram_name_be, time_step_sampled )
         
         if histogram_cluster_size:
             histogram_title_cluster = f'Cluster histogram (Eaa {E_aa}, Ead {E_ad})'
             saving_histogram_name_cluster = f'nA_{nA}_n_{N}_cluster_histo_Eaa_{E_aa}_Ead_{E_ad}.png'
             x_label_histogram_cluster = 'Cluster size'
             
-            functions_MC_simulation_both.plot_histogram(all_group_sizes_histogram, histogram_title_cluster, legend, subfolder_path,x_label_histogram_cluster, y_label_histogram, saving_histogram_name_cluster, time_step_sampled, True )
+            functions_MC_simulation_both.plot_histogram(all_group_sizes_histogram, histogram_title_cluster, legend, subfolder_path,x_label_histogram_cluster, 'Frequency', saving_histogram_name_cluster, time_step_sampled, True )
                     
       
     std_devs_for_different_E_aa.append(std_devs)       

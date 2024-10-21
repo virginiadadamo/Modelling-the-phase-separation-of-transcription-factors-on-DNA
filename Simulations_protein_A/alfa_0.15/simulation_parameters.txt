@@ -434,3 +434,11 @@ ignoring_steps = 10  # Steps to ignore
 alfa = 0.15  # Ratio between nA and N
 stop_time = 15000  # Simulation stop time
 ignoring_steps = 10  # Steps to ignore
+# Simulation Parameters
+alfa = 0.15  # Ratio between nA and N
+stop_time = 1000000  # Simulation stop time
+ignoring_steps = 10000  # Steps to ignore
+# Simulation Parameters
+alfa = 0.15  # Ratio between nA and N
+stop_time = 50000  # Simulation stop time
+ignoring_steps = 1000  # Steps to ignore
