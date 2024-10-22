@@ -139,7 +139,7 @@ def plot_histogram (list_to_plot, title, legend, subfolder_path, x_label, y_labe
     
     plot_filename = os.path.join(subfolder_path, name_to_save)
     plt.savefig(plot_filename)
-    plt.show()
+    plt.clf()
     plt.close() 
 
 
@@ -165,7 +165,7 @@ def scatter_plot (x,y, legend, subfolder_path, x_label, y_label, title, saving_n
     plot_filename = os.path.join(subfolder_path, saving_name )
     plt.savefig(plot_filename)
     
-    plt.show()
+    plt.clf()
     plt.close()
 
 def plot_different_Ead_in_time (element_for_different_energies, E_ad_values, time_step_sampled, xlabel, ylabel,title,legend,subfolder_path,saving_name, inverse = False):
@@ -192,7 +192,7 @@ def plot_different_Ead_in_time (element_for_different_energies, E_ad_values, tim
     plt.legend()
     plot_filename = os.path.join(subfolder_path,saving_name)
     plt.savefig(plot_filename)
-    plt.show()
+    plt.clf()
     plt.close()
     
 def plot_histogram_distribution_different_E_ad (list_to_plot,E_ad_values, E_aa, xlabel, ylabel,title,legend,subfolder_path,saving_name):
@@ -222,7 +222,7 @@ def plot_histogram_distribution_different_E_ad (list_to_plot,E_ad_values, E_aa, 
     plot_filename = os.path.join(subfolder_path, saving_name)
     plt.savefig(plot_filename)
 
-    plt.show()
+    plt.clf()
     plt.close()
 
 def comparison_plots_different_E_aa(list_to_plot, E_aa_values, E_ad_values, xlabel,ylabel,title,legend,subfolder_path,saving_name):
@@ -253,7 +253,7 @@ def comparison_plots_different_E_aa(list_to_plot, E_aa_values, E_ad_values, xlab
     plot_filename = os.path.join(subfolder_path, saving_name)
     plt.savefig(plot_filename)
     
-    plt.show()
+    plt.clf()
     plt.close()
 
 def plot_figure (x,y,xlabel,ylabel,title,subfolder_path,saving_name) :
@@ -267,7 +267,7 @@ def plot_figure (x,y,xlabel,ylabel,title,subfolder_path,saving_name) :
     plot_filename = os.path.join(subfolder_path, saving_name)
     plt.savefig(plot_filename)
     plt.grid(True)
-    plt.show()
+    plt.clf()
     plt.close()
 
     
