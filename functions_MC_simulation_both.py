@@ -87,27 +87,28 @@ def count_A (list_A):
     return len([x for x in list_A[0,:] if x != (-1)])
 
 
-def take_sample (list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, average_cluster_sizes,max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled):
+def take_sample (time_step,list_DNA, list_A, nA_bound_snapshots, average_cluster_sizes,max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled):
     
     return_only_nA= False #we want to take samples of all the variables
     
     group_sizes, max_count, clusters, nA_bound = count_consecutive_ones(list_DNA, return_only_nA)
     if not group_sizes: #if the group_sizes is empty 
         group_sizes = [0]
-    nA_bound_snapshots.append(nA_bound)
-    group_sizes_snapshots.append(group_sizes)
+    nA_bound_snapshots[0,number_previously_sampled] = nA_bound
+    #group_sizes_snapshots.append(group_sizes)
     all_group_sizes_histogram = all_group_sizes_histogram + group_sizes
     
-    average_cluster_sizes.append(np.mean(group_sizes))
-    max_cluster_sizes.append(max_count)
-    clusters_each_time_sampled.append(clusters)
-    rate_counter =1 #everytime take a sample put the counter back to one 
+    average_cluster_sizes[0,number_previously_sampled] = np.mean(group_sizes)
+    max_cluster_sizes[0,number_previously_sampled] =max_count
+    #clusters_each_time_sampled.append(clusters)
+    rate_counter =0 #everytime take a sample put the counter back to zero
     
     # print(f"Group sizes: {group_sizes}") 
     # print(f"Max count: {max_count}") 
     # print(f"Position of the first member of each cluster: {positions_first_clusters}") 
-    
-    return  group_sizes, max_count, nA_bound_snapshots, group_sizes_snapshots, average_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled    
+    time_step_sampled[0,number_previously_sampled] = time_step
+    number_previously_sampled = number_previously_sampled +1 
+    return  group_sizes, max_count, nA_bound_snapshots, average_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram , number_previously_sampled, time_step_sampled    
     
     
     
@@ -172,17 +173,23 @@ def plot_different_Ead_in_time (element_for_different_energies, E_ad_values, tim
         
     cmap = plt.get_cmap('viridis')
     plt.figure(figsize=(8, 6))
-    
+    #print(len (element_for_different_energies))
+    #print(len (element_for_different_energies[0]))
+    time_step_sampled = time_step_sampled.flatten()
     for i, (element, E_ad) in enumerate(zip(element_for_different_energies, E_ad_values)):
         
         color = cmap(i / len(E_ad_values))
+        element = element.flatten()
+        
         
         if inverse :
-            inverse_element = [1 / item for item in element]
-            inverse_time = [1 / time for time in time_step_sampled ]
+            inverse_element = 1 / element
+            inverse_time = 1 / time_step_sampled 
             plt.plot(inverse_time, inverse_element, label=f'E_ad={E_ad}', color=color, marker='o')
+            
         else:
             plt.plot(time_step_sampled, element, label=f'E_ad={E_ad}', color=color, marker='o')
+        
     
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)

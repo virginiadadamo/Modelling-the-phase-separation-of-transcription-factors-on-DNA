@@ -10,15 +10,15 @@ import random
 
 
 def add_A (list_DNA, empty_random_site, list_A , random_A, residence_times, list_empty_DNA, times_variables ):
-    list_DNA [empty_random_site] = 1  #always add because it lowers the energy 
-    list_A [random_A] = empty_random_site 
-    residence_times[random_A] = time_step
+    list_DNA [0,empty_random_site] = 1  #always add because it lowers the energy 
+    list_A [0,random_A] = empty_random_site 
+    residence_times[0,random_A] = time_step
     list_empty_DNA.remove (empty_random_site)
     times_variables[random_A]['Count binding events'] += 1
     
 def remove_A (list_DNA, empty_random_site, list_A , random_A, residence_times, times_variables ):
-    if list_A [random_A] != (-1):  #if A is not free 
-        if list_DNA [list_A [random_A]] == 1 : #only A is bound to the DNA
+    if list_A [0,random_A] != (-1):  #if A is not free 
+        if list_DNA [0,list_A [0,random_A]] == 1 : #only A is bound to the DNA
 
             random_binding = np.random.random()  #draw a random number between 0 and 1
             energy = energy_function (list_A [random_A], list_DNA, E_ad, E_aa)
@@ -26,7 +26,7 @@ def remove_A (list_DNA, empty_random_site, list_A , random_A, residence_times, t
             if random_binding < 1/np.exp(energy):
                 remove_A_not_bound_B()
                 
-        if list_DNA [list_A [random_A]] == 2 : # B protein is also bound 
+        if list_DNA [0, list_A [0,random_A]] == 2 : # B protein is also bound 
             #Energy condition 
             remove_A_bound_B ()
         

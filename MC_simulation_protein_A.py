@@ -21,7 +21,7 @@ ASSUMPTIONS:
 ###PARAMETERS###
 
 alfa = 0.15 #ratio between nA/N 
-N = 10000#10000 #total number of binding sites in the DNA
+N = 6000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
@@ -33,8 +33,12 @@ stop_time = 2000000
 ignoring_steps = 10000
 m = 50
 
+number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
+print ((stop_time - ignoring_steps) /m)
 if (stop_time - ignoring_steps) % m != 0 :
     raise ValueError(f"Error: m ({m}) is not a divisor of {stop_time - ignoring_steps}")
+    
+number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m) 
 
 #Energy parameters 
 
@@ -95,7 +99,9 @@ for E_aa in E_aa_values:
         ### PARAMETERS FOR THE INITIAL STATE###
         #Time parameters 
         time_step = 0 #initial time step
-        time_step_sampled = [] #To store the time steps that are being sampled
+        number_previously_sampled = 0
+        time_step_sampled = np.zeros((1,number_of_time_steps_sampled))
+        #time_step_sampled = [] #To store the time steps that are being sampled
         rate_counter = 0 #To count the steps after the first sampled one
         residence_times = np.zeros((1,nA)) # To store for each transcription the residence times and binding events. It is initialised at 0, if a binding event occurs the time of binding will be store. If an unbinding event then happens the time stored will be used to compute the Residence time and the value will be put to 0 again
         times_variables = [{'Index of Transcription Factor': i, 
@@ -105,10 +111,11 @@ for E_aa in E_aa_values:
                         'Max residence time' : 0,
                         'Count binding events': 0} for i in range (nA)] #Dictionary to store for each Transcription factors the time variables indicated 
         
+        #index_tfs = np.zeros((1,nA)) # To store the indexes of the Transcription factor with a least one Residence Time
         index_tfs = [] # To store the indexes of the Transcription factor with a least one Residence Time
-        stdv_each_tf = [] # To store for each transcription factor the Standard Deviation of Residence Times 
-        mean_each_tf = [] # To store for each transcription factor the Mean Residence time 
-        count_binding_events_list = [] #To store for each transcription factor the number of Binding Events
+        stdv_each_tf = [] # np.zeros((1,nA)) #[] # To store for each transcription factor the Standard Deviation of Residence Times 
+        mean_each_tf = [] # np.zeros((1,nA)) # [] # To store for each transcription factor the Mean Residence time 
+        count_binding_events_list = [] # np.zeros((1,nA))#[] #To store for each transcription factor the number of Binding Events
         mean_residence_time = 0 #To compute the mean of the residence times over all transcription factors
         
         #DNA parameters 
@@ -116,17 +123,18 @@ for E_aa in E_aa_values:
         list_empty_DNA  = list(range (0,list_DNA.shape[1],1)) #list containing all the indexes of empty sites in the DNA
         nA_bound_DNA = 0 # number of Transcription factors that are bound to the DNA
         
-        group_sizes_snapshots = [] #To store at each time step the corresponding cluster sizes 
-        average_cluster_sizes = [] #To store the mean of the cluster sizes at each time step
-        max_cluster_sizes = [] #To store at each time step the value of the highest value of cluster size
+        #group_sizes_snapshots = [] #To store at each time step the corresponding cluster sizes 
+        average_cluster_sizes = np.zeros((1,number_of_time_steps_sampled))#[] #To store the mean of the cluster sizes at each time step
+        max_cluster_sizes = np.zeros((1,number_of_time_steps_sampled))#[] #To store at each time step the value of the highest value of cluster size
         all_group_sizes_histogram = [] #union of all the cluster sizes list in one list, that will be used to compute the final histogram of distribution of cluster sizes 
         
-        clusters_each_time_sampled = [] #List containing the cluster objects at each time sampled 
+        #clusters_each_time_sampled = [] #List containing the cluster objects at each time sampled 
         
         #Transcription factors parameters 
         list_A = np.full(nA, -1).reshape(1, nA) #Array representing the transcription factors: -1 for unbound, will store the position of the site on the DNA when bound 
         nA_bound_list_A = 0 #As that are bound in the list of A- will be used to check that the number of transcription factors bound in the list of transcription factors is the same as the number of bound transcription factors in the DNA
-        nA_bound_snapshots = [] # To store the number of A bound for each time step
+        #nA_bound_snapshots = [] # To store the number of A bound for each time step
+        nA_bound_snapshots = np.zeros((1,number_of_time_steps_sampled))
         
         if nB > 0 :
             list_B = np.array ((nB,k))
@@ -150,9 +158,11 @@ for E_aa in E_aa_values:
                 rate_counter = rate_counter + 1
                 
                 if rate_counter == m: #sampling occurs
+                    
+
                 
-                    group_sizes, max_count, nA_bound_snapshots, group_sizes_snapshots, average_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled = functions_MC_simulation_both.take_sample(list_DNA, list_A, nA_bound_snapshots, group_sizes_snapshots, average_cluster_sizes,max_cluster_sizes, rate_counter, all_group_sizes_histogram, clusters_each_time_sampled)
-                    time_step_sampled.append(time_step)
+                    group_sizes, max_count, nA_bound_snapshots, average_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled = functions_MC_simulation_both.take_sample(time_step, list_DNA, list_A, nA_bound_snapshots, average_cluster_sizes,max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled)
+                    
                     
                     
         # count_never_unbind = np.count_nonzero(residence_times)
@@ -186,6 +196,8 @@ for E_aa in E_aa_values:
         max_residence_time = np.max([times_variables[i]['Max residence time'] for i in range(nA)])
         max_residence_times.append (max_residence_time)
         
+        print (nA_bound_snapshots)
+        print (nA_bound_snapshots.shape)
         nA_bound_for_different_energies.append(nA_bound_snapshots) 
         mean_cluster_sizes.append(np.mean(average_cluster_sizes)) #taking the mean of cluster sizes for each energy value
         mean_max_cluster_sizes.append(np.mean(max_cluster_sizes)) #taking the mean of maximum sized cluster for each energy value 
