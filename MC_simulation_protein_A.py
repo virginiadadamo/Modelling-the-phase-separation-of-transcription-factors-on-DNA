@@ -21,7 +21,7 @@ ASSUMPTIONS:
 ###PARAMETERS###
 
 alfa = 0.15 #ratio between nA/N 
-N = 10000#10000 #total number of binding sites in the DNA
+N = 6000#10000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
@@ -97,8 +97,7 @@ for E_aa in E_aa_values:
         time_step = 0 #initial time step
         time_step_sampled = [] #To store the time steps that are being sampled
         rate_counter = 0 #To count the steps after the first sampled one
-        residence_times = np.zeros((1,nA))
-        #residence_times = [0]*nA # To store for each transcription the residence times and binding events. It is initialised at 0, if a binding event occurs the time of binding will be store. If an unbinding event then happens the time stored will be used to compute the Residence time and the value will be put to 0 again
+        residence_times = np.zeros((1,nA)) # To store for each transcription the residence times and binding events. It is initialised at 0, if a binding event occurs the time of binding will be store. If an unbinding event then happens the time stored will be used to compute the Residence time and the value will be put to 0 again
         times_variables = [{'Index of Transcription Factor': i, 
                         'Residence times': [],
                         'Mean residence time' : 0 ,
@@ -113,8 +112,7 @@ for E_aa in E_aa_values:
         mean_residence_time = 0 #To compute the mean of the residence times over all transcription factors
         
         #DNA parameters 
-        list_DNA = np.zeros((1,N)) #List representing the DNA sites: 0 corresponds to an empty site, 1 to a site with an transcription factor bound to it- at the initial state there is no bound A to the DNA 
-        #list_DNA = [0] * N #List representing the DNA sites: 0 corresponds to an empty site, 1 to a site with an transcription factor bound to it- at the initial state there is no bound A to the DNA 
+        list_DNA = np.zeros((1,N)) #Array representing the DNA sites: 0 corresponds to an empty site, 1 to a site with an transcription factor bound to it, 2 if a B is bound - at the initial state there is no bound A nor B to the DNA 
         list_empty_DNA  = list(range (0,list_DNA.shape[1],1)) #list containing all the indexes of empty sites in the DNA
         nA_bound_DNA = 0 # number of Transcription factors that are bound to the DNA
         
@@ -126,10 +124,16 @@ for E_aa in E_aa_values:
         clusters_each_time_sampled = [] #List containing the cluster objects at each time sampled 
         
         #Transcription factors parameters 
-        list_A = np.full(nA, -1).reshape(1, nA) #List representing the transcription factors: -1 for unbound, will store the position of the site on the DNA when bound 
-        #list_A = [-1]*nA #List representing the transcription factors: -1 for unbound, will store the position of the site on the DNA when bound 
+        list_A = np.full(nA, -1).reshape(1, nA) #Array representing the transcription factors: -1 for unbound, will store the position of the site on the DNA when bound 
         nA_bound_list_A = 0 #As that are bound in the list of A- will be used to check that the number of transcription factors bound in the list of transcription factors is the same as the number of bound transcription factors in the DNA
         nA_bound_snapshots = [] # To store the number of A bound for each time step
+        
+        if nB > 0 :
+            list_B = np.array ((nB,k))
+            #do SIMULATION FOR PROTEIN B 
+            
+        
+        
         
         while time_step < stop_time:
                         
