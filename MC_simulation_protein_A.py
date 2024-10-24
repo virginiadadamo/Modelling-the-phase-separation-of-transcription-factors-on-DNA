@@ -21,7 +21,7 @@ ASSUMPTIONS:
 ###PARAMETERS###
 
 alfa = 0.15 #ratio between nA/N 
-N = 10000 #total number of binding sites in the DNA
+N = 6000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
@@ -246,11 +246,11 @@ for E_aa in E_aa_values:
             x_label_histogram_cluster = 'Cluster size'
             
             functions_MC_simulation_both.plot_histogram(all_group_sizes_histogram, histogram_title_cluster, legend, subfolder_path,x_label_histogram_cluster, 'Frequency', saving_histogram_name_cluster, time_step_sampled, True )
-                    
-      
+            del all_group_sizes_histogram       
+       
     std_devs_for_different_E_aa.append(std_devs)       
     mean_residence_times_for_different_E_aa.append (mean_residence_times)
-    
+    del index_tfs,std_devs, mean_residence_times
     ### PLOTS FOR EACH E_AA 
     if plot_nA_bound:
         xlabel_nA_bound_snapshots = 'Time Steps'
