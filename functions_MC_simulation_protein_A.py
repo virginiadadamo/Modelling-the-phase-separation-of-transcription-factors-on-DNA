@@ -68,8 +68,3 @@ def energy_function (index,list_DNA, E_ad, E_aa):
     return energy 
     
 
-
-
-#def correlation_times:
-    
- 
