@@ -87,7 +87,7 @@ def count_A (list_A):
     return len([x for x in list_A[0,:] if x != (-1)])
 
 
-def take_sample (time_step,list_DNA, list_A, nA_bound_snapshots, average_cluster_sizes,max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled):
+def take_sample (time_step,list_DNA, list_A, nA_bound_snapshots, average_cluster_sizes, stdv_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled):
     
     return_only_nA= False #we want to take samples of all the variables
     
@@ -99,6 +99,7 @@ def take_sample (time_step,list_DNA, list_A, nA_bound_snapshots, average_cluster
     all_group_sizes_histogram = all_group_sizes_histogram + group_sizes
     
     average_cluster_sizes[0,number_previously_sampled] = np.mean(group_sizes)
+    stdv_cluster_sizes [0,number_previously_sampled] = np.std(group_sizes)
     max_cluster_sizes[0,number_previously_sampled] =max_count
     #clusters_each_time_sampled.append(clusters)
     rate_counter =0 #everytime take a sample put the counter back to zero
@@ -108,7 +109,7 @@ def take_sample (time_step,list_DNA, list_A, nA_bound_snapshots, average_cluster
     # print(f"Position of the first member of each cluster: {positions_first_clusters}") 
     time_step_sampled[0,number_previously_sampled] = time_step
     number_previously_sampled = number_previously_sampled +1 
-    return  group_sizes, max_count, nA_bound_snapshots, average_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram , number_previously_sampled, time_step_sampled    
+    return  group_sizes, max_count, nA_bound_snapshots, average_cluster_sizes, stdv_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram , number_previously_sampled, time_step_sampled    
     
     
     
@@ -263,10 +264,13 @@ def comparison_plots_different_E_aa(list_to_plot, E_aa_values, E_ad_values, xlab
     plt.clf()
     plt.close()
 
-def plot_figure (x,y,xlabel,ylabel,title,subfolder_path,saving_name) :
+def plot_figure (x,y,xlabel,ylabel,title,subfolder_path,saving_name, stdv = None, yerr = False) :
     
     plt.figure(figsize=(8, 6))
-    plt.plot(x, y, color='r')
+    if yerr :
+        plt.errorbar(x, y, yerr=stdv, fmt='o', capsize=5, linestyle='-', color='b', label='Data with error bars')
+    else: 
+        plt.plot(x, y, color='r')
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)

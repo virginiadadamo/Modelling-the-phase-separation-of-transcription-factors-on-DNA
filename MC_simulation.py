@@ -19,8 +19,6 @@ ASSUMPTIONS:
 '''
 
 
-#mean and stdv cluster size in time 
-
 ###PARAMETERS###
 
 alfa = 0.15 #ratio between nA/N 
@@ -33,6 +31,7 @@ k = 0 #number of B interacting sites with A
 
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True 
+
 #Time parameters
 stop_time = 2000000
 ignoring_steps = 10000
@@ -53,6 +52,7 @@ E_aa_values = [0, 2.5]
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
 
 #For each combination of Eaa and Ead
+plot_cluster_sizes_over_time = True #To plot the mean cluster size at each time step, with error bars with the corresponding standard deviation 
 histogram_mean_residence_time = True # To plot the corresponding distribution of mean residence times of the transcription factors
 scatter_plot_std = True #To plot the standard deviation of the residence times of each transcription factors 
 scatter_plot_mean = True #To plot the mean of the residence times of each transcription factors
@@ -74,7 +74,11 @@ plot_ratio_mean_stdv = True  #Plot for different E_aa the ratio of Mean Residenc
 
 
 ###CREATING FOLDERS###
-folder_name = 'Simulations_protein_A'
+if protein_B :
+    folder_name = 'Simulations_proteins_A_B'
+else:
+    folder_name = 'Simulations_protein_A'
+    
 subfolder_path = general_functions.create_folders(folder_name, alfa)
 general_functions.create_txt_parameters(subfolder_path, alfa, stop_time, ignoring_steps)
 
@@ -130,6 +134,7 @@ for E_aa in E_aa_values:
         
         
         average_cluster_sizes = np.zeros((1,number_of_time_steps_sampled))#[] #To store the mean of the cluster sizes at each time step
+        stdv_cluster_sizes = np.zeros((1,number_of_time_steps_sampled)) #To store the standard deviation of cluster sizes at each time step 
         max_cluster_sizes = np.zeros((1,number_of_time_steps_sampled))#[] #To store at each time step the value of the highest value of cluster size
         all_group_sizes_histogram = [] #union of all the cluster sizes list in one list, that will be used to compute the final histogram of distribution of cluster sizes 
         
@@ -141,15 +146,19 @@ for E_aa in E_aa_values:
         nA_bound_snapshots = np.zeros((1,number_of_time_steps_sampled))
         
         if protein_B:
+            #Add B parameters 
             list_B = np.array ((nB,k))
-            #do SIMULATION FOR PROTEIN B 
+            
             
         
         
         
         while time_step < stop_time:
-                        
-            time_step, list_DNA, list_A, list_empty_DNA, times_variables = steps_MC_simulations.step_MC_protein_A(time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa, residence_times, times_variables)
+            
+            if protein_B:
+                time_step, list_DNA, list_A, list_empty_DNA, times_variables = steps_MC_simulations.step_MC_protein_A_B(time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa, residence_times, times_variables)
+            else:
+                time_step, list_DNA, list_A, list_empty_DNA, times_variables = steps_MC_simulations.step_MC_protein_A(time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa, residence_times, times_variables)
             
             nA_bound_list_A= general_functions.count_A(list_A)
             nA_bound_DNA = general_functions.count_consecutive_ones(list_DNA)
@@ -165,7 +174,7 @@ for E_aa in E_aa_values:
                     
 
                 
-                    group_sizes, max_count, nA_bound_snapshots, average_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled = general_functions.take_sample(time_step, list_DNA, list_A, nA_bound_snapshots, average_cluster_sizes,max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled)
+                    group_sizes, max_count, nA_bound_snapshots, average_cluster_sizes, stdv_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled = general_functions.take_sample(time_step, list_DNA, list_A, nA_bound_snapshots, average_cluster_sizes, stdv_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled)
                     
                     
                     
@@ -207,6 +216,14 @@ for E_aa in E_aa_values:
         mean_max_cluster_sizes.append(np.mean(max_cluster_sizes)) #taking the mean of maximum sized cluster for each energy value 
         
         ### PLOTS FOR EACH COMBINATION OF E_AA AND E_AD ###
+        
+        if plot_cluster_sizes_over_time :
+            plot_cluster_size_title = f'Mean Cluster size over time (E_aa={E_aa}, E_ad={E_ad})'
+            saving_cluster_size_name = f'nA_{nA}_n_{N}_mean_cluster_size_Eaa_{E_aa}_Ead_{E_ad}.png'
+            x_label_plot_cluster_size = 'Time_step'
+            y_label_plot_cluster_size = 'Mean Cluster size'
+             
+            general_functions.plot_figure (time_step_sampled,average_cluster_sizes,x_label_plot_cluster_size,y_label_plot_cluster_size,plot_cluster_size_title,subfolder_path,saving_cluster_size_name, stdv_cluster_sizes, True)
         
         
         if histogram_mean_residence_time:
@@ -255,6 +272,7 @@ for E_aa in E_aa_values:
     std_devs_for_different_E_aa.append(std_devs)       
     mean_residence_times_for_different_E_aa.append (mean_residence_times)
     del index_tfs,std_devs, mean_residence_times
+    
     ### PLOTS FOR EACH E_AA 
     if plot_nA_bound:
         xlabel_nA_bound_snapshots = 'Time Steps'
