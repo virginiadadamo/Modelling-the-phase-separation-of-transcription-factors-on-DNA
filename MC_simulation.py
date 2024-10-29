@@ -22,23 +22,24 @@ ASSUMPTIONS:
 ###PARAMETERS###
 
 alfa = 0.15 #ratio between nA/N 
-N = 10000 #total number of binding sites in the DNA
-nA = int (N*alfa) #number of As
+N = 20 #10000 #total number of binding sites in the DNA
+#nA = int (N*alfa) #number of As
+nA = 5
 
 
-nB = 0 #number of Bs
+nB = 100 #number of Bs
 k = 0 #number of B interacting sites with A  
 
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= True 
+protein_B= False 
 
 #Time parameters
-stop_time = 2000000
-ignoring_steps = 10000
-m = 50
+stop_time = 50#2000000
+ignoring_steps = 0 #10000
+m = 1 #50
 
 number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
-print ((stop_time - ignoring_steps) /m)
+
 if (stop_time - ignoring_steps) % m != 0 :
     raise ValueError(f"Error: m ({m}) is not a divisor of {stop_time - ignoring_steps}")
     
@@ -48,6 +49,8 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
 E_ad_values = np.arange(0, 4, 1)
 E_aa_values = [0, 2.5]
+E_ab = 0
+E_ba = 0
 
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
 
@@ -128,7 +131,7 @@ for E_aa in E_aa_values:
         mean_residence_time = 0 #To compute the mean of the residence times over all transcription factors
         
         #DNA parameters 
-        list_DNA = np.zeros((1,N)) #Array representing the DNA sites: 0 corresponds to an empty site, 1 to a site with an transcription factor bound to it, 2 if a B is bound - at the initial state there is no bound A nor B to the DNA 
+        list_DNA = np.zeros((1,N)) #Array representing the DNA sites: 0 corresponds to an empty site, 1 to a site with an transcription factor bound to it- at the initial state there is no bound A to the DNA 
         list_empty_DNA  = list(range (0,list_DNA.shape[1],1)) #list containing all the indexes of empty sites in the DNA
         nA_bound_DNA = 0 # number of Transcription factors that are bound to the DNA
         
@@ -141,30 +144,28 @@ for E_aa in E_aa_values:
         #clusters_each_time_sampled = [] #List containing the cluster objects at each time sampled 
         
         #Transcription factors parameters 
-        list_A = np.full(nA, -1).reshape(1, nA) #Array representing the transcription factors: -1 for unbound, will store the position of the site on the DNA when bound 
-        nA_bound_list_A = 0 #As that are bound in the list of A- will be used to check that the number of transcription factors bound in the list of transcription factors is the same as the number of bound transcription factors in the DNA
+        list_A = np.full((nA, 2), -1) #Array representing the transcription factors: -1 for unbound, will store the position of the site on the DNA when bound. The second column will be -1 if the A is not bound to a B, otherwise will store the index of the B to which it is bound
+        
         nA_bound_snapshots = np.zeros((1,number_of_time_steps_sampled))
+        list_B = np.full((nB, k), -1) #-1 if it's unbound, otherwhise store the A to which it is bound 
+        
         
         if protein_B:
             #Add B parameters 
-            list_B = np.array ((nB,k))
-            
-            
-        
-        
-        
+            p = 0.5 #probability of binding event 
+            L = 10 #distance (in terms of binding sites in the DNA) from one binding site in B protein to the other
         while time_step < stop_time:
             
             if protein_B:
-                time_step, list_DNA, list_A, list_empty_DNA, times_variables = steps_MC_simulations.step_MC_protein_A_B(time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa, residence_times, times_variables)
+                time_step, list_DNA, list_A, list_empty_DNA, times_variables = steps_MC_simulations.step_MC_protein_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, p, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables)
             else:
-                time_step, list_DNA, list_A, list_empty_DNA, times_variables = steps_MC_simulations.step_MC_protein_A(time_step, list_DNA, list_A, list_empty_DNA, E_ad, E_aa, residence_times, times_variables)
+                time_step, list_DNA, list_A, list_empty_DNA, times_variables = steps_MC_simulations.step_MC_protein_A(time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad, E_aa, E_ab, residence_times, times_variables)
             
-            nA_bound_list_A= general_functions.count_A(list_A)
+            
             nA_bound_DNA = general_functions.count_consecutive_ones(list_DNA)
             
-            if nA_bound_DNA != nA_bound_list_A:
-                raise ValueError(f"Error: nA_bound_DNA ({nA_bound_DNA}) and nA_bound ({nA_bound_list_A}) are not equal")
+            print ('Number of A that are currently bound', nA_bound_DNA)
+            
             
             if time_step >= ignoring_steps: 
                 
