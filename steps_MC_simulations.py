@@ -63,17 +63,18 @@ def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L
     
     if random_event < probability_binding_event:  #Adding B event is selected 
         
-        if list_B[random_B,:].any() == -1 :#if there is at least one empty binding site
+        if (list_B[random_B, :] == -1).any() :#if there is at least one empty binding site
              list_DNA, list_A, list_B = events_for_MC_steps.add_B_event( list_DNA, list_A, list_B, random_B, L)
     
     else: #Removing B event is selected 
-        if list_B[random_B,:].any() != -1 : #if there is at least one occupied site 
+        if (list_B[random_B, :] != -1).any(): #if there is at least one occupied site 
+            #print ('Is there a free site ? ', list_B[random_B,:])
     
-            list_A, list_B = events_for_MC_steps.remove_B(list_A, list_B,random_B, E_ba)
+            list_A, list_B = events_for_MC_steps.remove_B_event(list_A, list_B,random_B, E_ba)
     
      
     time_step = time_step + 1
-    return time_step,
+    return time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables
 
 
 

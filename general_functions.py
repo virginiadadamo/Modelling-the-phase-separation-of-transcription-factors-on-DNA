@@ -9,6 +9,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cluster_class
 
+from scipy.stats import norm, expon, gamma  # Import common distributions
+
+
 ###FUNCTIONS CREATE FOLDERS AND TXT FILES ###
 
 def create_folders (folder_name, alfa): 
@@ -116,33 +119,103 @@ def take_sample (time_step,list_DNA, list_A, nA_bound_snapshots, average_cluster
 ### PLOTS FUNCTIONS ###
     
 
-def plot_histogram (list_to_plot, title, legend, subfolder_path, x_label, y_label, name_to_save, time_step_sampled, mean = False, bin_width = 1): 
-    
+def plot_histogram(
+    list_to_plot, title, legend, subfolder_path, x_label, y_label, 
+    name_to_save, time_step_sampled, mean=False, bin_width=1, 
+    fit_distribution=None  
+):
     max_value = max(list_to_plot)
     min_value = min(list_to_plot)
     
-    bin_edges = np.arange(min_value, max_value + bin_width, bin_width)  
-     
+    # Define bins for histogram
+    bin_edges = np.arange(min_value, max_value + bin_width, bin_width)
     counts, bins = np.histogram(list_to_plot, bins=bin_edges)
+    
+    # Normalize if 'mean' is specified
     if mean:
-        
         if len(time_step_sampled) > 0:
             counts = counts / len(time_step_sampled)
         else:
             print("Warning: time_step_sampled is empty. No mean normalization applied.")
-    plt.stairs(counts, bins, fill = True)
     
+    # Plot histogram
+    plt.stairs(counts, bins, fill=True)
+    
+    # Fit and overlay distribution if specified
+    if fit_distribution:
+        x_vals = np.linspace(min_value, max_value, 1000)  # Fine grid for PDF
+        
+        # Fit the specified distribution to data
+        if fit_distribution == 'normal':
+            mu, std = norm.fit(list_to_plot)
+            pdf_vals = norm.pdf(x_vals, mu, std)
+            label = f"Normal Fit: μ={mu:.2f}, σ={std:.2f}"
+        
+        elif fit_distribution == 'exponential':
+            loc, scale = expon.fit(list_to_plot)
+            pdf_vals = expon.pdf(x_vals, loc, scale)
+            label = f"Exponential Fit: λ={1/scale:.2f}"
+        
+        elif fit_distribution == 'gamma':
+            shape, loc, scale = gamma.fit(list_to_plot)
+            pdf_vals = gamma.pdf(x_vals, shape, loc, scale)
+            label = f"Gamma Fit: shape={shape:.2f}, scale={scale:.2f}"
+        
+        else:
+            raise ValueError(f"Unsupported distribution: {fit_distribution}")
+        
+        # Normalize PDF to match histogram scale
+        pdf_vals *= (bin_width * len(list_to_plot) if not mean else bin_width)
+        
+        # Plot PDF
+        plt.plot(x_vals, pdf_vals, label=label, color="red", linewidth=2)
+
+    # Add labels and title
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    plt.title (title)
-    plt.text(1, 1, legend, 
-         horizontalalignment='right', verticalalignment='top', 
-         transform=plt.gca().transAxes)
+    plt.title(title)
+    plt.legend()
     
+    # Add legend text as an annotation
+    plt.text(1, 1, legend, horizontalalignment='left', verticalalignment='top', 
+             transform=plt.gca().transAxes)
+    
+    # Save plot
     plot_filename = os.path.join(subfolder_path, name_to_save)
     plt.savefig(plot_filename)
+    plt.show()
     plt.clf()
-    plt.close() 
+    plt.close()
+
+# def plot_histogram (list_to_plot, title, legend, subfolder_path, x_label, y_label, name_to_save, time_step_sampled, mean = False, bin_width = 1): 
+    
+#     max_value = max(list_to_plot)
+#     min_value = min(list_to_plot)
+    
+#     bin_edges = np.arange(min_value, max_value + bin_width, bin_width)  
+     
+#     counts, bins = np.histogram(list_to_plot, bins=bin_edges)
+#     if mean:
+        
+#         if len(time_step_sampled) > 0:
+#             counts = counts / len(time_step_sampled)
+#             print ('here')
+#         else:
+#             print("Warning: time_step_sampled is empty. No mean normalization applied.")
+#     plt.stairs(counts, bins, fill = True)
+    
+#     plt.xlabel(x_label)
+#     plt.ylabel(y_label)
+#     plt.title (title)
+#     plt.text(1, 1, legend, 
+#          horizontalalignment='right', verticalalignment='top', 
+#          transform=plt.gca().transAxes)
+    
+#     plot_filename = os.path.join(subfolder_path, name_to_save)
+#     plt.savefig(plot_filename)
+#     plt.show()
+#     plt.clf()
+#     plt.close() 
 
 
 def scatter_plot (x,y, legend, subfolder_path, x_label, y_label, title, saving_name):
@@ -167,6 +240,7 @@ def scatter_plot (x,y, legend, subfolder_path, x_label, y_label, title, saving_n
     plot_filename = os.path.join(subfolder_path, saving_name )
     plt.savefig(plot_filename)
     
+    plt.show()
     plt.clf()
     plt.close()
 
@@ -200,6 +274,7 @@ def plot_different_Ead_in_time (element_for_different_energies, E_ad_values, tim
     plt.legend()
     plot_filename = os.path.join(subfolder_path,saving_name)
     plt.savefig(plot_filename)
+    plt.show()
     plt.clf()
     plt.close()
     
@@ -229,7 +304,7 @@ def plot_histogram_distribution_different_E_ad (list_to_plot,E_ad_values, E_aa, 
     
     plot_filename = os.path.join(subfolder_path, saving_name)
     plt.savefig(plot_filename)
-
+    plt.show()
     plt.clf()
     plt.close()
 
@@ -250,6 +325,7 @@ def comparison_plots_different_E_aa(list_to_plot, E_aa_values, E_ad_values, xlab
     
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
+    plt.ylim (0, 20)
     plt.title(title)
     
     
@@ -260,24 +336,27 @@ def comparison_plots_different_E_aa(list_to_plot, E_aa_values, E_ad_values, xlab
     plt.legend()
     plot_filename = os.path.join(subfolder_path, saving_name)
     plt.savefig(plot_filename)
-    
+    plt.show()
     plt.clf()
+    
     plt.close()
 
 def plot_figure (x,y,xlabel,ylabel,title,subfolder_path,saving_name, stdv = None, yerr = False) :
     
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(12, 8))
     if yerr :
+       
         plt.errorbar(x, y, yerr=stdv, fmt='o', capsize=5, linestyle='-', color='b', label='Data with error bars')
+        plt.xscale('log')
     else: 
         plt.plot(x, y, color='r')
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
-    plt.ylim(0, max(y))
     plot_filename = os.path.join(subfolder_path, saving_name)
     plt.savefig(plot_filename)
     plt.grid(True)
+    plt.show()
     plt.clf()
     plt.close()
 

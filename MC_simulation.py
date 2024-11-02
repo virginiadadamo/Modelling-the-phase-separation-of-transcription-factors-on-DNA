@@ -22,21 +22,20 @@ ASSUMPTIONS:
 ###PARAMETERS###
 
 alfa = 0.15 #ratio between nA/N 
-N = 20 #10000 #total number of binding sites in the DNA
-#nA = int (N*alfa) #number of As
-nA = 5
+N = 3000 #10000 #total number of binding sites in the DNA
+nA = int (N*alfa) #number of As
 
 
 nB = 100 #number of Bs
-k = 0 #number of B interacting sites with A  
+k = 2 #number of B interacting sites with A  
 
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= False 
+protein_B= True 
 
 #Time parameters
-stop_time = 50#2000000
-ignoring_steps = 0 #10000
-m = 1 #50
+stop_time = 50000#2000000
+ignoring_steps = 10000
+m = 50
 
 number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
@@ -64,7 +63,7 @@ histogram_cluster_size = True #To plot the distribution of cluster sizes
 
 #For each E_aa
 plot_nA_bound = True #Plot the number of transcription factors bound in time
-plot_inverse = True #Plot the inverse of the number of transcription factors vs the inverse of the corresponding time steps 
+plot_inverse = False #Plot the inverse of the number of transcription factors vs the inverse of the corresponding time steps 
 histogram_binding_events_E_aa = True #Plot the distribution of binding events of the transcription factors for each E_aa
 plot_mean_cluster_size_max_cluster_size = False #Plot Mean Cluster Size vs Max Cluster size
 plot_mean_cluster_size_E_ad = False #Mean Cluster Size vs. E_ad 
@@ -153,18 +152,19 @@ for E_aa in E_aa_values:
         if protein_B:
             #Add B parameters 
             p = 0.5 #probability of binding event 
-            L = 10 #distance (in terms of binding sites in the DNA) from one binding site in B protein to the other
+            L = 1 #distance (in terms of binding sites in the DNA) from one binding site in B protein to the other
+            
         while time_step < stop_time:
             
             if protein_B:
-                time_step, list_DNA, list_A, list_empty_DNA, times_variables = steps_MC_simulations.step_MC_protein_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, p, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables)
+                time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, p, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables)
             else:
                 time_step, list_DNA, list_A, list_empty_DNA, times_variables = steps_MC_simulations.step_MC_protein_A(time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad, E_aa, E_ab, residence_times, times_variables)
             
             
             nA_bound_DNA = general_functions.count_consecutive_ones(list_DNA)
             
-            print ('Number of A that are currently bound', nA_bound_DNA)
+            #print ('Number of A that are currently bound', nA_bound_DNA)
             
             
             if time_step >= ignoring_steps: 
@@ -210,8 +210,7 @@ for E_aa in E_aa_values:
         max_residence_time = np.max([times_variables[i]['Max residence time'] for i in range(nA)])
         max_residence_times.append (max_residence_time)
         
-        print (nA_bound_snapshots)
-        print (nA_bound_snapshots.shape)
+        
         nA_bound_for_different_energies.append(nA_bound_snapshots) 
         mean_cluster_sizes.append(np.mean(average_cluster_sizes)) #taking the mean of cluster sizes for each energy value
         mean_max_cluster_sizes.append(np.mean(max_cluster_sizes)) #taking the mean of maximum sized cluster for each energy value 
@@ -223,8 +222,10 @@ for E_aa in E_aa_values:
             saving_cluster_size_name = f'nA_{nA}_n_{N}_mean_cluster_size_Eaa_{E_aa}_Ead_{E_ad}.png'
             x_label_plot_cluster_size = 'Time_step'
             y_label_plot_cluster_size = 'Mean Cluster size'
-             
-            general_functions.plot_figure (time_step_sampled,average_cluster_sizes,x_label_plot_cluster_size,y_label_plot_cluster_size,plot_cluster_size_title,subfolder_path,saving_cluster_size_name, stdv_cluster_sizes, True)
+            
+            general_functions.plot_figure (time_step_sampled[0],average_cluster_sizes[0],x_label_plot_cluster_size,y_label_plot_cluster_size,plot_cluster_size_title,subfolder_path,saving_cluster_size_name, stdv_cluster_sizes[0], True)
+            
+            
         
         
         if histogram_mean_residence_time:
@@ -232,7 +233,7 @@ for E_aa in E_aa_values:
             saving_histogram_name = f'nA_{nA}_n_{N}_histo_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}.png'
             x_label_histogram_mean = 'Mean Residence Time'
             
-            general_functions.plot_histogram(mean_each_tf, histogram_title_mean, legend, subfolder_path, x_label_histogram_mean, 'Frequency', saving_histogram_name, time_step_sampled, False, 100)
+            general_functions.plot_histogram(mean_each_tf, histogram_title_mean, legend, subfolder_path, x_label_histogram_mean, 'Frequency', saving_histogram_name, time_step_sampled, False, 100, 'normal')
         
         unique_idx = np.unique(index_tfs)
         
@@ -260,14 +261,14 @@ for E_aa in E_aa_values:
             saving_histogram_name_be = f'nA_{nA}_n_{N}_histo_binding_events_Eaa_{E_aa}_Ead_{E_ad}.png'
             x_label_histogram_be = 'Binding Events'
             
-            general_functions.plot_histogram(count_binding_events_list, histogram_title_be, legend, subfolder_path,x_label_histogram_be,'Frequency', saving_histogram_name_be, time_step_sampled )
+            general_functions.plot_histogram(count_binding_events_list, histogram_title_be, legend, subfolder_path,x_label_histogram_be,'Frequency', saving_histogram_name_be, time_step_sampled[0], False, 1, 'normal' )
         
         if histogram_cluster_size:
             histogram_title_cluster = f'Cluster histogram (Eaa {E_aa}, Ead {E_ad})'
             saving_histogram_name_cluster = f'nA_{nA}_n_{N}_cluster_histo_Eaa_{E_aa}_Ead_{E_ad}.png'
             x_label_histogram_cluster = 'Cluster size'
             
-            general_functions.plot_histogram(all_group_sizes_histogram, histogram_title_cluster, legend, subfolder_path,x_label_histogram_cluster, 'Frequency', saving_histogram_name_cluster, time_step_sampled, True )
+            general_functions.plot_histogram(all_group_sizes_histogram, histogram_title_cluster, legend, subfolder_path,x_label_histogram_cluster, 'Frequency', saving_histogram_name_cluster, time_step_sampled[0], True )
             del all_group_sizes_histogram       
        
     std_devs_for_different_E_aa.append(std_devs)       
@@ -281,7 +282,7 @@ for E_aa in E_aa_values:
         title_nA_bound_snapshots = f'Number of A bound to DNA vs. Time Steps (E_aa={E_aa})'
         saving_name_nA_bound_snapshots = f'nA_{nA}_n_{N}_bound_in_time_Eaa_{E_aa}_Ead_{E_ad}.png'
         
-        general_functions.plot_different_Ead_in_time (nA_bound_for_different_energies, E_ad_values, time_step_sampled, xlabel_nA_bound_snapshots, ylabel_nA_bound_snapshots,title_nA_bound_snapshots,legend,subfolder_path,saving_name_nA_bound_snapshots)
+        general_functions.plot_different_Ead_in_time (nA_bound_for_different_energies, E_ad_values, time_step_sampled[0], xlabel_nA_bound_snapshots, ylabel_nA_bound_snapshots,title_nA_bound_snapshots,legend,subfolder_path,saving_name_nA_bound_snapshots)
         
     if plot_inverse:
         xlabel_lineweaver_burk = 'Inverse Time Steps'
@@ -289,7 +290,7 @@ for E_aa in E_aa_values:
         title_lineweaver_burk = f'Lineweaver–Burk plot (E_aa={E_aa})'
         saving_name_lineweaver_burk = f'nA_{nA}_n_{N}_Lineweaver_Burk_Eaa_{E_aa}_Ead_{E_ad}.png'
         
-        general_functions.plot_different_Ead_in_time (nA_bound_for_different_energies, E_ad_values, time_step_sampled, xlabel_lineweaver_burk, ylabel_lineweaver_burk,title_lineweaver_burk,legend,subfolder_path,saving_name_lineweaver_burk, True)
+        general_functions.plot_different_Ead_in_time (nA_bound_for_different_energies, E_ad_values, time_step_sampled[0], xlabel_lineweaver_burk, ylabel_lineweaver_burk,title_lineweaver_burk,legend,subfolder_path,saving_name_lineweaver_burk, True)
         
     
     if histogram_binding_events_E_aa:
