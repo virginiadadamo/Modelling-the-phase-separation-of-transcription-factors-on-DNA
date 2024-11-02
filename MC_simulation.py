@@ -33,7 +33,7 @@ k = 2 #number of B interacting sites with A
 protein_B= True 
 
 #Time parameters
-stop_time = 50000#2000000
+stop_time = 2000000
 ignoring_steps = 10000
 m = 50
 
