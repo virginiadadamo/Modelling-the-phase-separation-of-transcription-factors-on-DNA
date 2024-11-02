@@ -262,7 +262,7 @@ for E_aa in E_aa_values:
             x_label_histogram_be = 'Binding Events'
             
             general_functions.plot_histogram(count_binding_events_list, histogram_title_be, legend, subfolder_path,x_label_histogram_be,'Frequency', saving_histogram_name_be, time_step_sampled[0], False, 1, 'normal' )
-        
+            del count_binding_events_list
         if histogram_cluster_size:
             histogram_title_cluster = f'Cluster histogram (Eaa {E_aa}, Ead {E_ad})'
             saving_histogram_name_cluster = f'nA_{nA}_n_{N}_cluster_histo_Eaa_{E_aa}_Ead_{E_ad}.png'
@@ -283,6 +283,7 @@ for E_aa in E_aa_values:
         saving_name_nA_bound_snapshots = f'nA_{nA}_n_{N}_bound_in_time_Eaa_{E_aa}_Ead_{E_ad}.png'
         
         general_functions.plot_different_Ead_in_time (nA_bound_for_different_energies, E_ad_values, time_step_sampled[0], xlabel_nA_bound_snapshots, ylabel_nA_bound_snapshots,title_nA_bound_snapshots,legend,subfolder_path,saving_name_nA_bound_snapshots)
+        del nA_bound_for_different_energies
         
     if plot_inverse:
         xlabel_lineweaver_burk = 'Inverse Time Steps'
@@ -291,7 +292,7 @@ for E_aa in E_aa_values:
         saving_name_lineweaver_burk = f'nA_{nA}_n_{N}_Lineweaver_Burk_Eaa_{E_aa}_Ead_{E_ad}.png'
         
         general_functions.plot_different_Ead_in_time (nA_bound_for_different_energies, E_ad_values, time_step_sampled[0], xlabel_lineweaver_burk, ylabel_lineweaver_burk,title_lineweaver_burk,legend,subfolder_path,saving_name_lineweaver_burk, True)
-        
+        del nA_bound_for_different_energies
     
     if histogram_binding_events_E_aa:
         xlabel_binding_events = 'Binding Events'
@@ -300,7 +301,7 @@ for E_aa in E_aa_values:
         saving_name_binding_events = f'nA_{nA}_n_{N}_combined_histo_binding_events.png'
       
         general_functions.plot_histogram_distribution_different_E_ad (binding_events_lists,E_ad_values, E_aa, xlabel_binding_events, ylabel_binding_events,title_binding_events,legend,subfolder_path,saving_name_binding_events)
-        
+        del binding_events_lists
     
     if plot_mean_cluster_size_max_cluster_size:
         general_functions.plot_figure (max_residence_times,mean_cluster_sizes,'Max residence times','Mean Cluster Size','Max Residence Time vs Max Cluster size (E_aa={E_aa})',subfolder_path,f'nA_{nA}_n_{N}_max_rt_mean_cluster_size.png') 
