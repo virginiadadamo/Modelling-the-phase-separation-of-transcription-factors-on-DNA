@@ -30,7 +30,7 @@ nB = 100 #number of Bs
 k = 2 #number of B interacting sites with A  
 
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= True 
+protein_B= False 
 
 #Time parameters
 stop_time = 2000000
