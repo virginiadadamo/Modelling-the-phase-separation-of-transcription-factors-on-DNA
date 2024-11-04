@@ -54,10 +54,10 @@ E_ba = 0
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
 
 #For each combination of Eaa and Ead
-plot_cluster_sizes_over_time = True #To plot the mean cluster size at each time step, with error bars with the corresponding standard deviation 
+plot_cluster_sizes_over_time = False #To plot the mean cluster size at each time step, with error bars with the corresponding standard deviation 
 histogram_mean_residence_time = True # To plot the corresponding distribution of mean residence times of the transcription factors
-scatter_plot_std = True #To plot the standard deviation of the residence times of each transcription factors 
-scatter_plot_mean = True #To plot the mean of the residence times of each transcription factors
+scatter_plot_std = False #To plot the standard deviation of the residence times of each transcription factors 
+scatter_plot_mean = False #To plot the mean of the residence times of each transcription factors
 histogram_binding_events = True #To plot the distribution of binding events of the transcription factors 
 histogram_cluster_size = True #To plot the distribution of cluster sizes 
 
@@ -71,7 +71,7 @@ plot_mean_cluster_size_max_cluster_size = False #Mean Cluster Size vs Max Cluste
 
 #Comparison between different E_aa
 plot_log_mean_residence_time = True #Plot for different E_aa the ln of Mean Residence Time vs E_ad values 
-plot_stdv_residence_time = True #Plot for different E_aa the Standard Deviation vs E_ad values 
+plot_stdv_residence_time = False #Plot for different E_aa the Standard Deviation vs E_ad values 
 plot_ratio_mean_stdv = True  #Plot for different E_aa the ratio of Mean Residence Time and Standard Deviation vs E_ad values 
 
 
