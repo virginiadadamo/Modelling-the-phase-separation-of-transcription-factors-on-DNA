@@ -14,9 +14,8 @@ def step_MC_protein_A (time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad
     random.seed(time.time())
     random_A = np.random.randint(0, list_A.shape[0])
     random_site = np.random.randint(0, len(list_empty_DNA))# Return random integers from low (inclusive) to high (exclusive).
-    print ('List empty DNA', list_empty_DNA)
     empty_random_site = list_empty_DNA [random_site] #select an empty site 
-    print ('Empty random site', empty_random_site)
+    
     
     #Randomly select between AddA or RemoveA   
     random_event = np.random.random()  #draw a random number between 0 and 1
