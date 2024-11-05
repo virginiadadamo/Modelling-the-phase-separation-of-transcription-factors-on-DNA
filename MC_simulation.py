@@ -30,7 +30,7 @@ nB = 100 #number of Bs
 k = 2 #number of B interacting sites with A  
 
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= False 
+protein_B= True 
 
 #Time parameters
 stop_time = 2000000
@@ -48,7 +48,7 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
 E_ad_values = np.arange(0, 4, 1)
 E_aa_values = [0, 2.5]
-E_ab = 0
+E_ab = 1
 E_ba = 0
 
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
@@ -84,7 +84,7 @@ else:
 subfolder_path = general_functions.create_folders(folder_name, alfa)
 general_functions.create_txt_parameters(subfolder_path, alfa, stop_time, ignoring_steps)
 
-legend = f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\nn={N}'
+legend = f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\nn={N}\nE_ab={E_ab}\nE_ba={E_ba}'
 
 
 ###MONTE CARLO SIMULATION###

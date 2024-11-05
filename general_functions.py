@@ -346,8 +346,8 @@ def plot_figure (x,y,xlabel,ylabel,title,subfolder_path,saving_name, stdv = None
     plt.figure(figsize=(12, 8))
     if yerr :
        
-        plt.errorbar(x, y, yerr=stdv, fmt='o', capsize=5, linestyle='-', color='b', label='Data with error bars')
-        plt.xscale('log')
+        plt.errorbar(x[::1000], y[::1000], yerr=stdv[::1000], fmt='o', capsize=5, linestyle='-', color='b', label='Data with error bars')
+       
     else: 
         plt.plot(x, y, color='r')
     plt.xlabel(xlabel)
