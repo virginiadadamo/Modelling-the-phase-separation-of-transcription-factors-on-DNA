@@ -30,7 +30,7 @@ nB = 100 #number of Bs
 k = 2 #number of B interacting sites with A  
 
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= True 
+protein_B= False 
 
 #Time parameters
 stop_time = 2000000
@@ -49,7 +49,7 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 E_ad_values = np.arange(0, 4, 1)
 E_aa_values = [0, 2.5]
 E_ab = 0
-E_ba = 1
+E_ba = 0
 
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
 
