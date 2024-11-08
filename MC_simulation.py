@@ -21,16 +21,16 @@ ASSUMPTIONS:
 
 ###PARAMETERS###
 
-alfa = 0.3 #ratio between nA/N 
+alfa = 0.15 #ratio between nA/N 
 N = 3000 #10000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
-nB = 100 #number of Bs
-k = 2 #number of B interacting sites with A  
-
+nB = 20 #number of Bs
+k = 5 #number of B interacting sites with A  
+#beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= False 
+protein_B= True  
 
 #Time parameters
 stop_time = 2000000
@@ -58,13 +58,13 @@ plot_cluster_sizes_over_time = False #To plot the mean cluster size at each time
 histogram_mean_residence_time = True # To plot the corresponding distribution of mean residence times of the transcription factors
 scatter_plot_std = False #To plot the standard deviation of the residence times of each transcription factors 
 scatter_plot_mean = False #To plot the mean of the residence times of each transcription factors
-histogram_binding_events = True #To plot the distribution of binding events of the transcription factors 
+histogram_binding_events = False #To plot the distribution of binding events of the transcription factors 
 histogram_cluster_size = True #To plot the distribution of cluster sizes 
 
 #For each E_aa
-plot_nA_bound = True #Plot the number of transcription factors bound in time
+plot_nA_bound = False #Plot the number of transcription factors bound in time
 plot_inverse = False #Plot the inverse of the number of transcription factors vs the inverse of the corresponding time steps 
-histogram_binding_events_E_aa = True #Plot the distribution of binding events of the transcription factors for each E_aa
+histogram_binding_events_E_aa = False #Plot the distribution of binding events of the transcription factors for each E_aa
 plot_mean_cluster_size_max_cluster_size = False #Plot Mean Cluster Size vs Max Cluster size
 plot_mean_cluster_size_E_ad = False #Mean Cluster Size vs. E_ad 
 plot_mean_cluster_size_max_cluster_size = False #Mean Cluster Size vs Max Cluster size
@@ -152,7 +152,7 @@ for E_aa in E_aa_values:
         if protein_B:
             #Add B parameters 
             p = 0.5 #probability of binding event 
-            L = 1 #distance (in terms of binding sites in the DNA) from one binding site in B protein to the other
+            L = 5 #distance (in terms of binding sites in the DNA) from one binding site in B protein to the other
             
         while time_step < stop_time:
             
@@ -230,7 +230,7 @@ for E_aa in E_aa_values:
         
         if histogram_mean_residence_time:
             histogram_title_mean = f'Histogram of distribution of mean residence times (E_aa={E_aa}, E_ad={E_ad})'
-            saving_histogram_name = f'nA_{nA}_n_{N}_histo_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.png'
+            saving_histogram_name = f'nA_{nA}_n_{N}_histo_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}'
             x_label_histogram_mean = 'Mean Residence Time'
             
             general_functions.plot_histogram(mean_each_tf, histogram_title_mean, legend, subfolder_path, x_label_histogram_mean, 'Frequency', saving_histogram_name, time_step_sampled, False, 100, 'normal')
@@ -258,14 +258,14 @@ for E_aa in E_aa_values:
 
         if histogram_binding_events:
             histogram_title_be = f'Histogram of distribution of binding events (Eaa {E_aa}, Ead {E_ad})'
-            saving_histogram_name_be = f'nA_{nA}_n_{N}_histo_binding_events_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.png'
+            saving_histogram_name_be = f'nA_{nA}_n_{N}_histo_binding_events_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}'
             x_label_histogram_be = 'Binding Events'
             
             general_functions.plot_histogram(count_binding_events_list, histogram_title_be, legend, subfolder_path,x_label_histogram_be,'Frequency', saving_histogram_name_be, time_step_sampled[0], False, 1, 'normal' )
             del count_binding_events_list
         if histogram_cluster_size:
             histogram_title_cluster = f'Cluster histogram (Eaa {E_aa}, Ead {E_ad})'
-            saving_histogram_name_cluster = f'nA_{nA}_n_{N}_cluster_histo_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.png'
+            saving_histogram_name_cluster = f'nA_{nA}_n_{N}_cluster_histo_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}'
             x_label_histogram_cluster = 'Cluster size'
             
             general_functions.plot_histogram(all_group_sizes_histogram, histogram_title_cluster, legend, subfolder_path,x_label_histogram_cluster, 'Frequency', saving_histogram_name_cluster, time_step_sampled[0], True )

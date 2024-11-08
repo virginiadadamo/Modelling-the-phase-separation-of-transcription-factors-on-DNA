@@ -117,7 +117,6 @@ def take_sample (time_step,list_DNA, list_A, nA_bound_snapshots, average_cluster
     
     
 ### PLOTS FUNCTIONS ###
-    
 
 def plot_histogram(
     list_to_plot, title, legend, subfolder_path, x_label, y_label, 
@@ -127,20 +126,19 @@ def plot_histogram(
     max_value = max(list_to_plot)
     min_value = min(list_to_plot)
     
-    # Define bins for histogram
     bin_edges = np.arange(min_value, max_value + bin_width, bin_width)
     counts, bins = np.histogram(list_to_plot, bins=bin_edges)
     
-    # Normalize if 'mean' is specified
     if mean:
         if len(time_step_sampled) > 0:
             counts = counts / len(time_step_sampled)
-        else:
-            print("Warning: time_step_sampled is empty. No mean normalization applied.")
     
     # Plot histogram
     plt.stairs(counts, bins, fill=True)
-    
+
+    x_data = bin_edges
+    y_data = np.append(counts, 0)  
+
     # Fit and overlay distribution if specified
     if fit_distribution:
         x_vals = np.linspace(min_value, max_value, 1000)  # Fine grid for PDF
@@ -170,6 +168,10 @@ def plot_histogram(
         # Plot PDF
         plt.plot(x_vals, pdf_vals, label=label, color="red", linewidth=2)
 
+        # Save PDF values along with histogram if fit_distribution is specified
+        x_data = np.concatenate((x_data, x_vals))  # Combine histogram and fit x values
+        y_data = np.concatenate((y_data, pdf_vals))  # Combine histogram and fit y values
+
     # Add labels and title
     plt.xlabel(x_label)
     plt.ylabel(y_label)
@@ -181,41 +183,19 @@ def plot_histogram(
              transform=plt.gca().transAxes)
     
     # Save plot
-    plot_filename = os.path.join(subfolder_path, name_to_save)
+    plot_filename = os.path.join(subfolder_path, name_to_save + '.png')
     plt.savefig(plot_filename)
     plt.show()
     plt.clf()
     plt.close()
+    
+    # Save x and y data to txt file
+    data_filename = os.path.join(subfolder_path, name_to_save + '.txt')
+    with open(data_filename, 'w') as f:
+        f.write("x\ty\n")  # Header
+        for x_val, y_val in zip(x_data, y_data):
+            f.write(f"{x_val}\t{y_val}\n")
 
-# def plot_histogram (list_to_plot, title, legend, subfolder_path, x_label, y_label, name_to_save, time_step_sampled, mean = False, bin_width = 1): 
-    
-#     max_value = max(list_to_plot)
-#     min_value = min(list_to_plot)
-    
-#     bin_edges = np.arange(min_value, max_value + bin_width, bin_width)  
-     
-#     counts, bins = np.histogram(list_to_plot, bins=bin_edges)
-#     if mean:
-        
-#         if len(time_step_sampled) > 0:
-#             counts = counts / len(time_step_sampled)
-#             print ('here')
-#         else:
-#             print("Warning: time_step_sampled is empty. No mean normalization applied.")
-#     plt.stairs(counts, bins, fill = True)
-    
-#     plt.xlabel(x_label)
-#     plt.ylabel(y_label)
-#     plt.title (title)
-#     plt.text(1, 1, legend, 
-#          horizontalalignment='right', verticalalignment='top', 
-#          transform=plt.gca().transAxes)
-    
-#     plot_filename = os.path.join(subfolder_path, name_to_save)
-#     plt.savefig(plot_filename)
-#     plt.show()
-#     plt.clf()
-#     plt.close() 
 
 
 def scatter_plot (x,y, legend, subfolder_path, x_label, y_label, title, saving_name):
