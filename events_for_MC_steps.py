@@ -5,6 +5,7 @@ Created on Fri Oct 25 13:45:42 2024
 @author: virgi
 """
 import numpy as np
+import random
 
 
 
@@ -78,14 +79,11 @@ def add_B_event ( list_DNA, list_A, list_B, random_B, L):
     else: #there is at least one Binding site in B protein that is already bound 
        
         bound_B_sites = np.where (list_B[random_B, :] != -1) #list of all the DNA sites where a binding site of the B protein is already bound 
-        #print ('Bound b sites', bound_B_sites)
         free_B_sites = np.where (list_B[random_B, :] == -1) #liste of all free B sites
-        #print ('Free b sites', free_B_sites)
-        random_B_bound_site = bound_B_sites[np.random.randint(0, len (bound_B_sites))] #pick randomly one of the bound sites 
-        #print ('Random B bound site',random_B_bound_site )
-        random_B_free_site = free_B_sites[np.random.randint(0, len (free_B_sites))] #pick randomly one of the free sites 
-        #print ('Random B free site', random_B_free_site)
+        random_B_bound_site = random.choice(bound_B_sites[0]) #pick randomly one of the bound sites 
+        random_B_free_site = random.choice(free_B_sites[0])  #pick randomly one of the free sites 
         DNA_index_where_B_bound = list_A[list_B[random_B,random_B_bound_site], 0]
+      
         if DNA_index_where_B_bound-L > 0:
             starting_site = int (DNA_index_where_B_bound-L)
         else:
@@ -130,7 +128,7 @@ def add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, ran
             
     if len(sites_with_bound_A) > 0 : #if there is at leas ìt one bound A in the given lenght 
         #print ('Sites with bound A', sites_with_bound_A )
-        random_site_with_A_to_bind = sites_with_bound_A[np.random.randint(0, len (sites_with_bound_A))]#choose randomly one of these sites. We assume B always bind independently of the energy
+        random_site_with_A_to_bind = random.choice (sites_with_bound_A)#[np.random.randint(0, len (sites_with_bound_A))]#choose randomly one of these sites. We assume B always bind independently of the energy
         #print ('Random site with bound A', random_site_with_A_to_bind)
         del sites_with_bound_A #clearing memory after usage
         #Get the A to which that occupied site correspond to 
@@ -149,8 +147,9 @@ def remove_B_event (list_A, list_B,random_B, Eba):
  #print ('Removing B event')
  bound_B_sites =np.where (list_B[random_B, :] != -1)[0] #get the binding sites that are bound to the DNA
  #print ('Bound B sites', bound_B_sites)
- index_of_B_binding_site = np.random.randint(0, len (bound_B_sites)) # randomly choose one index within the bound sites 
- random_B_bound_site = bound_B_sites[index_of_B_binding_site] #pick randomly one of the bound sites 
+ # randomly choose one index within the bound sites 
+ print (bound_B_sites)
+ random_B_bound_site = random.choice(bound_B_sites) #pick randomly one of the bound sites 
  #print ('Random B bound site', random_B_bound_site )
  random_binding = np.random.random()  #draw a random number between 0 and 1
  energy = energy_unbind_function_B (list_B[random_B, :], Eba)#compute unbinding energy

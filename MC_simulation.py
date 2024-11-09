@@ -33,8 +33,8 @@ k = 5 #number of B interacting sites with A
 protein_B= True  
 
 #Time parameters
-stop_time = 2000000
-ignoring_steps = 10000
+stop_time = 10000 #2000000
+ignoring_steps = 0#10000
 m = 50
 
 number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
@@ -48,7 +48,7 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
 E_ad_values = np.arange(0, 4, 1)
 E_aa_values = [0, 2.5]
-E_ab = 3
+E_ab = 0
 E_ba = 0
 
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
