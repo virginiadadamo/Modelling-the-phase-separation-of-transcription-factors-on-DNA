@@ -14,12 +14,35 @@ from scipy.stats import norm, expon, gamma  # Import common distributions
 
 ###FUNCTIONS CREATE FOLDERS AND TXT FILES ###
 
-def create_folders (folder_name, alfa): 
 
+def create_folders(folder_name, alfa, L):
+    """
+    Creates a folder named after L inside a subfolder named 'alfa_{alfa}'.
+    
+    Parameters:
+    - folder_name: Path where the main folder structure should be created.
+    - alfa: Value used to create a subfolder called 'alfa_{alfa}'.
+    - L: Folder name that will be created inside 'alfa_{alfa}'.
+
+    Returns:
+    - path to the newly created folder named after L.
+    """
+    # Create the subfolder named 'alfa_{alfa}'
     subfolder_name = f'alfa_{alfa}'
     subfolder_path = os.path.join(folder_name, subfolder_name)
+    
+    # Create the subfolder if it doesn't already exist
     os.makedirs(subfolder_path, exist_ok=True)
-    return subfolder_path
+    
+    # Now create a subfolder inside 'alfa_{alfa}' named after L
+    L_folder_name = str(L)  # Make sure L is a string for the folder name
+    L_folder_path = os.path.join(subfolder_path, L_folder_name)
+    
+    # Create the L folder inside 'alfa_{alfa}'
+    os.makedirs(L_folder_path, exist_ok=True)
+    
+    # Return the path to the L folder
+    return L_folder_path
 
 def create_txt_parameters (subfolder_path, alfa, stop_time, ignoring_steps):
 
@@ -31,6 +54,7 @@ def create_txt_parameters (subfolder_path, alfa, stop_time, ignoring_steps):
         f.write(f"stop_time = {stop_time}  # Simulation stop time\n")
         f.write(f"ignoring_steps = {ignoring_steps}  # Steps to ignore\n")
         
+    
 
 ### SAMPLING FUNCTIONS ###
 

@@ -6,6 +6,7 @@ Created on Thu Sep 19 21:09:15 2024
 """
 
 import numpy as np
+import os
 import steps_MC_simulations
 import general_functions
 
@@ -31,7 +32,7 @@ k = 5 #number of B interacting sites with A
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True  
-L = 5 #distance (in terms of binding sites in the DNA) from one binding site in B protein to the other
+L = 5#distance (in terms of binding sites in the DNA) from one binding site in B protein to the other
 #Try also L = 10 
 
 
@@ -49,11 +50,11 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
 #Energy parameters 
 
-E_ad_values = [2]
-# E_ad_values = np.arange(0, 4, 1)
-# E_aa_values = [0, 2.5]
-E_aa_values = [2.5]
-E_ab = 3
+#E_ad_values = [2]
+E_ad_values = np.arange(0, 4, 1)
+E_aa_values = [0, 2.5]
+#E_aa_values = [2.5]
+E_ab = 5
 E_ba = 0
 
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
@@ -88,10 +89,10 @@ if protein_B :
 else:
     folder_name = 'Simulations_protein_A'
     
-subfolder_path = general_functions.create_folders(folder_name, alfa)
+subfolder_path = general_functions.create_folders(folder_name, alfa, L)
 general_functions.create_txt_parameters(subfolder_path, alfa, stop_time, ignoring_steps)
 
-legend = f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\nn={N}\nE_ab={E_ab}\nE_ba={E_ba}'
+legend = f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\nn={N}\nE_ab={E_ab}\nE_ba={E_ba}\nL={L}'
 
 
 ###MONTE CARLO SIMULATION###
@@ -122,6 +123,7 @@ for E_aa in E_aa_values:
         #time_step_sampled = [] #To store the time steps that are being sampled
         rate_counter = 0 #To count the steps after the first sampled one
         residence_times = np.zeros((1,nA)) # To store for each transcription the residence times and binding events. It is initialised at 0, if a binding event occurs the time of binding will be store. If an unbinding event then happens the time stored will be used to compute the Residence time and the value will be put to 0 again
+        does_B_bind = np.ones((1,nA)) #To study 
         times_variables = [{'Index of Transcription Factor': i, 
                         'Residence times': [],
                         'Mean residence time' : 0 ,
@@ -167,7 +169,7 @@ for E_aa in E_aa_values:
         while time_step < stop_time:
             
             if protein_B:
-                time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, p, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables)
+                time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times, does_B_bind = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, p, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables, does_B_bind)
             else:
                 time_step, list_DNA, list_A, list_empty_DNA, times_variables,residence_times = steps_MC_simulations.step_MC_protein_A(time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad, E_aa, E_ab, residence_times, times_variables)
             
@@ -194,24 +196,36 @@ for E_aa in E_aa_values:
         
         index_never_unbind = [i for i, x in enumerate(residence_times[0]) if x != 0]
         
+        index_A_never_bind_B = np.where(does_B_bind[0,:] == 1)[0]
+    
+        file_path = os.path.join(subfolder_path, f'mean_residence_time_A_never_bind_to_B_E_ab={E_ab}_E_ba={E_ba}_L{L}_E_aa={E_aa}_E_ad={E_ad}.txt')
+
+        # Open the file in append mode to store mean residence times
+        with open(file_path, 'a') as file:
+
         
          
-        for i in range (nA):
-            
-            count_binding_events_list.append (times_variables[i]['Count binding events'])
-            
-            if len (times_variables[i]['Residence times']) != 0: #if there is at leat one value of Residence time
+            for i in range (nA):
                 
-                index_tfs.append (times_variables[i]['Index of Transcription Factor'])
+                count_binding_events_list.append (times_variables[i]['Count binding events'])
                 
-                times_variables[i]['Mean residence time'] = np.mean (times_variables[i]['Residence times'])
-                mean_each_tf.append(times_variables[i]['Mean residence time'])
-                
-                
-                times_variables[i]['Standard deviation'] = np.std (times_variables[i]['Residence times'])
-                stdv_each_tf.append (times_variables[i]['Standard deviation'])
-                
-                times_variables[i]['Max residence time'] = np.max (times_variables[i]['Residence times'])
+                if len (times_variables[i]['Residence times']) != 0: #if there is at leat one value of Residence time
+                    
+                    index_tfs.append (times_variables[i]['Index of Transcription Factor'])
+                    
+                    times_variables[i]['Mean residence time'] = np.mean (times_variables[i]['Residence times'])
+                    mean_each_tf.append(times_variables[i]['Mean residence time'])
+                    
+                    
+                    times_variables[i]['Standard deviation'] = np.std (times_variables[i]['Residence times'])
+                    stdv_each_tf.append (times_variables[i]['Standard deviation'])
+                    
+                    times_variables[i]['Max residence time'] = np.max (times_variables[i]['Residence times'])
+                    
+                    # Check if the index `i` is in the list of A that never binds to B
+                    if i in index_A_never_bind_B:
+                        # Write the mean residence time to the file
+                        file.write(f"Index {i}: Mean Residence Time = {times_variables[i]['Mean residence time']}\n")
                 
                 
         

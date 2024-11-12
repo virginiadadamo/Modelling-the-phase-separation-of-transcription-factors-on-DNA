@@ -63,7 +63,7 @@ def remove_A_from_DNA_site (list_DNA, list_A, random_A,list_empty_DNA,residence_
     return list_DNA, list_A,list_empty_DNA,residence_times, times_variables
     
             
-def add_B_event ( list_DNA, list_A, list_B, random_B, L):
+def add_B_event ( list_DNA, list_A, list_B, random_B, L, does_B_bind):
     
     #print ('Adding B event selected', random_B)
     
@@ -74,7 +74,7 @@ def add_B_event ( list_DNA, list_A, list_B, random_B, L):
         #print ('List A and List B before having added B, ', list_A, list_B)
         starting_site = 0
         ending_site = len(list_DNA[0]) 
-        list_A, list_B = add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, random_binding_site, random_B ) #add B to one random site within all DNA
+        list_A, list_B, does_B_bind = add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, random_binding_site, random_B, does_B_bind ) #add B to one random site within all DNA
         #print ('List A and List B after having added B, ', list_A, list_B)
         
     else: #there is at least one Binding site in B protein that is already bound 
@@ -97,13 +97,13 @@ def add_B_event ( list_DNA, list_A, list_B, random_B, L):
         #print ('Dna index where the B is bound', DNA_index_where_B_bound)
         
         #print ('List A and List B before having added B, ', list_A, list_B)
-        list_A, list_B = add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, random_B_free_site, random_B )
+        list_A, list_B, does_B_bind = add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, random_B_free_site, random_B, does_B_bind )
         #print ('List A and List B after having added B, ', list_A, list_B)
         
                                                               
-    return list_DNA, list_A, list_B
+    return list_DNA, list_A, list_B, does_B_bind
 
-def add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, random_binding_site, random_B ):
+def add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, random_binding_site, random_B, does_B_bind ):
     
     #print ('Starting site', starting_site)
     #print ('Ending site', ending_site)
@@ -139,8 +139,8 @@ def add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, ran
         
         list_B[random_B, random_binding_site] = A_to_bind #mark B as occupied by replacing -1 with the A to which it is bound
         list_A[A_to_bind, 1] = random_B #mark also that the A is bound to B 
-    
-    return list_A, list_B
+        does_B_bind[0,A_to_bind] = 0 #putting the corresponding equal to 0 to mark that a B has bound 
+    return list_A, list_B, does_B_bind
     
         
 def remove_B_event (list_A, list_B,random_B, Eba):

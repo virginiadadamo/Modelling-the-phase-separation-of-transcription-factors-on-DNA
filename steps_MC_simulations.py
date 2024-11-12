@@ -32,7 +32,7 @@ def step_MC_protein_A (time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad
     
     return time_step, list_DNA, list_A, list_empty_DNA, times_variables, residence_times
    
-def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L, p, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables):
+def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L, p, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables, does_B_bind):
     
     random.seed(time.time())
     random_A = np.random.randint(0, list_A.shape[0])
@@ -64,7 +64,7 @@ def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L
     if random_event < probability_binding_event:  #Adding B event is selected 
         
         if (list_B[random_B, :] == -1).any() :#if there is at least one empty binding site
-              list_DNA, list_A, list_B = events_for_MC_steps.add_B_event( list_DNA, list_A, list_B, random_B, L)
+              list_DNA, list_A, list_B , does_B_bind= events_for_MC_steps.add_B_event( list_DNA, list_A, list_B, random_B, L, does_B_bind)
     
     else: #Removing B event is selected 
         if (list_B[random_B, :] != -1).any(): #if there is at least one occupied site 
@@ -74,7 +74,7 @@ def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L
     
      
     time_step = time_step + 1
-    return time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times
+    return time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times, does_B_bind
 
 
 
