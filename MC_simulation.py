@@ -31,7 +31,7 @@ k = 5 #number of B interacting sites with A
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True  
-
+L = 5 #distance (in terms of binding sites in the DNA) from one binding site in B protein to the other
 #Try also L = 10 
 
 
@@ -49,11 +49,11 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
 #Energy parameters 
 
-#E_ad_values = [2]
-E_ad_values = np.arange(0, 4, 1)
-E_aa_values = [0, 2.5]
-#E_aa_values = [2.5]
-E_ab = 7
+E_ad_values = [2]
+# E_ad_values = np.arange(0, 4, 1)
+# E_aa_values = [0, 2.5]
+E_aa_values = [2.5]
+E_ab = 3
 E_ba = 0
 
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
@@ -162,7 +162,7 @@ for E_aa in E_aa_values:
         if protein_B:
             #Add B parameters 
             p = 0.5 #probability of binding event 
-            L = 5 #distance (in terms of binding sites in the DNA) from one binding site in B protein to the other
+            
             
         while time_step < stop_time:
             
