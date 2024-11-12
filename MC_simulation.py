@@ -32,7 +32,7 @@ k = 5 #number of B interacting sites with A
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True  
-L = 5#distance (in terms of binding sites in the DNA) from one binding site in B protein to the other
+L = 10#distance (in terms of binding sites in the DNA) from one binding site in B protein to the other
 #Try also L = 10 
 
 
