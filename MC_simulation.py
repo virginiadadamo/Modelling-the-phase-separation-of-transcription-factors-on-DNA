@@ -53,7 +53,7 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 E_ad_values = np.arange(0, 4, 1)
 E_aa_values = [0, 2.5]
 #E_aa_values = [2.5]
-E_ab = 5
+E_ab = 7
 E_ba = 0
 
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
