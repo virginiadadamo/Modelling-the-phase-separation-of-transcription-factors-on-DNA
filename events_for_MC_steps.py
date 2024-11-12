@@ -57,6 +57,7 @@ def remove_A_from_DNA_site (list_DNA, list_A, random_A,list_empty_DNA,residence_
     time_binding = residence_times[0,random_A]
     residence_times[0,random_A] = time_step-time_binding
     times_variables[random_A]['Residence times'].append(residence_times[0,random_A] )
+    
     residence_times[0,random_A]  = 0 #time put back to zero, to compute the next residence time when A will bind again
     
     return list_DNA, list_A,list_empty_DNA,residence_times, times_variables
@@ -148,7 +149,6 @@ def remove_B_event (list_A, list_B,random_B, Eba):
  bound_B_sites =np.where (list_B[random_B, :] != -1)[0] #get the binding sites that are bound to the DNA
  #print ('Bound B sites', bound_B_sites)
  # randomly choose one index within the bound sites 
- print (bound_B_sites)
  random_B_bound_site = random.choice(bound_B_sites) #pick randomly one of the bound sites 
  #print ('Random B bound site', random_B_bound_site )
  random_binding = np.random.random()  #draw a random number between 0 and 1

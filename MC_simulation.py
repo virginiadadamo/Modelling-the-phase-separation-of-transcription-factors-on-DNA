@@ -32,6 +32,9 @@ k = 5 #number of B interacting sites with A
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True  
 
+#Try also L = 10 
+
+
 #Time parameters
 stop_time = 2000000
 ignoring_steps = 10000
@@ -46,14 +49,18 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
 #Energy parameters 
 
+#E_ad_values = [2]
 E_ad_values = np.arange(0, 4, 1)
 E_aa_values = [0, 2.5]
-E_ab = 3
-E_ba = 3
+#E_aa_values = [2.5]
+E_ab = 5
+E_ba = 0
 
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
 
 #For each combination of Eaa and Ead
+plot_never_unbind = True #plot to identify the TF that never unbinds
+histogram_never_unbind = True  
 plot_cluster_sizes_over_time = False #To plot the mean cluster size at each time step, with error bars with the corresponding standard deviation 
 histogram_mean_residence_time = True # To plot the corresponding distribution of mean residence times of the transcription factors
 scatter_plot_std = False #To plot the standard deviation of the residence times of each transcription factors 
@@ -130,7 +137,12 @@ for E_aa in E_aa_values:
         mean_residence_time = 0 #To compute the mean of the residence times over all transcription factors
         
         #DNA parameters 
+        
         list_DNA = np.zeros((1,N)) #Array representing the DNA sites: 0 corresponds to an empty site, 1 to a site with an transcription factor bound to it- at the initial state there is no bound A to the DNA 
+        
+        
+        
+        
         list_empty_DNA  = list(range (0,list_DNA.shape[1],1)) #list containing all the indexes of empty sites in the DNA
         nA_bound_DNA = 0 # number of Transcription factors that are bound to the DNA
         
@@ -139,8 +151,6 @@ for E_aa in E_aa_values:
         stdv_cluster_sizes = np.zeros((1,number_of_time_steps_sampled)) #To store the standard deviation of cluster sizes at each time step 
         max_cluster_sizes = np.zeros((1,number_of_time_steps_sampled))#[] #To store at each time step the value of the highest value of cluster size
         all_group_sizes_histogram = [] #union of all the cluster sizes list in one list, that will be used to compute the final histogram of distribution of cluster sizes 
-        
-        #clusters_each_time_sampled = [] #List containing the cluster objects at each time sampled 
         
         #Transcription factors parameters 
         list_A = np.full((nA, 2), -1) #Array representing the transcription factors: -1 for unbound, will store the position of the site on the DNA when bound. The second column will be -1 if the A is not bound to a B, otherwise will store the index of the B to which it is bound
@@ -157,9 +167,9 @@ for E_aa in E_aa_values:
         while time_step < stop_time:
             
             if protein_B:
-                time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, p, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables)
+                time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, p, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables)
             else:
-                time_step, list_DNA, list_A, list_empty_DNA, times_variables = steps_MC_simulations.step_MC_protein_A(time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad, E_aa, E_ab, residence_times, times_variables)
+                time_step, list_DNA, list_A, list_empty_DNA, times_variables,residence_times = steps_MC_simulations.step_MC_protein_A(time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad, E_aa, E_ab, residence_times, times_variables)
             
             
             nA_bound_DNA = general_functions.count_consecutive_ones(list_DNA)
@@ -179,8 +189,11 @@ for E_aa in E_aa_values:
                     
                     
                     
-        # count_never_unbind = np.count_nonzero(residence_times)
-        # times_never_unbind =  [x for x in residence_times if x != 0]
+        
+        times_never_unbind =  [x for x in residence_times[0] if x != 0]
+        
+        index_never_unbind = [i for i, x in enumerate(residence_times[0]) if x != 0]
+        
         
          
         for i in range (nA):
@@ -202,7 +215,6 @@ for E_aa in E_aa_values:
                 
                 
         
-    
         mean_residence_times.append(np.mean(mean_each_tf)) 
         std_devs.append(np.mean(stdv_each_tf))
         binding_events_lists.append (count_binding_events_list) 
@@ -216,6 +228,22 @@ for E_aa in E_aa_values:
         mean_max_cluster_sizes.append(np.mean(max_cluster_sizes)) #taking the mean of maximum sized cluster for each energy value 
         
         ### PLOTS FOR EACH COMBINATION OF E_AA AND E_AD ###
+        
+        if plot_never_unbind :
+            plot_never_unbind_title = f'Transcription factor that bind but never unbind (E_aa={E_aa}, E_ad={E_ad})'
+            saving_never_unbind_name = f'nA_{nA}_n_{N}_never_unbind_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.png'
+            x_label_plot_never_unbind = 'Index of TF'
+            y_label_plot_never_unbind = 'Binding Time'
+            
+            general_functions.plot_figure (index_never_unbind,times_never_unbind, x_label_plot_never_unbind ,y_label_plot_never_unbind,plot_never_unbind_title,subfolder_path,saving_never_unbind_name)
+        
+       
+        if histogram_never_unbind :
+            histogram_never_unbind_title = f'Histogram for binding times for TFs that bind but never unbind (E_aa={E_aa}, E_ad={E_ad})'
+            saving_histogram_never_unbind_name = f'nA_{nA}_n_{N}_histo_never_unbind_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.png'
+            x_label_histogram_never_unbind = 'Binding Times'
+            y_label_histogram_never_unbind = 'Frequency'
+            general_functions.plot_histogram(times_never_unbind, histogram_never_unbind_title, legend, subfolder_path, x_label_histogram_never_unbind, 'Frequency', saving_histogram_never_unbind_name, time_step_sampled, False, 100) 
         
         if plot_cluster_sizes_over_time :
             plot_cluster_size_title = f'Mean Cluster size over time (E_aa={E_aa}, E_ad={E_ad})'
@@ -263,6 +291,8 @@ for E_aa in E_aa_values:
             
             general_functions.plot_histogram(count_binding_events_list, histogram_title_be, legend, subfolder_path,x_label_histogram_be,'Frequency', saving_histogram_name_be, time_step_sampled[0], False, 1, 'normal' )
             del count_binding_events_list
+            
+        
         if histogram_cluster_size:
             histogram_title_cluster = f'Cluster histogram (Eaa {E_aa}, Ead {E_ad})'
             saving_histogram_name_cluster = f'nA_{nA}_n_{N}_cluster_histo_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}'

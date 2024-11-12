@@ -97,6 +97,7 @@ def take_sample (time_step,list_DNA, list_A, nA_bound_snapshots, average_cluster
     group_sizes, max_count, clusters, nA_bound = count_consecutive_ones(list_DNA, return_only_nA)
     if not group_sizes: #if the group_sizes is empty 
         group_sizes = [0]
+    
     nA_bound_snapshots[0,number_previously_sampled] = nA_bound
     #group_sizes_snapshots.append(group_sizes)
     all_group_sizes_histogram = all_group_sizes_histogram + group_sizes
@@ -123,15 +124,19 @@ def plot_histogram(
     name_to_save, time_step_sampled, mean=False, bin_width=1, 
     fit_distribution=None  
 ):
-    max_value = max(list_to_plot)
+    max_value = max(list_to_plot)+1
     min_value = min(list_to_plot)
     
     bin_edges = np.arange(min_value, max_value + bin_width, bin_width)
+    
     counts, bins = np.histogram(list_to_plot, bins=bin_edges)
+    print (counts, bins)
     
     if mean:
         if len(time_step_sampled) > 0:
+            print ('Counts', counts )
             counts = counts / len(time_step_sampled)
+            print ('Counts', counts )
     
     # Plot histogram
     plt.stairs(counts, bins, fill=True)

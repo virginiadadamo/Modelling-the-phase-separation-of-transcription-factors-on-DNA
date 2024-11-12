@@ -30,7 +30,7 @@ def step_MC_protein_A (time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad
        
     time_step = time_step + 1
     
-    return time_step, list_DNA, list_A, list_empty_DNA, times_variables 
+    return time_step, list_DNA, list_A, list_empty_DNA, times_variables, residence_times
    
 def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L, p, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables):
     
@@ -42,14 +42,15 @@ def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L
     
     random_event = np.random.random()  #draw a random number between 0 and 1
     
+    
     if random_event < 0.5:  
-        #The adding event is selected 
-            list_DNA,list_A, residence_times, list_empty_DNA, times_variables = events_for_MC_steps.add_A (list_DNA, empty_random_site, list_A , random_A, residence_times, list_empty_DNA, times_variables, time_step)
+         #The adding event is selected 
+             list_DNA,list_A, residence_times, list_empty_DNA, times_variables = events_for_MC_steps.add_A (list_DNA, empty_random_site, list_A , random_A, residence_times, list_empty_DNA, times_variables, time_step)
     else: 
-        #Removing event is selected 
+         #Removing event is selected 
         list_DNA, list_A, random_A,list_empty_DNA,residence_time  = events_for_MC_steps.remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_times, times_variables, E_ad, E_aa, E_ab, time_step)
     
-    ### B PART ###
+    # ### B PART ###
     random_B = np.random.randint(0, list_B.shape[0])#choose random B means choosing one between the rows of the nB x K matrix representing Bs  
     random_event = np.random.random()  # choose random event - draw a random number between 0 and 1
     
@@ -63,7 +64,7 @@ def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L
     if random_event < probability_binding_event:  #Adding B event is selected 
         
         if (list_B[random_B, :] == -1).any() :#if there is at least one empty binding site
-             list_DNA, list_A, list_B = events_for_MC_steps.add_B_event( list_DNA, list_A, list_B, random_B, L)
+              list_DNA, list_A, list_B = events_for_MC_steps.add_B_event( list_DNA, list_A, list_B, random_B, L)
     
     else: #Removing B event is selected 
         if (list_B[random_B, :] != -1).any(): #if there is at least one occupied site 
@@ -73,7 +74,7 @@ def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L
     
      
     time_step = time_step + 1
-    return time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables
+    return time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times
 
 
 
