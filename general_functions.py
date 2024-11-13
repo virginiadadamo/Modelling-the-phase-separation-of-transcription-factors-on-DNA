@@ -15,7 +15,7 @@ from scipy.stats import norm, expon, gamma  # Import common distributions
 ###FUNCTIONS CREATE FOLDERS AND TXT FILES ###
 
 
-def create_folders(folder_name, alfa, L):
+def create_folders(folder_name, alfa, k):
     """
     Creates a folder named after L inside a subfolder named 'alfa_{alfa}'.
     
@@ -35,7 +35,7 @@ def create_folders(folder_name, alfa, L):
     os.makedirs(subfolder_path, exist_ok=True)
     
     # Now create a subfolder inside 'alfa_{alfa}' named after L
-    L_folder_name = str(L)  # Make sure L is a string for the folder name
+    L_folder_name = f'K_{k}'  # Make sure L is a string for the folder name
     L_folder_path = os.path.join(subfolder_path, L_folder_name)
     
     # Create the L folder inside 'alfa_{alfa}'

@@ -28,11 +28,11 @@ nA = int (N*alfa) #number of As
 
 
 nB = 20 #number of Bs
-k = 5 #number of B interacting sites with A  
+k = 10 #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True  
-L = 10#distance (in terms of binding sites in the DNA) from one binding site in B protein to the other
+L = 5#distance (in terms of binding sites in the DNA) from one binding site in B protein to the other
 #Try also L = 10 
 
 
@@ -89,7 +89,7 @@ if protein_B :
 else:
     folder_name = 'Simulations_protein_A'
     
-subfolder_path = general_functions.create_folders(folder_name, alfa, L)
+subfolder_path = general_functions.create_folders(folder_name, alfa, k)
 general_functions.create_txt_parameters(subfolder_path, alfa, stop_time, ignoring_steps)
 
 legend = f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\nn={N}\nE_ab={E_ab}\nE_ba={E_ba}\nL={L}'
