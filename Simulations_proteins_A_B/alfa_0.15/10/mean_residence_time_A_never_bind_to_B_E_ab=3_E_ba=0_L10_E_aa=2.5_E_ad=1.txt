@@ -1,0 +1,2 @@
+Index 258: Mean Residence Time = 1905.0
+Index 366: Mean Residence Time = 1579.75

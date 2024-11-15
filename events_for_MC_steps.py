@@ -65,17 +65,17 @@ def remove_A_from_DNA_site (list_DNA, list_A, random_A,list_empty_DNA,residence_
             
 def add_B_event ( list_DNA, list_A, list_B, random_B, L, does_B_bind):
     
-    #print ('Adding B event selected', random_B)
+    print ('Adding B event selected', random_B)
     
     if (list_B[random_B, :] == -1).all():  #check if B is free, i.e. all the binding sites are empty (representing by -1 in the original matrix)
         #print ('All random sites !')
         random_binding_site = np.random.randint(0, list_B.shape[1]) #choose randomly one of the sites
         #print ('Random binding site', random_binding_site)
-        #print ('List A and List B before having added B, ', list_A, list_B)
+        print ('List A and List B before having added B, ', list_A, list_B)
         starting_site = 0
         ending_site = len(list_DNA[0]) 
         list_A, list_B, does_B_bind = add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, random_binding_site, random_B, does_B_bind ) #add B to one random site within all DNA
-        #print ('List A and List B after having added B, ', list_A, list_B)
+        print ('List A and List B after having added B, ', list_A, list_B)
         
     else: #there is at least one Binding site in B protein that is already bound 
        
@@ -94,25 +94,25 @@ def add_B_event ( list_DNA, list_A, list_B, random_B, L, does_B_bind):
         else: 
             ending_site = int(DNA_index_where_B_bound+L)
             
-        #print ('Dna index where the B is bound', DNA_index_where_B_bound)
+        print ('Dna index where the B is bound', DNA_index_where_B_bound)
         
-        #print ('List A and List B before having added B, ', list_A, list_B)
+        print ('List A and List B before having added B, ', list_A, list_B)
         list_A, list_B, does_B_bind = add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, random_B_free_site, random_B, does_B_bind )
-        #print ('List A and List B after having added B, ', list_A, list_B)
+        print ('List A and List B after having added B, ', list_A, list_B)
         
                                                               
     return list_DNA, list_A, list_B, does_B_bind
 
 def add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, random_binding_site, random_B, does_B_bind ):
     
-    #print ('Starting site', starting_site)
-    #print ('Ending site', ending_site)
+    print ('Starting site', starting_site)
+    print ('Ending site', ending_site)
     
     #The problem if the random A selcted is already bound to B 
     range_sites_within_L = list_DNA [0, starting_site:ending_site+1] #look within a maximum distance L for an A bound 
-    #print('Range sites within a distance L', range_sites_within_L)
+    print('Range sites within a distance L', range_sites_within_L)
     sites_with_bound_A = list (np.where (range_sites_within_L == 1)[0]) #find the sites in the specified distance
-    #print('sites_with_bound_A', sites_with_bound_A)
+    print('sites_with_bound_A', sites_with_bound_A)
     if starting_site != 0:
     # Convert relative indices to original indices in list_DNA
         sites_with_bound_A = [i + starting_site for i in sites_with_bound_A]
@@ -120,22 +120,22 @@ def add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, ran
     
     for site in sites_with_bound_A[:]:  # Use a slice to create a copy of the list
      corresponding_A_to_site = np.where(list_A[:, 0] == site)[0]
-     #print('Site', site, 'corresponding_A_to_site', corresponding_A_to_site)
+     print('Site', site, 'corresponding_A_to_site', corresponding_A_to_site)
      if list_A[corresponding_A_to_site, 1] != -1:  # If that A is already bound to a B
-        #print('Before removing the site', sites_with_bound_A)
+        print('Before removing the site', sites_with_bound_A)
         sites_with_bound_A.remove(site)  # Remove the site
-        #print('After removing the site', sites_with_bound_A)
+        print('After removing the site', sites_with_bound_A)
 
             
     if len(sites_with_bound_A) > 0 : #if there is at leas ìt one bound A in the given lenght 
-        #print ('Sites with bound A', sites_with_bound_A )
+        print ('Sites with bound A', sites_with_bound_A )
         random_site_with_A_to_bind = random.choice (sites_with_bound_A)#[np.random.randint(0, len (sites_with_bound_A))]#choose randomly one of these sites. We assume B always bind independently of the energy
-        #print ('Random site with bound A', random_site_with_A_to_bind)
+        print ('Random site with bound A', random_site_with_A_to_bind)
         del sites_with_bound_A #clearing memory after usage
         #Get the A to which that occupied site correspond to 
         A_to_bind = np.where(list_A[:, 0] == random_site_with_A_to_bind)[0]
         
-        #print('A to bind:', A_to_bind)
+        print('A to bind:', A_to_bind)
         
         list_B[random_B, random_binding_site] = A_to_bind #mark B as occupied by replacing -1 with the A to which it is bound
         list_A[A_to_bind, 1] = random_B #mark also that the A is bound to B 
@@ -176,17 +176,21 @@ def energy_unbind_function_B (B, Eba):
     
     #computing the number of sites in B protein that are bound
     energy = compute_energy_B_binding (B, Eba)
+    print ('energy unbind B', B, energy  )
     return energy
 
 def energy_function_unbinding_A (list_DNA, A, list_B, E_ad, E_aa, E_ab): 
     DNA_site_index = A[0] #find the index to which A is bound 
     if A[1] != (-1 ): #There is a B bound to that A
             B = list_B[A[1],:] #all binding sites for that B 
+            #print (B)
             B_energy = compute_energy_B_binding (B, E_ab) #compute the energy of B protein bound to A, depending on the number of B sites 
+            #print ('energy unbind a', B, B_energy  )
     else: 
             B_energy = 0 #if there are no B bound to A the corresponding energy will be zero 
-            
+            #print ('energy unbind a', B_energy  )        
     A_energy = compute_energy_A_binding (DNA_site_index, list_DNA, E_ad, E_aa)
+    #print ('energy unbind a', A_energy ) 
     return A_energy + B_energy
 
 
@@ -214,4 +218,9 @@ def compute_energy_B_binding (B, energy):
     bound_B_sites =np.where (B != -1)[0]
     B_energy = energy * len(bound_B_sites)
     return B_energy 
-    
+
+def compute_probability_removal (k_bound):
+#function that takes the number of B bound sites and computes the probability of removal event for B 
+#We want to be 0 if all the sites are free and 1 if all the sites are occupied 
+    p = k_bound/(1+k_bound)
+    return p     

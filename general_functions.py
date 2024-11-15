@@ -131,8 +131,8 @@ def take_sample (time_step,list_DNA, list_A, nA_bound_snapshots, average_cluster
     max_cluster_sizes[0,number_previously_sampled] =max_count
     #clusters_each_time_sampled.append(clusters)
     rate_counter =0 #everytime take a sample put the counter back to zero
-    
-    # print(f"Group sizes: {group_sizes}") 
+    print (list_DNA)
+    print(f"Group sizes: {group_sizes}") 
     # print(f"Max count: {max_count}") 
     # print(f"Position of the first member of each cluster: {positions_first_clusters}") 
     time_step_sampled[0,number_previously_sampled] = time_step

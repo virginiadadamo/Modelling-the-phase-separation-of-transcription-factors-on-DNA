@@ -22,13 +22,13 @@ ASSUMPTIONS:
 
 ###PARAMETERS###
 
-alfa = 0.15 #ratio between nA/N 
+alfa = 0.2 #ratio between nA/N 
 N = 3000 #10000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
 nB = 20 #number of Bs
-k = 10 #number of B interacting sites with A  
+k = 5 #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True  
@@ -55,7 +55,7 @@ E_ad_values = np.arange(0, 4, 1)
 E_aa_values = [0, 2.5]
 #E_aa_values = [2.5]
 E_ab = 7
-E_ba = 0
+E_ba = 1
 
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
 
@@ -123,7 +123,7 @@ for E_aa in E_aa_values:
         #time_step_sampled = [] #To store the time steps that are being sampled
         rate_counter = 0 #To count the steps after the first sampled one
         residence_times = np.zeros((1,nA)) # To store for each transcription the residence times and binding events. It is initialised at 0, if a binding event occurs the time of binding will be store. If an unbinding event then happens the time stored will be used to compute the Residence time and the value will be put to 0 again
-        does_B_bind = np.ones((1,nA)) #To study 
+        does_B_bind = np.ones((1,nA)) #To study if a transcription factor never sees a B. Start all at 1, put a 0 if a B binds to that A 
         times_variables = [{'Index of Transcription Factor': i, 
                         'Residence times': [],
                         'Mean residence time' : 0 ,
@@ -141,7 +141,7 @@ for E_aa in E_aa_values:
         #DNA parameters 
         
         list_DNA = np.zeros((1,N)) #Array representing the DNA sites: 0 corresponds to an empty site, 1 to a site with an transcription factor bound to it- at the initial state there is no bound A to the DNA 
-        
+        #rimetti a 0
         
         
         
