@@ -1,3 +1,0 @@
-Index 197: Mean Residence Time = 2219.0
-Index 432: Mean Residence Time = 567.0
-Index 440: Mean Residence Time = 3224.5
