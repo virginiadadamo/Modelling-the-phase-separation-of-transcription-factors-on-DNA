@@ -22,8 +22,8 @@ ASSUMPTIONS:
 
 ###PARAMETERS###
 
-alfa = 0.2 #ratio between nA/N 
-N = 3000 #10000 #total number of binding sites in the DNA
+alfa = 0.7 #ratio between nA/N 
+N = 10000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
@@ -31,7 +31,7 @@ nB = 20 #number of Bs
 k = 5 #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= False  
+protein_B= True   
 L = 5#distance (in terms of binding sites in the DNA) from one binding site in B protein to the other
 #Try also L = 10 
 

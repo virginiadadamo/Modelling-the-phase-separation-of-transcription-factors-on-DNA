@@ -12,10 +12,10 @@ import random
 def add_A (list_DNA, empty_random_site, list_A , random_A, residence_times, list_empty_DNA, times_variables, time_step):
     
     if list_A[random_A,0] == (-1): #A is free
-        #print (f'Step: adding of a free A : (time step={time_step}, A selected is ={random_A})')
+        print (f'Step: adding of a free A : (time step={time_step}, A selected is ={random_A})')
         list_DNA [0,empty_random_site] = 1  #always add because it lowers the energy 
         list_A [random_A,0] = empty_random_site #change the value in list A, instead of (-1) to the site where A is bound 
-        #print (f'The site to which the A was added is {empty_random_site}, the DNA is  ={list_DNA})')
+        print (f'The site to which the A was added is {empty_random_site}, the DNA is  ={list_DNA})')
         residence_times[0,random_A] = time_step
         list_empty_DNA.remove (empty_random_site)
         times_variables[random_A]['Count binding events'] += 1
@@ -33,22 +33,22 @@ def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_tim
         if random_binding < 1/np.exp(energy): #if energy condition then it will remove
         
             list_DNA, list_A,list_empty_DNA,residence_times, times_variables = remove_A_from_DNA_site(list_DNA, list_A, random_A,list_empty_DNA,residence_times,time_step, times_variables)
-            #print (f'Removal of A succceed: list_DNA {list_DNA}, list_A  ={list_A}, list_empty_DNA={list_empty_DNA} ')
+            print (f'Removal of A succceed: list_DNA {list_DNA}, list_A  ={list_A}, list_empty_DNA={list_empty_DNA} ')
             
             if A[1] != (-1): #Also a B protein is bound, it must be freed
-                #print ('Step: remove A but also B is bound')
+                print ('Step: remove A but also B is bound')
                 B_bound = A[1]
                 B_bound_site = np.where(list_B[B_bound,:] == random_A)[0] #find the site 
-                #print('List a and B before:', list_A, list_B)
+                print('List a and B before:', list_A, list_B)
                 list_B[B_bound,B_bound_site] = -1 #setting B as free in the list of Bs
                 list_A [random_A,1] = -1 #mark as free the corresponding site on A 
-                #print('List a and B after:', list_A, list_B)
+                print('List a and B after:', list_A, list_B)
     return list_DNA, list_A, random_A,list_empty_DNA,residence_times 
 
 
 def remove_A_from_DNA_site (list_DNA, list_A, random_A,list_empty_DNA,residence_times,time_step, times_variables):  #CHANG ETHE NAME (RESET)
     
-    #print (f'Before starting removing the list of A is {list_A}, random A is {random_A}')
+    print (f'Before starting removing the list of A is {list_A}, random A is {random_A}')
     list_DNA [0,list_A [random_A, 0]] = 0 #A is removed 
     list_empty_DNA.append(list_A [random_A,0]) #the site is added to the list of empty sites 
     list_A [random_A,0] = -1 #A becomes unbound state
@@ -68,9 +68,9 @@ def add_B_event ( list_DNA, list_A, list_B, random_B, L, does_B_bind):
     print ('Adding B event selected', random_B)
     
     if (list_B[random_B, :] == -1).all():  #check if B is free, i.e. all the binding sites are empty (representing by -1 in the original matrix)
-        #print ('All random sites !')
+        print ('All random sites !')
         random_binding_site = np.random.randint(0, list_B.shape[1]) #choose randomly one of the sites
-        #print ('Random binding site', random_binding_site)
+        print ('Random binding site', random_binding_site)
         print ('List A and List B before having added B, ', list_A, list_B)
         starting_site = 0
         ending_site = len(list_DNA[0]) 
@@ -145,28 +145,28 @@ def add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, ran
         
 def remove_B_event (list_A, list_B,random_B, Eba):
 
- #print ('Removing B event')
+ print ('Removing B event')
  bound_B_sites =np.where (list_B[random_B, :] != -1)[0] #get the binding sites that are bound to the DNA
- #print ('Bound B sites', bound_B_sites)
+ print ('Bound B sites', bound_B_sites)
  # randomly choose one index within the bound sites 
  random_B_bound_site = random.choice(bound_B_sites) #pick randomly one of the bound sites 
- #print ('Random B bound site', random_B_bound_site )
+ print ('Random B bound site', random_B_bound_site )
  random_binding = np.random.random()  #draw a random number between 0 and 1
  energy = energy_unbind_function_B (list_B[random_B, :], Eba)#compute unbinding energy
- #print (energy)
+ print (energy)
  
  if random_binding < 1/np.exp(energy): #if energy condition succeed then it will remove
-     #print ('Removal succeeded')
-     #print ('List A and B before removing', list_A, list_B)
+     print ('Removal succeeded')
+     print ('List A and B before removing', list_A, list_B)
      list_A, list_B=remove_B_from_DNA_site(random_B_bound_site, list_A, list_B, random_B)
-     #print ('List A and B after removing', list_A, list_B)
+     print ('List A and B after removing', list_A, list_B)
      
  return list_A, list_B
     
 def remove_B_from_DNA_site (random_B_bound_site, list_A, list_B, random_B):
 
     index_bound_A = list_B[random_B,random_B_bound_site]
-    #print (index_bound_A)
+    print (index_bound_A)
     list_A[index_bound_A, 1] = -1 #marking that the B is no longer bound to the A
     list_B[random_B,random_B_bound_site] = -1 #setting B as free in the list of Bs
     
@@ -183,14 +183,14 @@ def energy_function_unbinding_A (list_DNA, A, list_B, E_ad, E_aa, E_ab):
     DNA_site_index = A[0] #find the index to which A is bound 
     if A[1] != (-1 ): #There is a B bound to that A
             B = list_B[A[1],:] #all binding sites for that B 
-            #print (B)
+            print (B)
             B_energy = compute_energy_B_binding (B, E_ab) #compute the energy of B protein bound to A, depending on the number of B sites 
-            #print ('energy unbind a', B, B_energy  )
+            print ('energy unbind a', B, B_energy  )
     else: 
             B_energy = 0 #if there are no B bound to A the corresponding energy will be zero 
-            #print ('energy unbind a', B_energy  )        
+            print ('energy unbind a', B_energy  )        
     A_energy = compute_energy_A_binding (DNA_site_index, list_DNA, E_ad, E_aa)
-    #print ('energy unbind a', A_energy ) 
+    print ('energy unbind a', A_energy ) 
     return A_energy + B_energy
 
 
