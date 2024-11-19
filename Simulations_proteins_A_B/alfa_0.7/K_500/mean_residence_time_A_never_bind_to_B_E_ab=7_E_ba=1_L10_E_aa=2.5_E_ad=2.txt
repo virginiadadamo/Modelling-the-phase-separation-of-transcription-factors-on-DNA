@@ -1,0 +1,2 @@
+Index 162: Mean Residence Time = 22.0
+Index 897: Mean Residence Time = 456.0

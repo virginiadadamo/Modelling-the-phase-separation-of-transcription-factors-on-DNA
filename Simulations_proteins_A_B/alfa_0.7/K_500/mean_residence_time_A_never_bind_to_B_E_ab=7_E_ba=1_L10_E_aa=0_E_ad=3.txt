@@ -1,0 +1,2 @@
+Index 543: Mean Residence Time = 466.0
+Index 1002: Mean Residence Time = 2836.0

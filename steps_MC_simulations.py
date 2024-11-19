@@ -53,7 +53,7 @@ def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L
     # ### B PART ###
     random_B = np.random.randint(0, list_B.shape[0])#choose random B means choosing one between the rows of the nB x K matrix representing Bs  
     
-    
+    random_event = np.random.random() 
     B_bound_sites = np.where (list_B[random_B, :] != -1)[0] #selecting all binding sites which are not free
     
     if len(B_bound_sites) == 0:
@@ -64,7 +64,7 @@ def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L
     probability_removal = events_for_MC_steps.compute_probability_removal(number_of_bound_sites)
     #print ('probability_removal', probability_removal)
     
-    if probability_removal <= 0.5:  #Adding B event is selected 
+    if random_event < 0.5:  #Adding B event is selected 
         
         if (list_B[random_B, :] == -1).any() :#if there is at least one empty binding site
               list_DNA, list_A, list_B , does_B_bind= events_for_MC_steps.add_B_event( list_DNA, list_A, list_B, random_B, L, does_B_bind)

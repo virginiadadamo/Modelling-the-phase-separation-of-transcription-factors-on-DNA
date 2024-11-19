@@ -1,0 +1,3 @@
+Index 421: Mean Residence Time = 497.0
+Index 1847: Mean Residence Time = 118.0
+Index 1943: Mean Residence Time = 1000.0
