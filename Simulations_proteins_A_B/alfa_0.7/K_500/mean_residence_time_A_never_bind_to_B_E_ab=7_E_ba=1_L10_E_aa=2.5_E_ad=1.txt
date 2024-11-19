@@ -1,2 +1,0 @@
-Index 1273: Mean Residence Time = 1593.0
-Index 1926: Mean Residence Time = 2785.0

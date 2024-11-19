@@ -1,4 +1,0 @@
-# Simulation Parameters
-alfa = 0.7  # Ratio between nA and N
-stop_time = 100  # Simulation stop time
-ignoring_steps = 0  # Steps to ignore

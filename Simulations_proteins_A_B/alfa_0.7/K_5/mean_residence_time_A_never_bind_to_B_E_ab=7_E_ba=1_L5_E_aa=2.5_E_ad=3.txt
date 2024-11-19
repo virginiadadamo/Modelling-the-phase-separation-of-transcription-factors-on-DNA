@@ -1,2 +1,0 @@
-Index 1409: Mean Residence Time = 570.0
-Index 1607: Mean Residence Time = 302.0
