@@ -53,6 +53,7 @@ def create_txt_parameters (subfolder_path, alfa, stop_time, ignoring_steps):
         f.write(f"alfa = {alfa}  # Ratio between nA and N\n")
         f.write(f"stop_time = {stop_time}  # Simulation stop time\n")
         f.write(f"ignoring_steps = {ignoring_steps}  # Steps to ignore\n")
+    return txt_filename
         
     
 
@@ -113,6 +114,13 @@ def count_consecutive_ones(DNA_list, return_only_nA= True):
 def count_A (list_A):
     return len([x for x in list_A[0,:] if x != (-1)])
 
+def count_fraction_occupied_sites_B(B_list):
+   
+    count = np.count_nonzero(B_list != -1, axis=1)
+    count = count / B_list.shape[1]
+    
+    return np.reshape (count, ((1, B_list.shape[0] )))
+
 
 def take_sample (time_step,list_DNA, list_A, nA_bound_snapshots, average_cluster_sizes, stdv_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled):
     
@@ -131,8 +139,7 @@ def take_sample (time_step,list_DNA, list_A, nA_bound_snapshots, average_cluster
     max_cluster_sizes[0,number_previously_sampled] =max_count
     #clusters_each_time_sampled.append(clusters)
     rate_counter =0 #everytime take a sample put the counter back to zero
-    print (list_DNA)
-    print(f"Group sizes: {group_sizes}") 
+    
     # print(f"Max count: {max_count}") 
     # print(f"Position of the first member of each cluster: {positions_first_clusters}") 
     time_step_sampled[0,number_previously_sampled] = time_step

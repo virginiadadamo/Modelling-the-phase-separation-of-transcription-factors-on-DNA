@@ -32,7 +32,7 @@ def step_MC_protein_A (time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad
     
     return time_step, list_DNA, list_A, list_empty_DNA, times_variables, residence_times
    
-def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L, p, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables, does_B_bind):
+def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables, does_B_bind):
     
     random.seed(time.time())
     random_A = np.random.randint(0, list_A.shape[0])
@@ -62,7 +62,7 @@ def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L
         number_of_bound_sites = len(B_bound_sites)
     
     probability_removal = events_for_MC_steps.compute_probability_removal(number_of_bound_sites)
-    print ('probability_removal', probability_removal)
+    #print ('probability_removal', probability_removal)
     
     if probability_removal <= 0.5:  #Adding B event is selected 
         

@@ -23,23 +23,21 @@ ASSUMPTIONS:
 ###PARAMETERS###
 
 alfa = 0.7 #ratio between nA/N 
-N = 3000 #total number of binding sites in the DNA
+N = 10#3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
-nB = 20 #number of Bs
+nB = 50 #number of Bs #50 AND 100 AND 500  L=10
 k = 5 #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= False    
-L = 5#distance (in terms of binding sites in the DNA) from one binding site in B protein to the other
-#Try also L = 10 
+protein_B= True    
 
 
 #Time parameters
 stop_time = 2000000
 ignoring_steps = 10000
-m = 50
+m = 100
 
 number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
@@ -54,12 +52,21 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 E_ad_values = np.arange(0, 4, 1)
 E_aa_values = [0, 2.5]
 #E_aa_values = [2.5]
-E_ab = 7
-E_ba = 1
+
+#B parameters 
+if protein_B:
+    E_ab = 7
+    E_ba = 1
+    L = 10 
+else: 
+    E_ab = 0
+    E_ba = 0
+    L = 0
 
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
 
 #For each combination of Eaa and Ead
+average_B_fraction = True 
 plot_never_unbind = True #plot to identify the TF that never unbinds
 histogram_never_unbind = True  
 plot_cluster_sizes_over_time = False #To plot the mean cluster size at each time step, with error bars with the corresponding standard deviation 
@@ -70,7 +77,7 @@ histogram_binding_events = False #To plot the distribution of binding events of 
 histogram_cluster_size = True #To plot the distribution of cluster sizes 
 
 #For each E_aa
-plot_nA_bound = False #Plot the number of transcription factors bound in time
+plot_nA_bound = True #Plot the number of transcription factors bound in time
 plot_inverse = False #Plot the inverse of the number of transcription factors vs the inverse of the corresponding time steps 
 histogram_binding_events_E_aa = False #Plot the distribution of binding events of the transcription factors for each E_aa
 plot_mean_cluster_size_max_cluster_size = False #Plot Mean Cluster Size vs Max Cluster size
@@ -89,8 +96,8 @@ if protein_B :
 else:
     folder_name = 'Simulations_protein_A'
     
-subfolder_path = general_functions.create_folders(folder_name, alfa, k)
-general_functions.create_txt_parameters(subfolder_path, alfa, stop_time, ignoring_steps)
+subfolder_path = general_functions.create_folders(folder_name, alfa, nB)
+sim_parameters = general_functions.create_txt_parameters(subfolder_path, alfa, stop_time, ignoring_steps)
 
 legend = f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\nn={N}\nE_ab={E_ab}\nE_ba={E_ba}\nL={L}'
 
@@ -120,7 +127,6 @@ for E_aa in E_aa_values:
         time_step = 0 #initial time step
         number_previously_sampled = 0
         time_step_sampled = np.zeros((1,number_of_time_steps_sampled))
-        #time_step_sampled = [] #To store the time steps that are being sampled
         rate_counter = 0 #To count the steps after the first sampled one
         residence_times = np.zeros((1,nA)) # To store for each transcription the residence times and binding events. It is initialised at 0, if a binding event occurs the time of binding will be store. If an unbinding event then happens the time stored will be used to compute the Residence time and the value will be put to 0 again
         does_B_bind = np.ones((1,nA)) #To study if a transcription factor never sees a B. Start all at 1, put a 0 if a B binds to that A 
@@ -141,7 +147,7 @@ for E_aa in E_aa_values:
         #DNA parameters 
         
         list_DNA = np.zeros((1,N)) #Array representing the DNA sites: 0 corresponds to an empty site, 1 to a site with an transcription factor bound to it- at the initial state there is no bound A to the DNA 
-        #rimetti a 0
+        
         
         
         
@@ -159,17 +165,15 @@ for E_aa in E_aa_values:
         
         nA_bound_snapshots = np.zeros((1,number_of_time_steps_sampled))
         list_B = np.full((nB, k), -1) #-1 if it's unbound, otherwhise store the A to which it is bound 
+        fraction_occupied_sites = np.zeros ((number_of_time_steps_sampled,nB))
         
-        
-        if protein_B:
-            #Add B parameters 
-            p = 0.5 #probability of binding event 
-            
+       
+        DNA_over_time_file = os.path.join(subfolder_path, f"nA_{nA}_n_{N}_DNA_list_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.txt")
             
         while time_step < stop_time:
             
             if protein_B:
-                time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times, does_B_bind = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, p, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables, does_B_bind)
+                time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times, does_B_bind = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables, does_B_bind)
             else:
                 time_step, list_DNA, list_A, list_empty_DNA, times_variables,residence_times = steps_MC_simulations.step_MC_protein_A(time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad, E_aa, E_ab, residence_times, times_variables)
             
@@ -184,12 +188,36 @@ for E_aa in E_aa_values:
                 rate_counter = rate_counter + 1
                 
                 if rate_counter == m: #sampling occurs
-                    
+                   
+                    print (list_DNA)
+                    with open(DNA_over_time_file, 'a') as file:
+                        
+                        print ('list A', list_A)
+                        print ('list B', list_B)
+                        indices = np.where(list_A[:, 1] != -1)[0]  # Returns indices of As bound to B 
 
-                
+                        print (indices)
+                        for idx in indices:
+                            list_DNA[0,list_A[idx, 0]] = 2  # Set all elements in the row `idx` of DNA to 2
+
+                        # Write the DNA to the new file
+                        file.write(f"Time step {time_step}: DNA = ")
+                    
+                        # Loop through each element in the DNA and write each element on the same line
+                        for row in list_DNA:
+                            for element in row:
+                                file.write(f"{int(element)} ")  # Write each element, converted to an integer, followed by a space
+                        
+                        file.write("\n")  # Newline after writing all elements for the current time step
+                        
+                        for idx in indices:
+                            list_DNA[0,list_A[idx, 0]] = 1
                     group_sizes, max_count, nA_bound_snapshots, average_cluster_sizes, stdv_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled = general_functions.take_sample(time_step, list_DNA, list_A, nA_bound_snapshots, average_cluster_sizes, stdv_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled)
                     
-                    
+            
+                    if protein_B:
+                        fraction_occupied_sites[number_previously_sampled-1, :]  = general_functions.count_fraction_occupied_sites_B(list_B)
+
                     
         
         times_never_unbind =  [x for x in residence_times[0] if x != 0]
@@ -241,7 +269,21 @@ for E_aa in E_aa_values:
         mean_cluster_sizes.append(np.mean(average_cluster_sizes)) #taking the mean of cluster sizes for each energy value
         mean_max_cluster_sizes.append(np.mean(max_cluster_sizes)) #taking the mean of maximum sized cluster for each energy value 
         
+        
+        average_occupied_B_fraction_over_time = np.mean(fraction_occupied_sites, axis=0)
         ### PLOTS FOR EACH COMBINATION OF E_AA AND E_AD ###
+        
+        if average_B_fraction :
+            
+            plot_average_B_fraction_title = f'Avarage over time of occupied sites for each B(E_aa={E_aa}, E_ad={E_ad})'
+            saving_average_B_fraction_name = f'nA_{nA}_n_{N}_av_frac_bound_sites_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.png'
+            x_label_average_B_fraction = 'Index of TF'
+            y_label_average_B_fraction = 'Avearge number of occupied sites'
+            
+            general_functions.plot_figure (np.arange(nB), average_occupied_B_fraction_over_time, x_label_average_B_fraction ,y_label_average_B_fraction,plot_average_B_fraction_title,subfolder_path,saving_average_B_fraction_name)
+        
+       
+        
         
         if plot_never_unbind :
             plot_never_unbind_title = f'Transcription factor that bind but never unbind (E_aa={E_aa}, E_ad={E_ad})'
