@@ -1,0 +1,2 @@
+Index 4: Mean Residence Time = 3.5
+Index 13: Mean Residence Time = 8.0

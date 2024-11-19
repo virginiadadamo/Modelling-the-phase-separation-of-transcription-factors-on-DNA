@@ -23,11 +23,11 @@ ASSUMPTIONS:
 ###PARAMETERS###
 
 alfa = 0.7 #ratio between nA/N 
-N = 10#3000 #total number of binding sites in the DNA
+N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
-nB = 500 #number of Bs #50 AND 100 AND 500  L=10
+nB = 50 #number of Bs #50 AND 100 AND 500  L=10
 k = 5 #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
@@ -48,27 +48,28 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
 #Energy parameters 
 
-#E_ad_values = [2]
 E_ad_values = np.arange(0, 4, 1)
 E_aa_values = [0, 2.5]
-#E_aa_values = [2.5]
+
 
 #B parameters 
 if protein_B:
     E_ab = 7
     E_ba = 1
     L = 10 
-else: 
+    
+else: #put these same parameters to 0 
     E_ab = 0
     E_ba = 0
     L = 0
 
+
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
 
 #For each combination of Eaa and Ead
-average_B_fraction = True 
-plot_never_unbind = True #plot to identify the TF that never unbinds
-histogram_never_unbind = True  
+average_B_fraction = True #plot to identify the average (over time steps sampled) of the fraction of bound sites for each B protein
+plot_never_unbind = True #plot to identify the time at which the TFs that never leave the DNA bind
+histogram_never_unbind = True #histogram to identify the distribution of Binding Times of the TFs that never leave the DNA
 plot_cluster_sizes_over_time = False #To plot the mean cluster size at each time step, with error bars with the corresponding standard deviation 
 histogram_mean_residence_time = True # To plot the corresponding distribution of mean residence times of the transcription factors
 scatter_plot_std = False #To plot the standard deviation of the residence times of each transcription factors 
@@ -145,12 +146,9 @@ for E_aa in E_aa_values:
         mean_residence_time = 0 #To compute the mean of the residence times over all transcription factors
         
         #DNA parameters 
-        
         list_DNA = np.zeros((1,N)) #Array representing the DNA sites: 0 corresponds to an empty site, 1 to a site with an transcription factor bound to it- at the initial state there is no bound A to the DNA 
         
-        
-        
-        
+
         list_empty_DNA  = list(range (0,list_DNA.shape[1],1)) #list containing all the indexes of empty sites in the DNA
         nA_bound_DNA = 0 # number of Transcription factors that are bound to the DNA
         
@@ -167,7 +165,7 @@ for E_aa in E_aa_values:
         list_B = np.full((nB, k), -1) #-1 if it's unbound, otherwhise store the A to which it is bound 
         fraction_occupied_sites = np.zeros ((number_of_time_steps_sampled,nB))
         
-       
+        #File to store the DNA over time sampled
         DNA_over_time_file = os.path.join(subfolder_path, f"nA_{nA}_n_{N}_DNA_list_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.txt")
             
         while time_step < stop_time:
@@ -180,27 +178,20 @@ for E_aa in E_aa_values:
             
             nA_bound_DNA = general_functions.count_consecutive_ones(list_DNA)
             
-            #print ('Number of A that are currently bound', nA_bound_DNA)
-            
-            
             if time_step >= ignoring_steps: 
                 
                 rate_counter = rate_counter + 1
                 
                 if rate_counter == m: #sampling occurs
                    
-                    print (list_DNA)
+                    
                     with open(DNA_over_time_file, 'a') as file:
+                    
                         
-                        print ('list A', list_A)
-                        print ('list B', list_B)
                         indices = np.where(list_A[:, 1] != -1)[0]  # Returns indices of As bound to B 
-
-                        print (indices)
+                        
                         for idx in indices:
-                            list_DNA[0,list_A[idx, 0]] = 2  # Set all elements in the row `idx` of DNA to 2
-
-                        # Write the DNA to the new file
+                            list_DNA[0,list_A[idx, 0]] = 2  #Put the corresponding sites as 2, marked by B protein
                         file.write(f"Time step {time_step}: DNA = ")
                     
                         # Loop through each element in the DNA and write each element on the same line
@@ -210,8 +201,9 @@ for E_aa in E_aa_values:
                         
                         file.write("\n")  # Newline after writing all elements for the current time step
                         
-                        for idx in indices:
+                        for idx in indices: #Put everything back as it was before sampling 
                             list_DNA[0,list_A[idx, 0]] = 1
+                    
                     group_sizes, max_count, nA_bound_snapshots, average_cluster_sizes, stdv_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled = general_functions.take_sample(time_step, list_DNA, list_A, nA_bound_snapshots, average_cluster_sizes, stdv_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled)
                     
             
