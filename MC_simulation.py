@@ -31,7 +31,7 @@ nB = 100 #500 #number of Bs #50 AND 100 AND 500  L=10
 k = 5 #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= True    
+protein_B= False    
 
 
 #Time parameters
@@ -49,7 +49,7 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 #Energy parameters 
 
 E_ad_values = np.arange(0, 4, 1)
-E_aa_values = [0]
+E_aa_values = [1,2]
 
 
 #B parameters 
