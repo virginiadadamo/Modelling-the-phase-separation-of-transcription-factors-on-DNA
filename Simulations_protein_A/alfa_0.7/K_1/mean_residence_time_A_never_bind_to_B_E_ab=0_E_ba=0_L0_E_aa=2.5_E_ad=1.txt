@@ -1,0 +1,13 @@
+Index 2: Mean Residence Time = 442.5
+Index 3: Mean Residence Time = 116.0
+Index 4: Mean Residence Time = 266.5
+Index 6: Mean Residence Time = 51.0
+Index 7: Mean Residence Time = 917.0
+Index 13: Mean Residence Time = 13.0
+Index 0: Mean Residence Time = 812.0
+Index 2: Mean Residence Time = 276.3333333333333
+Index 3: Mean Residence Time = 298.6666666666667
+Index 7: Mean Residence Time = 512.0
+Index 9: Mean Residence Time = 237.66666666666666
+Index 10: Mean Residence Time = 37.0
+Index 12: Mean Residence Time = 239.66666666666666

@@ -1,0 +1,1 @@
+Index 255: Mean Residence Time = 8036.0

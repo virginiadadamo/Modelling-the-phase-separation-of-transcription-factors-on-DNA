@@ -27,17 +27,17 @@ N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
-nB = 500 #number of Bs #50 AND 100 AND 500  L=10
+nB = 4#500 #number of Bs #50 AND 100 AND 500  L=10
 k = 5 #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= True    
+protein_B= False    
 
 
 #Time parameters
 stop_time = 2000000
-ignoring_steps = 10000
-m = 100
+ignoring_steps = 250000
+m = 50
 
 number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
@@ -49,7 +49,7 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 #Energy parameters 
 
 E_ad_values = np.arange(0, 4, 1)
-E_aa_values = [0, 2.5]
+E_aa_values = [0]
 
 
 #B parameters 
@@ -171,7 +171,7 @@ for E_aa in E_aa_values:
         while time_step < stop_time:
             
             if protein_B:
-                time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times, does_B_bind = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables, does_B_bind)
+                time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times, does_B_bind = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables, does_B_bind, k)
             else:
                 time_step, list_DNA, list_A, list_empty_DNA, times_variables,residence_times = steps_MC_simulations.step_MC_protein_A(time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad, E_aa, E_ab, residence_times, times_variables)
             

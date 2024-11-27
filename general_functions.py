@@ -15,18 +15,8 @@ from scipy.stats import norm, expon, gamma  # Import common distributions
 ###FUNCTIONS CREATE FOLDERS AND TXT FILES ###
 
 
-def create_folders(folder_name, alfa, k):
-    """
-    Creates a folder named after L inside a subfolder named 'alfa_{alfa}'.
-    
-    Parameters:
-    - folder_name: Path where the main folder structure should be created.
-    - alfa: Value used to create a subfolder called 'alfa_{alfa}'.
-    - L: Folder name that will be created inside 'alfa_{alfa}'.
+def create_folders(folder_name, alfa, nB):
 
-    Returns:
-    - path to the newly created folder named after L.
-    """
     # Create the subfolder named 'alfa_{alfa}'
     subfolder_name = f'alfa_{alfa}'
     subfolder_path = os.path.join(folder_name, subfolder_name)
@@ -34,8 +24,8 @@ def create_folders(folder_name, alfa, k):
     # Create the subfolder if it doesn't already exist
     os.makedirs(subfolder_path, exist_ok=True)
     
-    # Now create a subfolder inside 'alfa_{alfa}' named after L
-    L_folder_name = f'K_{k}'  # Make sure L is a string for the folder name
+    # Now create a subfolder inside 'alfa_{alfa}' named after nB
+    L_folder_name = f'nB_{nB}'  
     L_folder_path = os.path.join(subfolder_path, L_folder_name)
     
     # Create the L folder inside 'alfa_{alfa}'
@@ -212,7 +202,7 @@ def plot_histogram(
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.title(title)
-    plt.legend()
+    plt.legend(loc='best')
     
     # Add legend text as an annotation
     plt.text(1, 1, legend, horizontalalignment='left', verticalalignment='top', 
@@ -287,7 +277,7 @@ def plot_different_Ead_in_time (element_for_different_energies, E_ad_values, tim
     plt.title(title)
     plt.text(0.95, 0.05, legend, 
               horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
-    plt.legend()
+    plt.legend(loc='best')
     plot_filename = os.path.join(subfolder_path,saving_name)
     plt.savefig(plot_filename)
     plt.show()
@@ -316,7 +306,7 @@ def plot_histogram_distribution_different_E_ad (list_to_plot,E_ad_values, E_aa, 
     
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.legend()
+    plt.legend(loc='best')
     
     plot_filename = os.path.join(subfolder_path, saving_name)
     plt.savefig(plot_filename)
@@ -341,7 +331,6 @@ def comparison_plots_different_E_aa(list_to_plot, E_aa_values, E_ad_values, xlab
     
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.ylim (0, 20)
     plt.title(title)
     
     
@@ -349,7 +338,7 @@ def comparison_plots_different_E_aa(list_to_plot, E_aa_values, E_ad_values, xlab
     plt.text(0.5, 0.95, legend, 
               horizontalalignment='center', verticalalignment='top', transform=plt.gca().transAxes)
     
-    plt.legend()
+    plt.legend(loc='best')
     plot_filename = os.path.join(subfolder_path, saving_name)
     plt.savefig(plot_filename)
     plt.show()
