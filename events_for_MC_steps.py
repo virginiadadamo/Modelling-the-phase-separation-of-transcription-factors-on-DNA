@@ -152,9 +152,9 @@ def remove_B_event (list_DNA, list_A, list_B,random_B, k, Eba):
  random_B_bound_site = random.choice(bound_B_sites) #pick randomly one of the bound sites 
  #print ('Random B bound site', random_B_bound_site )
  random_binding = np.random.random()  #draw a random number between 0 and 1
- energy = energy_unbind_function_B (list_B[random_B, :], Eba)#compute unbinding energy
+ #energy = energy_unbind_function_B (list_B[random_B, :], Eba)#compute unbinding energy
  DNA_site_to_which_A_bound = list_A[list_B[random_B, random_B_bound_site], 0]
- #energy = energy_unbind_function_B_adjacent (list_DNA, list_A, DNA_site_to_which_A_bound, k, Eba)
+ energy = energy_unbind_function_B_adjacent (list_DNA, list_A, DNA_site_to_which_A_bound, k, Eba)
  
  
  if random_binding < 1/np.exp(energy): #if energy condition succeed then it will remove
@@ -196,8 +196,8 @@ def energy_function_unbinding_A (list_DNA, list_A, A, list_B, E_ad, E_aa, E_ab, 
             B = list_B[A[1],:] #all binding sites for that B 
             #print (B)
     
-            #B_energy = compute_energy_B_binding_adjacent (list_DNA, list_A,DNA_site_index, k, E_ab) 
-            B_energy = compute_energy_B_binding (B, E_ab) #compute the energy of B protein bound to A, depending on the number of B sites 
+            B_energy = compute_energy_B_binding_adjacent (list_DNA, list_A,DNA_site_index, k, E_ab) 
+            #B_energy = compute_energy_B_binding (B, E_ab) #compute the energy of B protein bound to A, depending on the number of B sites 
             #print ('energy unbind a', B, B_energy  )
     else: 
             B_energy = 0 #if there are no B bound to A the corresponding energy will be zero 
