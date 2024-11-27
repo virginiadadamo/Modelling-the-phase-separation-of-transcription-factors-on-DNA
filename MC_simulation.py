@@ -185,24 +185,24 @@ for E_aa in E_aa_values:
                 if rate_counter == m: #sampling occurs
                    
                     
-                    with open(DNA_over_time_file, 'a') as file:
+                    # with open(DNA_over_time_file, 'a') as file:
                     
                         
-                        indices = np.where(list_A[:, 1] != -1)[0]  # Returns indices of As bound to B 
+                    #     indices = np.where(list_A[:, 1] != -1)[0]  # Returns indices of As bound to B 
                         
-                        for idx in indices:
-                            list_DNA[0,list_A[idx, 0]] = 2  #Put the corresponding sites as 2, marked by B protein
-                        file.write(f"Time step {time_step}: DNA = ")
+                    #     for idx in indices:
+                    #         list_DNA[0,list_A[idx, 0]] = 2  #Put the corresponding sites as 2, marked by B protein
+                    #     file.write(f"Time step {time_step}: DNA = ")
                     
-                        # Loop through each element in the DNA and write each element on the same line
-                        for row in list_DNA:
-                            for element in row:
-                                file.write(f"{int(element)} ")  # Write each element, converted to an integer, followed by a space
+                    #     # Loop through each element in the DNA and write each element on the same line
+                    #     for row in list_DNA:
+                    #         for element in row:
+                    #             file.write(f"{int(element)} ")  # Write each element, converted to an integer, followed by a space
                         
-                        file.write("\n")  # Newline after writing all elements for the current time step
+                    #     file.write("\n")  # Newline after writing all elements for the current time step
                         
-                        for idx in indices: #Put everything back as it was before sampling 
-                            list_DNA[0,list_A[idx, 0]] = 1
+                    #     for idx in indices: #Put everything back as it was before sampling 
+                    #         list_DNA[0,list_A[idx, 0]] = 1
                     
                     group_sizes, max_count, nA_bound_snapshots, average_cluster_sizes, stdv_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled = general_functions.take_sample(time_step, list_DNA, list_A, nA_bound_snapshots, average_cluster_sizes, stdv_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled)
                     
