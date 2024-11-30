@@ -27,7 +27,7 @@ N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
-nB = 1 #100 #500 #number of Bs 
+nB = 100 #100 #500 #number of Bs 
 k = 5 #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
