@@ -22,16 +22,17 @@ def add_A (list_DNA, empty_random_site, list_A , random_A, residence_times, list
         
     return list_DNA,list_A, residence_times, list_empty_DNA, times_variables
     
-def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_times, times_variables, E_ad, E_aa, E_ab, time_step, k= 0):
+def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_times, times_variables, E_ad, E_aa, time_step, k= 0):
     
     random_binding = np.random.random()  #draw a random number between 0 and 1
     A = list_A [random_A,:] 
     if A[0] != (-1):  #if A is not free 
     
-        energy = energy_function_unbinding_A (list_DNA,list_A, A, list_B, E_ad, E_aa, E_ab, k)#compute unbinding energy
+        energy = energy_function_unbinding_A (list_DNA,list_A, A, list_B, E_ad, E_aa, k)#compute unbinding energy
         
         if random_binding < 1/np.exp(energy): #if energy condition then it will remove
-        
+            
+            
             list_DNA, list_A,list_empty_DNA,residence_times, times_variables = remove_A_from_DNA_site(list_DNA, list_A, random_A,list_empty_DNA,residence_times,time_step, times_variables)
             #print (f'Removal of A succceed: list_DNA {list_DNA}, list_A  ={list_A}, list_empty_DNA={list_empty_DNA} ')
             
@@ -43,6 +44,7 @@ def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_tim
                 list_B[B_bound,B_bound_site] = -1 #setting B as free in the list of Bs
                 list_A [random_A,1] = -1 #mark as free the corresponding site on A 
                 #print('List a and B after:', list_A, list_B)
+                
     return list_DNA, list_A, random_A,list_empty_DNA,residence_times 
 
 
@@ -143,7 +145,7 @@ def add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, ran
     return list_A, list_B, does_B_bind
     
         
-def remove_B_event (list_DNA, list_A, list_B,random_B, k, Eba):
+def remove_B_event (list_DNA, list_A, list_B,random_B, L, Eba):
 #def remove_B_event (list_A, list_B,random_B, Eba):
  #print ('Removing B event')
  bound_B_sites =np.where (list_B[random_B, :] != -1)[0] #get the binding sites that are bound to the DNA
@@ -154,7 +156,7 @@ def remove_B_event (list_DNA, list_A, list_B,random_B, k, Eba):
  random_binding = np.random.random()  #draw a random number between 0 and 1
  #energy = energy_unbind_function_B (list_B[random_B, :], Eba)#compute unbinding energy
  DNA_site_to_which_A_bound = list_A[list_B[random_B, random_B_bound_site], 0]
- energy = energy_unbind_function_B_adjacent (list_DNA, list_A, DNA_site_to_which_A_bound, k, Eba)
+ energy = energy_unbind_function_B_adjacent (list_DNA, list_A, DNA_site_to_which_A_bound, L, Eba)
  
  
  if random_binding < 1/np.exp(energy): #if energy condition succeed then it will remove
@@ -182,29 +184,36 @@ def energy_unbind_function_B (B, Eba):
     return energy
 
 
-def energy_unbind_function_B_adjacent (list_DNA, list_A, A_corresponding_B_to_unbind, k, Eba): 
+def energy_unbind_function_B_adjacent (list_DNA, list_A, A_corresponding_B_to_unbind, L, Eba): 
     
     #computing the number of sites in B protein that are bound
-    energy = compute_energy_B_binding_adjacent (list_DNA, list_A, A_corresponding_B_to_unbind, k, Eba) 
+    energy = compute_energy_B_binding_adjacent (list_DNA, list_A, A_corresponding_B_to_unbind, L, Eba) 
     #print ('energy unbind B', B, energy  )
     return energy
 
 
-def energy_function_unbinding_A (list_DNA, list_A, A, list_B, E_ad, E_aa, E_ab, k): 
+def energy_function_unbinding_A (list_DNA, list_A, A, list_B, E_ad, E_aa, k): 
     DNA_site_index = A[0] #find the index to which A is bound 
     if A[1] != (-1 ): #There is a B bound to that A
-            B = list_B[A[1],:] #all binding sites for that B 
+            #B = list_B[A[1],:] #all binding sites for that B 
             #print (B)
-    
-            B_energy = compute_energy_B_binding_adjacent (list_DNA, list_A,DNA_site_index, k, E_ab) 
+            B_energy = np.nan #set this energy to infinity so it will never leave
+            #print (energy_function_unbinding_A, B_energy)
+            #B_energy = compute_energy_B_binding_adjacent (list_DNA, list_A,DNA_site_index, k, E_ab) 
             #B_energy = compute_energy_B_binding (B, E_ab) #compute the energy of B protein bound to A, depending on the number of B sites 
             #print ('energy unbind a', B, B_energy  )
     else: 
             B_energy = 0 #if there are no B bound to A the corresponding energy will be zero 
-            #print ('energy unbind a', B_energy  )        
-    A_energy = compute_energy_A_binding (DNA_site_index, list_DNA, E_ad, E_aa)
+            #print ('energy unbind a', B_energy  )  
+    if B_energy != (np.nan):
+        A_energy = compute_energy_A_binding (DNA_site_index, list_DNA, E_ad, E_aa)
+        #print ('DNA', DNA_site_index, list_DNA)
+        total_energy = A_energy + B_energy
     #print ('energy unbind a', A_energy ) 
-    return A_energy + B_energy
+    else:
+        total_energy = B_energy
+    #print ('Total energy', total_energy)
+    return total_energy
 
 
 def compute_energy_A_binding (index, list_DNA, E_ad, E_aa):
@@ -233,21 +242,21 @@ def compute_energy_B_binding (B, energy):
     return B_energy 
 
 
-def compute_energy_B_binding_adjacent (list_DNA, list_A, DNA_site, k, energy):
+def compute_energy_B_binding_adjacent (list_DNA, list_A, DNA_site, L, energy):
     
-    if DNA_site-k < 0:
+    if DNA_site-L < 0:
         starting_site = 0
     else:
-        starting_site = DNA_site-k
-    if DNA_site+ k > list_DNA.shape[1]:
+        starting_site = DNA_site-L
+    if DNA_site+ L > list_DNA.shape[1]:
         ending_site = list_DNA.shape[1]
     else:
-        ending_site = DNA_site+ k
+        ending_site = DNA_site+ L
         
         
-    range_sites_within_k = list_DNA [0, starting_site:ending_site+1] 
+    range_sites_within_L = list_DNA [0, starting_site:ending_site+1] 
     
-    sites_with_bound_A = list (np.where (range_sites_within_k == 1)[0]) #find the sites in the specified distance
+    sites_with_bound_A = list (np.where (range_sites_within_L == 1)[0]) #find the sites in the specified distance
   
     
     if starting_site != 0 : 
@@ -262,15 +271,16 @@ def compute_energy_B_binding_adjacent (list_DNA, list_A, DNA_site, k, energy):
      
         if list_A[corresponding_A_to_site, 1] != -1:  # If that A is already bound to a B
             
-            sites_with_bound_B.append(site)  # Remove the site
+            sites_with_bound_B.append(site)  # Add the site
             
 
     if len (sites_with_bound_B) > 0:      
         number_adjacent_bound_Bs = len (sites_with_bound_B)  
     else: 
         number_adjacent_bound_Bs = 0
-        
-    p = number_adjacent_bound_Bs / (number_adjacent_bound_Bs + 1)
+    
+    
+    p = number_adjacent_bound_Bs / (2*L)
     B_energy = (p)*energy
     return B_energy
 

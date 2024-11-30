@@ -16,7 +16,7 @@ ASSUMPTIONS:
     -For the residence times: Difference between unbinding and binding event of the transcription factor. If a TF binds but never
     unbinds the residence time will not be computed. These trasncription factors will be ignored when computing the mean residence times over all transcription factors 
     -If an A is free and there is an empty site of DNA, protein A will always find that site 
-
+    -E_ab is now set to infinity, id est if a B is bound to an A it will never leave 
 '''
 
 
@@ -24,14 +24,15 @@ ASSUMPTIONS:
 
 alfa = 0.7 #ratio between nA/N 
 N = 3000 #total number of binding sites in the DNA
-nA = int (N*alfa) #number of As
+#nA = int (N*alfa) #number of As
+nA = 1 
 
 
-nB = 100 #500 #number of Bs #50 AND 100 AND 500  L=10
+nB = 1#100 #500 #number of Bs 
 k = 5 #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= True    
+protein_B= False    
 
 
 #Time parameters
@@ -48,20 +49,22 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
 #Energy parameters 
 
-E_ad_values = np.arange(0, 4, 1)
-E_aa_values = [1,2]
+#E_ad_values = np.arange(0, 4, 1)
+E_ad_values = [0]
+E_aa_values = [0]
 
 
 #B parameters 
 if protein_B:
-    E_ab = 7
-    E_ba = 1
+    #E_ab = 7
+    E_ba = 7
     L = 10 
     
 else: #put these same parameters to 0 
     E_ab = 0
     E_ba = 0
     L = 0
+    nB=0
 
 
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
@@ -100,7 +103,7 @@ else:
 subfolder_path = general_functions.create_folders(folder_name, alfa, nB)
 sim_parameters = general_functions.create_txt_parameters(subfolder_path, alfa, stop_time, ignoring_steps)
 
-legend = f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\nn={N}\nE_ab={E_ab}\nE_ba={E_ba}\nL={L}'
+legend = f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\nn={N}\nL={L}'
 
 
 ###MONTE CARLO SIMULATION###
@@ -166,12 +169,12 @@ for E_aa in E_aa_values:
         fraction_occupied_sites = np.zeros ((number_of_time_steps_sampled,nB))
         
         #File to store the DNA over time sampled
-        DNA_over_time_file = os.path.join(subfolder_path, f"nA_{nA}_n_{N}_DNA_list_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.txt")
+        DNA_over_time_file = os.path.join(subfolder_path, f"nA_{nA}_n_{N}_DNA_list_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}.txt")
             
         while time_step < stop_time:
             
             if protein_B:
-                time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times, does_B_bind = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, E_ad, E_aa, E_ba, E_ab, residence_times, times_variables, does_B_bind, k)
+                time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times, does_B_bind = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, E_ad, E_aa, E_ba, residence_times, times_variables, does_B_bind, k)
             else:
                 time_step, list_DNA, list_A, list_empty_DNA, times_variables,residence_times = steps_MC_simulations.step_MC_protein_A(time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad, E_aa, E_ab, residence_times, times_variables)
             
@@ -218,7 +221,7 @@ for E_aa in E_aa_values:
         
         index_A_never_bind_B = np.where(does_B_bind[0,:] == 1)[0]
     
-        file_path = os.path.join(subfolder_path, f'mean_residence_time_A_never_bind_to_B_E_ab={E_ab}_E_ba={E_ba}_L{L}_E_aa={E_aa}_E_ad={E_ad}.txt')
+        file_path = os.path.join(subfolder_path, f'mean_residence_time_A_never_bind_to_B_E_ba={E_ba}_L{L}_E_aa={E_aa}_E_ad={E_ad}.txt')
 
         # Open the file in append mode to store mean residence times
         with open(file_path, 'a') as file:
@@ -268,7 +271,7 @@ for E_aa in E_aa_values:
         if average_B_fraction :
             
             plot_average_B_fraction_title = f'Avarage over time of occupied sites for each B(E_aa={E_aa}, E_ad={E_ad})'
-            saving_average_B_fraction_name = f'nA_{nA}_n_{N}_av_frac_bound_sites_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.png'
+            saving_average_B_fraction_name = f'nA_{nA}_n_{N}_av_frac_bound_sites_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}.png'
             x_label_average_B_fraction = 'Index of TF'
             y_label_average_B_fraction = 'Avearge number of occupied sites'
             
@@ -279,7 +282,7 @@ for E_aa in E_aa_values:
         
         if plot_never_unbind :
             plot_never_unbind_title = f'Transcription factor that bind but never unbind (E_aa={E_aa}, E_ad={E_ad})'
-            saving_never_unbind_name = f'nA_{nA}_n_{N}_never_unbind_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.png'
+            saving_never_unbind_name = f'nA_{nA}_n_{N}_never_unbind_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}.png'
             x_label_plot_never_unbind = 'Index of TF'
             y_label_plot_never_unbind = 'Binding Time'
             
@@ -288,14 +291,14 @@ for E_aa in E_aa_values:
        
         if histogram_never_unbind :
             histogram_never_unbind_title = f'Histogram for binding times for TFs that bind but never unbind (E_aa={E_aa}, E_ad={E_ad})'
-            saving_histogram_never_unbind_name = f'nA_{nA}_n_{N}_histo_never_unbind_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.png'
+            saving_histogram_never_unbind_name = f'nA_{nA}_n_{N}_histo_never_unbind_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}.png'
             x_label_histogram_never_unbind = 'Binding Times'
             y_label_histogram_never_unbind = 'Frequency'
             general_functions.plot_histogram(times_never_unbind, histogram_never_unbind_title, legend, subfolder_path, x_label_histogram_never_unbind, 'Frequency', saving_histogram_never_unbind_name, time_step_sampled, False, 100) 
         
         if plot_cluster_sizes_over_time :
             plot_cluster_size_title = f'Mean Cluster size over time (E_aa={E_aa}, E_ad={E_ad})'
-            saving_cluster_size_name = f'nA_{nA}_n_{N}_mean_cluster_size_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.png'
+            saving_cluster_size_name = f'nA_{nA}_n_{N}_mean_cluster_size_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}.png'
             x_label_plot_cluster_size = 'Time_step'
             y_label_plot_cluster_size = 'Mean Cluster size'
             
@@ -306,7 +309,7 @@ for E_aa in E_aa_values:
         
         if histogram_mean_residence_time:
             histogram_title_mean = f'Histogram of distribution of mean residence times (E_aa={E_aa}, E_ad={E_ad})'
-            saving_histogram_name = f'nA_{nA}_n_{N}_histo_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}'
+            saving_histogram_name = f'nA_{nA}_n_{N}_histo_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}'
             x_label_histogram_mean = 'Mean Residence Time'
             
             general_functions.plot_histogram(mean_each_tf, histogram_title_mean, legend, subfolder_path, x_label_histogram_mean, 'Frequency', saving_histogram_name, time_step_sampled, False, 100, 'normal')
@@ -320,7 +323,7 @@ for E_aa in E_aa_values:
             xlabel_scatter = 'Index of TF'
             ylabel_scatter_stdv = 'Standard Deviation of Residence Times'
             title_scatter_stdv = f'Standard deviation of Residence times for different TFs (E_aa={E_aa}, E_ad={E_ad})'
-            saving_name_scatter_stdv = f'nA_{nA}_n_{N}_stdv_res_times_tf__Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.png' 
+            saving_name_scatter_stdv = f'nA_{nA}_n_{N}_stdv_res_times_tf__Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}.png' 
             
             general_functions.scatter_plot (index_tfs,stdv_each_tf, legend, subfolder_path, xlabel_scatter, ylabel_scatter_stdv, title_scatter_stdv, saving_name_scatter_stdv)
         
@@ -328,13 +331,13 @@ for E_aa in E_aa_values:
             xlabel_scatter = 'Index of TF'
             ylabel_scatter_mean = 'Mean of Residence Times'
             title_scatter_mean = f'Mean of Residence times for different TFs (E_aa={E_aa}, E_ad={E_ad})'
-            saving_name_scatter_mean = f'nA_{nA}_n_{N}_mean_res_times_tf__Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.png'
+            saving_name_scatter_mean = f'nA_{nA}_n_{N}_mean_res_times_tf__Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}.png'
             
             general_functions.scatter_plot (index_tfs,mean_each_tf, legend, subfolder_path, xlabel_scatter, ylabel_scatter_mean, title_scatter_mean, saving_name_scatter_mean)
 
         if histogram_binding_events:
             histogram_title_be = f'Histogram of distribution of binding events (Eaa {E_aa}, Ead {E_ad})'
-            saving_histogram_name_be = f'nA_{nA}_n_{N}_histo_binding_events_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}'
+            saving_histogram_name_be = f'nA_{nA}_n_{N}_histo_binding_events_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}'
             x_label_histogram_be = 'Binding Events'
             
             general_functions.plot_histogram(count_binding_events_list, histogram_title_be, legend, subfolder_path,x_label_histogram_be,'Frequency', saving_histogram_name_be, time_step_sampled[0], False, 1, 'normal' )
@@ -343,7 +346,7 @@ for E_aa in E_aa_values:
         
         if histogram_cluster_size:
             histogram_title_cluster = f'Cluster histogram (Eaa {E_aa}, Ead {E_ad})'
-            saving_histogram_name_cluster = f'nA_{nA}_n_{N}_cluster_histo_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}'
+            saving_histogram_name_cluster = f'nA_{nA}_n_{N}_cluster_histo_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}'
             x_label_histogram_cluster = 'Cluster size'
             
             general_functions.plot_histogram(all_group_sizes_histogram, histogram_title_cluster, legend, subfolder_path,x_label_histogram_cluster, 'Frequency', saving_histogram_name_cluster, time_step_sampled[0], True )
@@ -358,7 +361,7 @@ for E_aa in E_aa_values:
         xlabel_nA_bound_snapshots = 'Time Steps'
         ylabel_nA_bound_snapshots = 'Number of A bound to DNA'
         title_nA_bound_snapshots = f'Number of A bound to DNA vs. Time Steps (E_aa={E_aa})'
-        saving_name_nA_bound_snapshots = f'nA_{nA}_n_{N}_bound_in_time_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.png'
+        saving_name_nA_bound_snapshots = f'nA_{nA}_n_{N}_bound_in_time_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}.png'
         
         general_functions.plot_different_Ead_in_time (nA_bound_for_different_energies, E_ad_values, time_step_sampled[0], xlabel_nA_bound_snapshots, ylabel_nA_bound_snapshots,title_nA_bound_snapshots,legend,subfolder_path,saving_name_nA_bound_snapshots)
         del nA_bound_for_different_energies
@@ -367,7 +370,7 @@ for E_aa in E_aa_values:
         xlabel_lineweaver_burk = 'Inverse Time Steps'
         ylabel_lineweaver_burk = 'Inverse Number of A bound to DNA'
         title_lineweaver_burk = f'Lineweaver–Burk plot (E_aa={E_aa})'
-        saving_name_lineweaver_burk = f'nA_{nA}_n_{N}_Lineweaver_Burk_Eaa_{E_aa}_Ead_{E_ad}_E_ab_{E_ab}_E_ba_{E_ba}.png'
+        saving_name_lineweaver_burk = f'nA_{nA}_n_{N}_Lineweaver_Burk_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}.png'
         
         general_functions.plot_different_Ead_in_time (nA_bound_for_different_energies, E_ad_values, time_step_sampled[0], xlabel_lineweaver_burk, ylabel_lineweaver_burk,title_lineweaver_burk,legend,subfolder_path,saving_name_lineweaver_burk, True)
         del nA_bound_for_different_energies
@@ -376,7 +379,7 @@ for E_aa in E_aa_values:
         xlabel_binding_events = 'Binding Events'
         ylabel_binding_events = 'Frequency'
         title_binding_events = f'Histogram of Distribution of Binding Events for different E_ad (E_aa={E_aa})'
-        saving_name_binding_events = f'nA_{nA}_n_{N}_combined_histo_binding_events_E_ab_{E_ab}_E_ba_{E_ba}.png'
+        saving_name_binding_events = f'nA_{nA}_n_{N}_combined_histo_binding_events_E_ba_{E_ba}.png'
       
         general_functions.plot_histogram_distribution_different_E_ad (binding_events_lists,E_ad_values, E_aa, xlabel_binding_events, ylabel_binding_events,title_binding_events,legend,subfolder_path,saving_name_binding_events)
         del binding_events_lists
@@ -393,14 +396,14 @@ if plot_log_mean_residence_time:
     log_list = [np.log(element) for element in mean_residence_times_for_different_E_aa]
     ylabel_log = 'Log (Mean Residence Time)'
     title_log = 'Log Mean Residence Time vs. E ad values'
-    saving_name_log = f'nA_{nA}_n_{N}_log_mean_residence_time_E_ab_{E_ab}_E_ba_{E_ba}.png'
+    saving_name_log = f'nA_{nA}_n_{N}_log_mean_residence_time_E_ba_{E_ba}.png'
     
     general_functions.comparison_plots_different_E_aa(log_list, E_aa_values, E_ad_values, x_label_E_aa_comparison, ylabel_log,title_log,legend,subfolder_path,saving_name_log)
 
 if plot_stdv_residence_time:
     ylabel_stdv = 'Stdv residence times'
     title_stdv = 'Mean standard deviation of residence times vs. E ad values'
-    saving_name_stdv = f'nA_{nA}_n_{N}_mean_stdv_residence_times_E_ab_{E_ab}_E_ba_{E_ba}.png'
+    saving_name_stdv = f'nA_{nA}_n_{N}_mean_stdv_residence_times_E_ba_{E_ba}.png'
     
     general_functions.comparison_plots_different_E_aa(std_devs_for_different_E_aa, E_aa_values, E_ad_values, x_label_E_aa_comparison, ylabel_stdv,title_stdv,legend,subfolder_path,saving_name_stdv)
     
@@ -410,7 +413,7 @@ if plot_ratio_mean_stdv:
     
     ylabel_ratio = 'Mean/standard devation'
     title_ratio = 'Ratio Mean and standard devation of residence times vs. E ad values'
-    saving_name_ratio = f'nA_{nA}_n_{N}_ratio_mean_stdv_residence_times_E_ab_{E_ab}_E_ba_{E_ba}.png'
+    saving_name_ratio = f'nA_{nA}_n_{N}_ratio_mean_stdv_residence_times_E_ba_{E_ba}.png'
     
     general_functions.comparison_plots_different_E_aa(ratio_mean_stdv, E_aa_values, E_ad_values, x_label_E_aa_comparison, ylabel_ratio,title_ratio,legend,subfolder_path,saving_name_ratio)
 
