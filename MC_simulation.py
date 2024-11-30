@@ -24,8 +24,7 @@ ASSUMPTIONS:
 
 alfa = 0.7 #ratio between nA/N 
 N = 3000 #total number of binding sites in the DNA
-#nA = int (N*alfa) #number of As
-nA = 100
+nA = int (N*alfa) #number of As
 
 
 nB = 1#100 #500 #number of Bs 
