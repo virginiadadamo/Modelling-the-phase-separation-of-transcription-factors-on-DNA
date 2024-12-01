@@ -1,0 +1,7 @@
+Index 0: Mean Residence Time = -47.166666666666664
+Index 0: Mean Residence Time = -50.80952380952381
+Index 0: Mean Residence Time = -45.8
+Index 0: Mean Residence Time = -45.095238095238095
+Index 0: Mean Residence Time = -49.148148148148145
+Index 0: Mean Residence Time = 2.4545454545454546
+Index 0: Mean Residence Time = 2.0

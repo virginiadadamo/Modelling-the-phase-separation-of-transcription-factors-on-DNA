@@ -12,18 +12,18 @@ import random
 def add_A (list_DNA, empty_random_site, list_A , random_A, residence_times, list_empty_DNA, times_variables, time_step):
     
     if list_A[random_A,0] == (-1): #A is free
-        #print (f'Step: adding of a free A : (time step={time_step}, A selected is ={random_A})')
         list_DNA [0,empty_random_site] = 1  #always add because it lowers the energy 
         list_A [random_A,0] = empty_random_site #change the value in list A, instead of (-1) to the site where A is bound 
-        #print (f'The site to which the A was added is {empty_random_site}, the DNA is  ={list_DNA})')
+        
         residence_times[0,random_A] = time_step
+        
         list_empty_DNA.remove (empty_random_site)
         times_variables[random_A]['Count binding events'] += 1
         
     return list_DNA,list_A, residence_times, list_empty_DNA, times_variables
     
 def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_times, times_variables, E_ad, E_aa, time_step, k= 0):
-    
+
     random_binding = np.random.random()  #draw a random number between 0 and 1
     A = list_A [random_A,:] 
     if A[0] != (-1):  #if A is not free 
@@ -34,7 +34,6 @@ def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_tim
             
             
             list_DNA, list_A,list_empty_DNA,residence_times, times_variables = remove_A_from_DNA_site(list_DNA, list_A, random_A,list_empty_DNA,residence_times,time_step, times_variables)
-            #print (f'Removal of A succceed: list_DNA {list_DNA}, list_A  ={list_A}, list_empty_DNA={list_empty_DNA} ')
             
             if A[1] != (-1): #Also a B protein is bound, it must be freed
                 #print ('Step: remove A but also B is bound')

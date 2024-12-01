@@ -26,7 +26,7 @@ def step_MC_protein_A (time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad
     else:
         
         #Remove event is selected 
-        list_DNA, list_A, random_A,list_empty_DNA,residence_time  = events_for_MC_steps.remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_times, times_variables, E_ad, E_aa, E_ab, time_step)
+        list_DNA, list_A, random_A,list_empty_DNA,residence_time  = events_for_MC_steps.remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_times, times_variables, E_ad, E_aa, time_step)
        
     time_step = time_step + 1
     

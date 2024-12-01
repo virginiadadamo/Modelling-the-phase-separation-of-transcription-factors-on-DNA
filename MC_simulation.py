@@ -24,14 +24,14 @@ ASSUMPTIONS:
 
 alfa = 0.7 #ratio between nA/N 
 N = 3000 #total number of binding sites in the DNA
-nA = int (N*alfa) #number of As
+nA = 1 #int (N*alfa) #number of As
 
 
 nB = 100 #100 #500 #number of Bs 
 k = 5 #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= True    
+protein_B= False    
 
 
 #Time parameters
@@ -176,7 +176,7 @@ for E_aa in E_aa_values:
                 time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times, does_B_bind = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, E_ad, E_aa, E_ba, residence_times, times_variables, does_B_bind, k)
             else:
                 time_step, list_DNA, list_A, list_empty_DNA, times_variables,residence_times = steps_MC_simulations.step_MC_protein_A(time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad, E_aa, E_ab, residence_times, times_variables)
-            
+        
             
             nA_bound_DNA = general_functions.count_consecutive_ones(list_DNA)
             
