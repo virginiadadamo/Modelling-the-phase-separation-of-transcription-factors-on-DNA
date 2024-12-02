@@ -16,9 +16,9 @@ def add_A (list_DNA, empty_random_site, list_A , random_A, residence_times, list
         list_A [random_A,0] = empty_random_site #change the value in list A, instead of (-1) to the site where A is bound 
         
         residence_times[0,random_A] = time_step
-        
         list_empty_DNA.remove (empty_random_site)
         times_variables[random_A]['Count binding events'] += 1
+        
         
     return list_DNA,list_A, residence_times, list_empty_DNA, times_variables
     
@@ -36,20 +36,18 @@ def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_tim
             list_DNA, list_A,list_empty_DNA,residence_times, times_variables = remove_A_from_DNA_site(list_DNA, list_A, random_A,list_empty_DNA,residence_times,time_step, times_variables)
             
             if A[1] != (-1): #Also a B protein is bound, it must be freed
-                #print ('Step: remove A but also B is bound')
                 B_bound = A[1]
                 B_bound_site = np.where(list_B[B_bound,:] == random_A)[0] #find the site 
-                #print('List a and B before:', list_A, list_B)
                 list_B[B_bound,B_bound_site] = -1 #setting B as free in the list of Bs
                 list_A [random_A,1] = -1 #mark as free the corresponding site on A 
-                #print('List a and B after:', list_A, list_B)
+                
                 
     return list_DNA, list_A, random_A,list_empty_DNA,residence_times 
 
 
 def remove_A_from_DNA_site (list_DNA, list_A, random_A,list_empty_DNA,residence_times,time_step, times_variables):  #CHANG ETHE NAME (RESET)
     
-    #print (f'Before starting removing the list of A is {list_A}, random A is {random_A}')
+    
     list_DNA [0,list_A [random_A, 0]] = 0 #A is removed 
     list_empty_DNA.append(list_A [random_A,0]) #the site is added to the list of empty sites 
     list_A [random_A,0] = -1 #A becomes unbound state
@@ -57,8 +55,9 @@ def remove_A_from_DNA_site (list_DNA, list_A, random_A,list_empty_DNA,residence_
     #Now the A unbinds we compute the residence time
     time_binding = residence_times[0,random_A]
     residence_times[0,random_A] = time_step-time_binding
-    times_variables[random_A]['Residence times'].append(residence_times[0,random_A] )
     
+    times_variables[random_A]['Residence times'].append(residence_times[0,random_A] )
+    #print ('Times variables',  times_variables )
     residence_times[0,random_A]  = 0 #time put back to zero, to compute the next residence time when A will bind again
     
     return list_DNA, list_A,list_empty_DNA,residence_times, times_variables

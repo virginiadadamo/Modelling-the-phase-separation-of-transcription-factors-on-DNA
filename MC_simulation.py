@@ -24,7 +24,7 @@ ASSUMPTIONS:
 
 alfa = 0.7 #ratio between nA/N 
 N = 3000 #total number of binding sites in the DNA
-nA = int (N*alfa) #number of As
+nA = 1#int (N*alfa) #number of As
 
 
 nB = 100 #100 #500 #number of Bs 
@@ -69,14 +69,18 @@ else: #put these same parameters to 0
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
 
 #For each combination of Eaa and Ead
-average_B_fraction = True #plot to identify the average (over time steps sampled) of the fraction of bound sites for each B protein
-plot_never_unbind = True #plot to identify the time at which the TFs that never leave the DNA bind
-histogram_never_unbind = True #histogram to identify the distribution of Binding Times of the TFs that never leave the DNA
+if protein_B== False  :
+    average_B_fraction = False #plot to identify the average (over time steps sampled) of the fraction of bound sites for each B protein
+else: 
+    average_B_fraction = True
+    
+plot_never_unbind = False #plot to identify the time at which the TFs that never leave the DNA bind
+histogram_never_unbind = False #histogram to identify the distribution of Binding Times of the TFs that never leave the DNA
 plot_cluster_sizes_over_time = False #To plot the mean cluster size at each time step, with error bars with the corresponding standard deviation 
 histogram_mean_residence_time = True # To plot the corresponding distribution of mean residence times of the transcription factors
 scatter_plot_std = False #To plot the standard deviation of the residence times of each transcription factors 
 scatter_plot_mean = False #To plot the mean of the residence times of each transcription factors
-histogram_binding_events = False #To plot the distribution of binding events of the transcription factors 
+histogram_binding_events = True #To plot the distribution of binding events of the transcription factors 
 histogram_cluster_size = True #To plot the distribution of cluster sizes 
 
 #For each E_aa
@@ -236,6 +240,8 @@ for E_aa in E_aa_values:
                     index_tfs.append (times_variables[i]['Index of Transcription Factor'])
                     
                     times_variables[i]['Mean residence time'] = np.mean (times_variables[i]['Residence times'])
+                    
+                    
                     mean_each_tf.append(times_variables[i]['Mean residence time'])
                     
                     
@@ -243,6 +249,8 @@ for E_aa in E_aa_values:
                     stdv_each_tf.append (times_variables[i]['Standard deviation'])
                     
                     times_variables[i]['Max residence time'] = np.max (times_variables[i]['Residence times'])
+                    
+                    print (f'nA = {nA}, Times variables:', times_variables[i])
                     
                     # Check if the index `i` is in the list of A that never binds to B
                     if i in index_A_never_bind_B:
