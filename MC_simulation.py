@@ -19,6 +19,8 @@ ASSUMPTIONS:
     -E_ab is now set to infinity, id est if a B is bound to an A it will never leave 
 '''
 
+# Fare E_ab_values 
+#Mettere i plots delle varie Average occupied faction in una sola per diverse E_ba_values 
 
 ###PARAMETERS###
 
