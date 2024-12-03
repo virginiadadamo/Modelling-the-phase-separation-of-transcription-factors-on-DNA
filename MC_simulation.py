@@ -24,13 +24,13 @@ ASSUMPTIONS:
 
 ###PARAMETERS###
 
-alfa = 0.3 #ratio between nA/N 
+alfa = 0.7  #ratio between nA/N 
 N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
 nB = 100 #number of Bs 
-k = 10  #number of B interacting sites with A  
+k = 5  #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True    
@@ -58,7 +58,7 @@ E_aa_values = [0]
 #B parameters 
 if protein_B:
     #E_ab = 7
-    E_ba = 4
+    E_ba = 0
     L = 10 
     
 else: #put these same parameters to 0 
@@ -220,14 +220,14 @@ for E_aa in E_aa_values:
             
                     if protein_B:
                         fraction_occupied_sites[number_previously_sampled-1, :]  = general_functions.count_fraction_occupied_sites_B(list_B)
-                        idx_DNA_B_bound_final_time_step = []
                         
                         if time_step == stop_time: #last time step
-                            # print('Final time step', time_step) 
+                            print('Final time step', time_step) 
                             # print ('List_A', list_A)
                             # print ('List_B', list_B)
                             # print ('List_DNA', list_DNA)
                             indices = np.where(list_A[:, 1] != -1)[0]
+                            idx_DNA_B_bound_final_time_step = []
                             #print ('Indices', indices)
                             for idx in indices:
                                 idx_DNA_B_bound_final_time_step.append(list_A[idx, 0]) 
