@@ -15,7 +15,7 @@ from scipy.stats import norm, expon, gamma  # Import common distributions
 ###FUNCTIONS CREATE FOLDERS AND TXT FILES ###
 
 
-def create_folders(folder_name, alfa, nB):
+def create_folders(folder_name, alfa, nB, k):
 
     # Create the subfolder named 'alfa_{alfa}'
     subfolder_name = f'alfa_{alfa}'
@@ -25,7 +25,7 @@ def create_folders(folder_name, alfa, nB):
     os.makedirs(subfolder_path, exist_ok=True)
     
     # Now create a subfolder inside 'alfa_{alfa}' named after nB
-    L_folder_name = f'nB_{nB}_new_unbinding_function_INFINITY'  
+    L_folder_name = f'nB_{nB}_K_{k}'  
     L_folder_path = os.path.join(subfolder_path, L_folder_name)
     
     # Create the L folder inside 'alfa_{alfa}'
@@ -249,7 +249,14 @@ def scatter_plot (x,y, legend, subfolder_path, x_label, y_label, title, saving_n
     plt.show()
     plt.clf()
     plt.close()
-
+    
+    # Save x and y data to txt file
+    data_filename = os.path.join(subfolder_path, saving_name + '.txt')
+    with open(data_filename, 'w') as f:
+        f.write("x\ty\n")  # Header
+        for x_val, y_val in zip(x, y):
+            f.write(f"{x_val}\t{y_val}\n")
+            
 def plot_different_Ead_in_time (element_for_different_energies, E_ad_values, time_step_sampled, xlabel, ylabel,title,legend,subfolder_path,saving_name, inverse = False):
         
     cmap = plt.get_cmap('viridis')

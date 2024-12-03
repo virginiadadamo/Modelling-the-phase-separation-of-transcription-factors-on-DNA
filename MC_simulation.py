@@ -27,16 +27,16 @@ N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
-nB = 100 #100 #500 #number of Bs 
+nB = 100 #number of Bs 
 k = 5 #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= False    
+protein_B= True    
 
 
 #Time parameters
 stop_time = 2000000
-ignoring_steps = 250000
+ignoring_steps = 200000
 m = 50
 
 number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
@@ -49,14 +49,14 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 #Energy parameters 
 
 #E_ad_values = np.arange(0, 4, 1)
-E_ad_values = [0]
+E_ad_values = [0.5, 1]
 E_aa_values = [0]
 
 
 #B parameters 
 if protein_B:
     #E_ab = 7
-    E_ba = 4
+    E_ba = 0
     L = 10 
     
 else: #put these same parameters to 0 
@@ -64,6 +64,7 @@ else: #put these same parameters to 0
     E_ba = 0
     L = 0
     nB=0
+    k=0
 
 
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
@@ -71,8 +72,10 @@ else: #put these same parameters to 0
 #For each combination of Eaa and Ead
 if protein_B== False  :
     average_B_fraction = False #plot to identify the average (over time steps sampled) of the fraction of bound sites for each B protein
+    plot_B_bound_final_time_step = False 
 else: 
     average_B_fraction = True
+    plot_B_bound_final_time_step =  True 
     
 plot_never_unbind = False #plot to identify the time at which the TFs that never leave the DNA bind
 histogram_never_unbind = False #histogram to identify the distribution of Binding Times of the TFs that never leave the DNA
@@ -103,7 +106,7 @@ if protein_B :
 else:
     folder_name = 'Simulations_protein_A'
     
-subfolder_path = general_functions.create_folders(folder_name, alfa, nB)
+subfolder_path = general_functions.create_folders(folder_name, alfa, nB, k)
 sim_parameters = general_functions.create_txt_parameters(subfolder_path, alfa, stop_time, ignoring_steps)
 
 legend = f'stop_time={stop_time}\nignoring_steps={ignoring_steps}\nm={m}\nnA={nA}\nn={N}\nL={L}'
@@ -215,9 +218,19 @@ for E_aa in E_aa_values:
             
                     if protein_B:
                         fraction_occupied_sites[number_previously_sampled-1, :]  = general_functions.count_fraction_occupied_sites_B(list_B)
-
+                        idx_DNA_B_bound_final_time_step = []
+                        
+                        if time_step == stop_time: #last time step
+                            # print('Final time step', time_step) 
+                            # print ('List_A', list_A)
+                            # print ('List_B', list_B)
+                            # print ('List_DNA', list_DNA)
+                            indices = np.where(list_A[:, 1] != -1)[0]
+                            #print ('Indices', indices)
+                            for idx in indices:
+                                idx_DNA_B_bound_final_time_step.append(list_A[idx, 0]) 
                     
-        
+                            #print ('Index of B bound', idx_DNA_B_bound_final_time_step )
         times_never_unbind =  [x for x in residence_times[0] if x != 0]
         
         index_never_unbind = [i for i, x in enumerate(residence_times[0]) if x != 0]
@@ -250,7 +263,6 @@ for E_aa in E_aa_values:
                     
                     times_variables[i]['Max residence time'] = np.max (times_variables[i]['Residence times'])
                     
-                    print (f'nA = {nA}, Times variables:', times_variables[i])
                     
                     # Check if the index `i` is in the list of A that never binds to B
                     if i in index_A_never_bind_B:
@@ -274,12 +286,17 @@ for E_aa in E_aa_values:
         
         average_occupied_B_fraction_over_time = np.mean(fraction_occupied_sites, axis=0)
         ### PLOTS FOR EACH COMBINATION OF E_AA AND E_AD ###
-        
+        if plot_B_bound_final_time_step: 
+            xlabel_plot_B_bound_final_time_step = 'DNA site'
+            title_plot_B_bound_final_time_step = f'B bound at the last time step (E_aa={E_aa}, E_ad={E_ad})'
+            saving_name_plot_B_bound_final_time_step = f'nA_{nA}_n_{N}_B_bound_last_time_step_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}.png' 
+            general_functions.plot_histogram(idx_DNA_B_bound_final_time_step, title_plot_B_bound_final_time_step, legend, subfolder_path, xlabel_plot_B_bound_final_time_step, 'Frequency', saving_name_plot_B_bound_final_time_step, time_step_sampled, False, bin_width=10) 
+            
         if average_B_fraction :
             
             plot_average_B_fraction_title = f'Avarage over time of occupied sites for each B(E_aa={E_aa}, E_ad={E_ad})'
             saving_average_B_fraction_name = f'nA_{nA}_n_{N}_av_frac_bound_sites_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}.png'
-            x_label_average_B_fraction = 'Index of TF'
+            x_label_average_B_fraction = 'Index of B'
             y_label_average_B_fraction = 'Avearge number of occupied sites'
             
             general_functions.plot_figure (np.arange(nB), average_occupied_B_fraction_over_time, x_label_average_B_fraction ,y_label_average_B_fraction,plot_average_B_fraction_title,subfolder_path,saving_average_B_fraction_name)
