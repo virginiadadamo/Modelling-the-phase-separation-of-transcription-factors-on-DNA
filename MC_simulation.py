@@ -56,7 +56,7 @@ E_aa_values = [0]
 #B parameters 
 if protein_B:
     #E_ab = 7
-    E_ba = 0
+    E_ba = 1
     L = 10 
     
 else: #put these same parameters to 0 
