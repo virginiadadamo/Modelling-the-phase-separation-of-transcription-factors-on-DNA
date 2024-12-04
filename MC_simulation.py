@@ -183,6 +183,18 @@ for E_aa in E_aa_values:
             
             if protein_B:
                 time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times, does_B_bind = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, E_ad, E_aa, E_ba, residence_times, times_variables, does_B_bind, k)
+                
+                if time_step == stop_time: #last time step
+                    print('Final time step', time_step) 
+                    # print ('List_A', list_A)
+                    # print ('List_B', list_B)
+                    # print ('List_DNA', list_DNA)
+                    indices = np.where(list_A[:, 1] != -1)[0]
+                    idx_DNA_B_bound_final_time_step = []
+                    #print ('Indices', indices)
+                    for idx in indices:
+                        idx_DNA_B_bound_final_time_step.append(list_A[idx, 0])
+        
             else:
                 time_step, list_DNA, list_A, list_empty_DNA, times_variables,residence_times = steps_MC_simulations.step_MC_protein_A(time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad, E_aa, E_ab, residence_times, times_variables)
         
@@ -221,16 +233,7 @@ for E_aa in E_aa_values:
                     if protein_B:
                         fraction_occupied_sites[number_previously_sampled-1, :]  = general_functions.count_fraction_occupied_sites_B(list_B)
                         
-                        if time_step == stop_time: #last time step
-                            print('Final time step', time_step) 
-                            # print ('List_A', list_A)
-                            # print ('List_B', list_B)
-                            # print ('List_DNA', list_DNA)
-                            indices = np.where(list_A[:, 1] != -1)[0]
-                            idx_DNA_B_bound_final_time_step = []
-                            #print ('Indices', indices)
-                            for idx in indices:
-                                idx_DNA_B_bound_final_time_step.append(list_A[idx, 0]) 
+                         
                     
                             #print ('Index of B bound', idx_DNA_B_bound_final_time_step )
         times_never_unbind =  [x for x in residence_times[0] if x != 0]
