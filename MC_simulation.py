@@ -24,7 +24,7 @@ ASSUMPTIONS:
 
 ###PARAMETERS###
 
-alfa = 0.3  #ratio between nA/N 
+alfa = 0.7  #ratio between nA/N 
 N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
@@ -58,7 +58,7 @@ E_aa_values = [0]
 #B parameters 
 if protein_B:
     #E_ab = 7
-    E_ba = 4
+    E_ba = 0
     L = 10 
     
 else: #put these same parameters to 0 
