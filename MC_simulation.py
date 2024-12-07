@@ -24,13 +24,13 @@ ASSUMPTIONS:
 
 ###PARAMETERS###
 
-alfa = 0.3  #ratio between nA/N 
+alfa = 0.4  #ratio between nA/N 
 N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
 nB = 100 #number of Bs 
-k = 10 #, 5, 10]  #number of B interacting sites with A  
+k = 3 #, 5, 10]  #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True    
