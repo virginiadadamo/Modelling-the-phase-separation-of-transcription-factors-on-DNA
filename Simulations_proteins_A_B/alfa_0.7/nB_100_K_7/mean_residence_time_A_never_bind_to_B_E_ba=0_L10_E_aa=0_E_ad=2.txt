@@ -1,0 +1,7 @@
+Index 231: Mean Residence Time = 16.0
+Index 1490: Mean Residence Time = 384.0
+Index 1652: Mean Residence Time = 163.0
+Index 1688: Mean Residence Time = 188.0
+Index 1739: Mean Residence Time = 7.0
+Index 1876: Mean Residence Time = 321.0
+Index 2046: Mean Residence Time = 205.0

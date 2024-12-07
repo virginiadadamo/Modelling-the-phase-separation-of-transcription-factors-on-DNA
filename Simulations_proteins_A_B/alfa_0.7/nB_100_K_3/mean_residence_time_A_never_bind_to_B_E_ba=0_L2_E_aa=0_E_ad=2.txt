@@ -1,0 +1,5 @@
+Index 368: Mean Residence Time = 11.0
+Index 395: Mean Residence Time = 594.0
+Index 1926: Mean Residence Time = 273.0
+Index 1956: Mean Residence Time = 367.0
+Index 95: Mean Residence Time = 636.0

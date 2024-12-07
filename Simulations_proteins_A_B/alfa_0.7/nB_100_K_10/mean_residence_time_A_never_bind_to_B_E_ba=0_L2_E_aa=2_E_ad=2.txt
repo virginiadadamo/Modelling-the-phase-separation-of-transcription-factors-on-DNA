@@ -1,0 +1,2 @@
+Index 745: Mean Residence Time = 101.0
+Index 2086: Mean Residence Time = 224.0

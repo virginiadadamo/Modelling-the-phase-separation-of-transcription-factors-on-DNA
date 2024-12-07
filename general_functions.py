@@ -15,7 +15,7 @@ from scipy.stats import norm, expon, gamma  # Import common distributions
 ###FUNCTIONS CREATE FOLDERS AND TXT FILES ###
 
 
-def create_folders(folder_name, alfa, nB, k):
+def create_folders(folder_name, alfa, nB, k, L):
 
     # Create the subfolder named 'alfa_{alfa}'
     subfolder_name = f'alfa_{alfa}'
@@ -25,7 +25,7 @@ def create_folders(folder_name, alfa, nB, k):
     os.makedirs(subfolder_path, exist_ok=True)
     
     # Now create a subfolder inside 'alfa_{alfa}' named after nB
-    L_folder_name = f'nB_{nB}_K_{k}'  
+    L_folder_name = f'nB_{nB}_K_{k}_L_{L}'  
     L_folder_path = os.path.join(subfolder_path, L_folder_name)
     
     # Create the L folder inside 'alfa_{alfa}'
@@ -104,6 +104,33 @@ def count_consecutive_ones(DNA_list, return_only_nA= True):
 def count_A (list_A):
     return len([x for x in list_A[0,:] if x != (-1)])
 
+
+def gaps_and_consecutives(idx_B_on_DNA):
+    print ('Idx B on the DNA', idx_B_on_DNA)
+    consecutive_B = []
+    gaps = []
+    start = 0
+    
+    # Loop through the list to find consecutive groups
+    for i in range(1, len(idx_B_on_DNA)):
+        if idx_B_on_DNA[i] != idx_B_on_DNA[i-1] + 1:
+            # If not consecutive, capture the length of the sequence
+            group_length = i - start
+            if group_length > 1:  # Skip groups of length 1
+                consecutive_B.append(group_length)
+            # Calculate the gap difference
+            gaps.append((idx_B_on_DNA[i] - idx_B_on_DNA[i-1]-1))
+            #The start of the next group
+            start = i
+    # Add the last consecutive group length if > 1
+    group_length = len(idx_B_on_DNA) - start
+    if group_length > 1:
+        consecutive_B.append(group_length)
+    
+    return consecutive_B, gaps
+
+
+
 def count_fraction_occupied_sites_B(B_list):
    
     count = np.count_nonzero(B_list != -1, axis=1)
@@ -155,9 +182,9 @@ def plot_histogram(
     
     if mean:
         if len(time_step_sampled) > 0:
-            print ('Counts', counts )
+            
             counts = counts / len(time_step_sampled)
-            print ('Counts', counts )
+            
     
     # Plot histogram
     plt.stairs(counts, bins, fill=True)
@@ -226,8 +253,7 @@ def plot_histogram(
 
 def scatter_plot (x,y, legend, subfolder_path, x_label, y_label, title, saving_name):
     plt.scatter(x, y, color='r', s=5) 
-    plt.xlim(min(x), max(x))
-    
+   
     #mean_y = np.mean(y)
     
     plt.xlabel(x_label)
@@ -243,7 +269,7 @@ def scatter_plot (x,y, legend, subfolder_path, x_label, y_label, title, saving_n
          horizontalalignment='right', verticalalignment='top', 
          transform=plt.gca().transAxes)
     
-    plot_filename = os.path.join(subfolder_path, saving_name )
+    plot_filename = os.path.join(subfolder_path, saving_name  + '.png' )
     plt.savefig(plot_filename)
     
     plt.show()
