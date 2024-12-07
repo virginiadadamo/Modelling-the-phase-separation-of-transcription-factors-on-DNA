@@ -24,13 +24,13 @@ ASSUMPTIONS:
 
 ###PARAMETERS###
 
-alfa = 0.7  #ratio between nA/N 
+alfa = 0.2  #ratio between nA/N 
 N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
 nB = 100 #number of Bs 
-k = 10 #, 5, 10]  #number of B interacting sites with A  
+k = 3#10 #, 5, 10]  #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True    
@@ -38,7 +38,7 @@ protein_B= True
 
 #Time parameters
 stop_time = 2000000
-ignoring_steps = 200000
+ignoring_steps = 250000
 m = 50
 
 number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
@@ -51,15 +51,15 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 #Energy parameters 
 
 #E_ad_values = np.arange(0, 4, 1)
-E_ad_values = [0, 0.25, 1]
+E_ad_values = [1]
 E_aa_values = [0,2]
 
 
 #B parameters 
 if protein_B:
     #E_ab = 7
-    E_ba_values = [0,1,4]
-    L_values = [2,5,10] 
+    E_ba_values = [0,4]
+    L_values = [5,10] 
     
 else: #put these same parameters to 0 
     E_ab = [0]
