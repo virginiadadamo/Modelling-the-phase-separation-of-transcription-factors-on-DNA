@@ -24,21 +24,21 @@ ASSUMPTIONS:
 
 ###PARAMETERS###
 
-alfa = 0.7  #ratio between nA/N 
+alfa = 0.2  #ratio between nA/N 
 N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
 nB = 100 #number of Bs 
-k = 3 #, 5, 10]  #number of B interacting sites with A  
+k = 5 #, 5, 10]  #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True    
 
 
 #Time parameters
-stop_time = 1000 #2000000
-ignoring_steps = 0#200000
+stop_time = 2000000
+ignoring_steps = 200000
 m = 50
 
 number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
