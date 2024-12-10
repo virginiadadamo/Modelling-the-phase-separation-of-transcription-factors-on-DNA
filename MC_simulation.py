@@ -24,13 +24,13 @@ ASSUMPTIONS:
 
 ###PARAMETERS###
 
-alfa = 0.7  #ratio between nA/N 
+alfa = 0.2  #ratio between nA/N 
 N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
 nB = 100 #number of Bs 
-k = 10 #10 #, 5, 10]  #number of B interacting sites with A  
+k = 5 #10 #, 5, 10]  #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True    
@@ -58,7 +58,7 @@ E_aa_values = [0,2]
 #B parameters 
 if protein_B:
     #E_ab = 7
-    E_ba_values = [0,4]
+    E_ba_values = [1,4]
     L_values = [5,10] 
     
 else: #put these same parameters to 0 
@@ -326,7 +326,7 @@ for L  in L_values:
                                     xlabel_plot_B_bound_final_time_step = 'DNA site'
                                     title_plot_B_bound_final_time_step = f'B bound at the last time step (E_aa={E_aa}, E_ad={E_ad})'
                                     saving_name_plot_B_bound_final_time_step = f'nA_{nA}_n_{N}_B_bound_last_time_step_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}_L_{L}_k_{k}.png' 
-                                    general_functions.plot_histogram(idx_DNA_B_bound_final_time_step, title_plot_B_bound_final_time_step, legend, subfolder_path, xlabel_plot_B_bound_final_time_step, 'Frequency', saving_name_plot_B_bound_final_time_step, time_step_sampled, False, bin_width=10) 
+                                    general_functions.plot_histogram(idx_DNA_B_bound_final_time_step, title_plot_B_bound_final_time_step, legend, subfolder_path, xlabel_plot_B_bound_final_time_step, 'Frequency', saving_name_plot_B_bound_final_time_step, time_step_sampled, False, bin_width=1) 
                                     
                                 if average_B_fraction :
                                     
