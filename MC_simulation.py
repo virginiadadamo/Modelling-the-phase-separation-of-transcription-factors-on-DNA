@@ -323,7 +323,7 @@ for L  in L_values:
 
                                 
                                 if plot_B_bound_final_time_step: 
-                                    bin_width_values = [1]#[1,5,10]
+                                    bin_width_values = [1,5,10]
                                     for bin_width in bin_width_values: 
                                         xlabel_plot_B_bound_final_time_step = 'DNA site'
                                         title_plot_B_bound_final_time_step = f'B bound at the last time step (E_aa={E_aa}, E_ad={E_ad})'
