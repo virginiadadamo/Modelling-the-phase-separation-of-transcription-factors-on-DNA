@@ -24,13 +24,13 @@ ASSUMPTIONS:
 
 ###PARAMETERS###
 
-alfa = 0.15  #ratio between nA/N 
+alfa = 0.2  #ratio between nA/N 
 N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
 nB = 100 #number of Bs 
-k = 10 #10 #, 5, 10]  #number of B interacting sites with A  
+k = 3 #10 #, 5, 10]  #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True    
@@ -323,7 +323,7 @@ for L  in L_values:
 
                                 
                                 if plot_B_bound_final_time_step: 
-                                    bin_width_values = [1,5,10]
+                                    bin_width_values = [1]#[1,5,10]
                                     for bin_width in bin_width_values: 
                                         xlabel_plot_B_bound_final_time_step = 'DNA site'
                                         title_plot_B_bound_final_time_step = f'B bound at the last time step (E_aa={E_aa}, E_ad={E_ad})'
