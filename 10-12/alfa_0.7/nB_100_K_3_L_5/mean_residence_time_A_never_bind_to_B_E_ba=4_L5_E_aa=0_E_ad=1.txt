@@ -1,0 +1,4 @@
+Index 804: Mean Residence Time = 171.0
+Index 957: Mean Residence Time = 255.0
+Index 1326: Mean Residence Time = 88.0
+Index 1374: Mean Residence Time = 297.0
