@@ -24,13 +24,13 @@ ASSUMPTIONS:
 
 ###PARAMETERS###
 
-alfa = 0.2  #ratio between nA/N 
-N = 3000 #total number of binding sites in the DNA
+alfa = 0.15  #ratio between nA/N 
+N = 6000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
-nB = 100 #number of Bs 
-k = 3 #10 #, 5, 10]  #number of B interacting sites with A  
+nB = 200 #number of Bs 
+k = 2 #, 5, 10]  #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True    
@@ -52,14 +52,14 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
 #E_ad_values = np.arange(0, 4, 1)
 E_ad_values = [1]
-E_aa_values = [0,2]
+E_aa_values = [2]
 
 
 #B parameters 
 if protein_B:
     #E_ab = 7
     E_ba_values = [1,4]
-    L_values = [5,10] 
+    L_values = [10] 
     
 else: #put these same parameters to 0 
     E_ab = [0]
@@ -473,61 +473,61 @@ for L  in L_values:
                  
                  
                 if plot_ratio_mean_var:
-                    ratio_mean_var = [[mean / stdv**2 for mean, stdv in zip(res_times, std_devs)]
+                    ratio_mean_stdev = [[mean / stdv for mean, stdv in zip(res_times, std_devs)]
                                         for res_times, std_devs in zip(mean_residence_times_for_different_E_aa, std_devs_for_different_E_aa)]
                     
-                    ylabel_ratio = 'Mean/variance devation'
-                    title_ratio = 'Ratio Mean and Variance of residence times vs. E ad values'
-                    saving_name_ratio = f'nA_{nA}_n_{N}_ratio_mean_var_residence_times_E_ba_{E_ba}.png'
+                    ylabel_ratio = 'Mean/stdv devation'
+                    title_ratio = 'Ratio Mean and Stdev of residence times vs. E ad values'
+                    saving_name_ratio = f'nA_{nA}_n_{N}_ratio_mean_stdev_residence_times_E_ba_{E_ba}.png'
                     
-                    general_functions.comparison_plots_different_E_aa(ratio_mean_var, E_aa_values, E_ad_values, x_label_E_aa_comparison, ylabel_ratio,title_ratio,legend,subfolder_path,saving_name_ratio)
+                    general_functions.comparison_plots_different_E_aa(ratio_mean_stdev, E_aa_values, E_ad_values, x_label_E_aa_comparison, ylabel_ratio,title_ratio,legend,subfolder_path,saving_name_ratio)
             
-import matplotlib.pyplot as plt
-from collections import defaultdict
-# Group results by parameters (E_ba, E_aa, E_ad) while keeping track of L
+# import matplotlib.pyplot as plt
+# from collections import defaultdict
+# # Group results by parameters (E_ba, E_aa, E_ad) while keeping track of L
 
-main_folder = 'Simulations_proteins_A_B'
-subfolder =  f'alfa_{alfa}'
-full_folder_path = os.path.join(folder_name, subfolder)
+# main_folder = 'Simulations_proteins_A_B'
+# subfolder =  f'alfa_{alfa}'
+# full_folder_path = os.path.join(folder_name, subfolder)
 
 
 
-grouped_results = defaultdict(list)
-for key, value in results_dict_B.items():
-    # Extract parameters
-    params = key.split(", ")
-    L = int(params[0].split(" = ")[1])  # Extract L value
-    E_ba = params[1]
-    E_aa = params[2]
-    E_ad = params[3]
+# grouped_results = defaultdict(list)
+# for key, value in results_dict_B.items():
+#     # Extract parameters
+#     params = key.split(", ")
+#     L = int(params[0].split(" = ")[1])  # Extract L value
+#     E_ba = params[1]
+#     E_aa = params[2]
+#     E_ad = params[3]
     
-    # Group data
-    parameter_combination = f"{E_ba}, {E_aa}, {E_ad}"
-    grouped_results[parameter_combination].append((L, value["Mean number of consecutives B"], value["Mean width of the gaps between the Bs"]))
+#     # Group data
+#     parameter_combination = f"{E_ba}, {E_aa}, {E_ad}"
+#     grouped_results[parameter_combination].append((L, value["Mean number of consecutives B"], value["Mean width of the gaps between the Bs"]))
 
 
-# Plot for each combination
-for params, data in grouped_results.items():
-    # Sort data by L for consistent plotting
-    data.sort(key=lambda x: x[0])  # Sort by L
-    L_values = [item[0] for item in data]
-    ncons_values = [item[1] for item in data]
-    ngaps_values = [item[2] for item in data]
+# # Plot for each combination
+# for params, data in grouped_results.items():
+#     # Sort data by L for consistent plotting
+#     data.sort(key=lambda x: x[0])  # Sort by L
+#     L_values = [item[0] for item in data]
+#     ncons_values = [item[1] for item in data]
+#     ngaps_values = [item[2] for item in data]
     
-    # Create a plot for ncons vs L
-    plt.figure(figsize=(8, 6))
-    plt.plot(L_values, ncons_values, label="Mean Consecutive", marker="o")
-    plt.plot(L_values, ngaps_values, label="Mean Gaps", marker="s", linestyle="--")
-    plt.title(f"Mean Consecutive and Gaps vs L\nParameters: {params}")
-    plt.xlabel("L")
-    plt.ylabel("Mean Values")
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
+#     # Create a plot for ncons vs L
+#     plt.figure(figsize=(8, 6))
+#     plt.plot(L_values, ncons_values, label="Mean Consecutive", marker="o")
+#     plt.plot(L_values, ngaps_values, label="Mean Gaps", marker="s", linestyle="--")
+#     plt.title(f"Mean Consecutive and Gaps vs L\nParameters: {params}")
+#     plt.xlabel("L")
+#     plt.ylabel("Mean Values")
+#     plt.legend()
+#     plt.grid(True)
+#     plt.tight_layout()
     
-    # Save the plot in the specified folder
-    safe_params = params.replace(", ", "_").replace(" = ", "_")  # Make filename safe
-    plot_path = os.path.join(full_folder_path, f"width_gaps_vsL_k_{k}_{safe_params}.png")
-    plt.savefig(plot_path)
-    plt.show()
-    plt.close()  # Close the plot to avoid memory issues
+#     # Save the plot in the specified folder
+#     safe_params = params.replace(", ", "_").replace(" = ", "_")  # Make filename safe
+#     plot_path = os.path.join(full_folder_path, f"width_gaps_vsL_k_{k}_{safe_params}.png")
+#     plt.savefig(plot_path)
+#     plt.show()
+#     plt.close()  # Close the plot to avoid memory issues
