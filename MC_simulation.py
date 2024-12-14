@@ -303,23 +303,23 @@ for L  in L_values:
                                 mean_cluster_sizes.append(np.mean(average_cluster_sizes)) #taking the mean of cluster sizes for each energy value
                                 mean_max_cluster_sizes.append(np.mean(max_cluster_sizes)) #taking the mean of maximum sized cluster for each energy value 
                                 
-                                
-                                average_occupied_B_fraction_over_time = np.mean(fraction_occupied_sites, axis=0)
-                                
-                                ### PLOTS FOR EACH COMBINATION OF PARAMETERS ###
-                                
-                                consecutive_B, gaps = general_functions.gaps_and_consecutives(sorted(idx_DNA_B_bound_final_time_step))
-                                
-                                key = f"L = {L}, E_ba = {E_ba}, E_aa = {E_aa}, E_ad = {E_ad}"
-                
-                                # Store results in the dictionary
-                                results_dict_B[key] = {
-                                    "Mean number of consecutives B": np.mean(consecutive_B),
-                                    "Mean width of the gaps between the Bs": np.mean (gaps)
-                                }
-                                
-                                # Optionally log or print progress
-                                print(f"Processed {key}: ncons = {np.mean(consecutive_B)}, ngaps = {np.mean (gaps)}")
+                                if protein_B: 
+                                    average_occupied_B_fraction_over_time = np.mean(fraction_occupied_sites, axis=0)
+                                    
+                                    ### PLOTS FOR EACH COMBINATION OF PARAMETERS ###
+                                    
+                                    consecutive_B, gaps = general_functions.gaps_and_consecutives(sorted(idx_DNA_B_bound_final_time_step))
+                                    
+                                    key = f"L = {L}, E_ba = {E_ba}, E_aa = {E_aa}, E_ad = {E_ad}"
+                    
+                                    # Store results in the dictionary
+                                    results_dict_B[key] = {
+                                        "Mean number of consecutives B": np.mean(consecutive_B),
+                                        "Mean width of the gaps between the Bs": np.mean (gaps)
+                                    }
+                                    
+                                    # Optionally log or print progress
+                                    print(f"Processed {key}: ncons = {np.mean(consecutive_B)}, ngaps = {np.mean (gaps)}")
 
                                 
                                 if plot_B_bound_final_time_step: 
