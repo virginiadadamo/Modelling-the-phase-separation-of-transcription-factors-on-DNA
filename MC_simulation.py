@@ -30,7 +30,7 @@ nA = int (N*alfa) #number of As
 
 
 nB = 100 #number of Bs 
-k = 2# 2 #, 5, 10]  #number of B interacting sites with A  
+k = 10# 2 #, 5, 10]  #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True     
@@ -197,7 +197,7 @@ for L  in L_values:
                                 while time_step < stop_time:
                                     
                                     if time_step > 2000000:
-                                        E_ba = 1 
+                                        k = 2 
                                     
                                     if protein_B:
                                         time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times, does_B_bind = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, E_ad, E_aa, E_ba, residence_times, times_variables, does_B_bind, k)
