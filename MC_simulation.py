@@ -37,8 +37,8 @@ protein_B= True
 
 
 #Time parameters
-stop_time = 4000000
-ignoring_steps = 2000000
+stop_time = 2000000
+ignoring_steps = 1000000
 m = 50
 
 number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
@@ -195,9 +195,6 @@ for L  in L_values:
                                 DNA_over_time_file = os.path.join(subfolder_path, f"nA_{nA}_n_{N}_DNA_list_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}.txt")
                                     
                                 while time_step < stop_time:
-                                    
-                                    if time_step > 2000000:
-                                        k = 2 
                                     
                                     if protein_B:
                                         time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times, does_B_bind = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, E_ad, E_aa, E_ba, residence_times, times_variables, does_B_bind, k)
