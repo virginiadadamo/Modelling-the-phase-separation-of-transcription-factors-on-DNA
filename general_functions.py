@@ -25,7 +25,7 @@ def create_folders(folder_name, alfa, nB, k, L):
     os.makedirs(subfolder_path, exist_ok=True)
     
     # Now create a subfolder inside 'alfa_{alfa}' named after nB
-    L_folder_name = f'nB_{nB}_K_{k}_L_{L}_all_bin_values'  
+    L_folder_name = f'nB_{nB}_K_{k}_L_{L}_19_dec'  
     L_folder_path = os.path.join(subfolder_path, L_folder_name)
     
     # Create the L folder inside 'alfa_{alfa}'
