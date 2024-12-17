@@ -33,7 +33,7 @@ nB = 200 #number of Bs
 k = 2# 2 #, 5, 10]  #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= False    
+protein_B= True     
 
 
 #Time parameters
