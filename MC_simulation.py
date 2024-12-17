@@ -30,14 +30,14 @@ nA = int (N*alfa) #number of As
 
 
 nB = 100 #number of Bs 
-k = 10# 2 #, 5, 10]  #number of B interacting sites with A  
+k = 2# 2 #, 5, 10]  #number of B interacting sites with A  
 #beta fraction B over As
 #Adding protein B in the simulation (True if you want to add, False otherwise)
 protein_B= True     
 
 
 #Time parameters
-stop_time = 2000000
+stop_time = 3000000
 ignoring_steps = 1000000
 m = 50
 
@@ -58,7 +58,7 @@ E_aa_values = [2]
 #B parameters 
 if protein_B:
     #E_ab = 7
-    E_ba_values = [4]
+    E_ba_values = [1,2.5,4]
     L_values = [10] 
     
 else: #put these same parameters to 0 
