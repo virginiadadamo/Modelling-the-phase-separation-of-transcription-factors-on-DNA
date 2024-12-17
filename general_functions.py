@@ -18,14 +18,14 @@ from scipy.stats import norm, expon, gamma  # Import common distributions
 def create_folders(folder_name, alfa, nB, k, L):
 
     # Create the subfolder named 'alfa_{alfa}'
-    subfolder_name = f'alfa_{alfa}'
+    subfolder_name = f'alfa_{alfa}_new'
     subfolder_path = os.path.join(folder_name, subfolder_name)
     
     # Create the subfolder if it doesn't already exist
     os.makedirs(subfolder_path, exist_ok=True)
     
     # Now create a subfolder inside 'alfa_{alfa}' named after nB
-    L_folder_name = f'nB_{nB}_K_{k}_L_{L}_19_dec_6000'  
+    L_folder_name = f'nB_{nB}_K_{k}_L_{L}'  
     L_folder_path = os.path.join(subfolder_path, L_folder_name)
     
     # Create the L folder inside 'alfa_{alfa}'
