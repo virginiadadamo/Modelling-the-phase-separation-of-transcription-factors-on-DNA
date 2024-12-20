@@ -11,30 +11,30 @@ import steps_MC_simulations
 import general_functions
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
+from collections import defaultdict
 
 '''
 ASSUMPTIONS:
     -For the residence times: Difference between unbinding and binding event of the transcription factor. If a TF binds but never
     unbinds the residence time will not be computed. These trasncription factors will be ignored when computing the mean residence times over all transcription factors 
     -If an A is free and there is an empty site of DNA, protein A will always find that site 
-    -E_ab is now set to infinity, id est if a B is bound to an A it will never leave 
+    -E_ab is now set to infinity, id est if a B is bound to an A, that A will never leave 
 '''
 
-# Fare E_ab_values 
-#Mettere i plots delle varie Average occupied faction in una sola per diverse E_ba_values 
 
 ###PARAMETERS###
 
-alfa = 0.15  #ratio between nA/N 
+alfa = 0.15 #0.3 #ratio between nA/N 
 N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
 nB = 100 #number of Bs 
-k = 10# 2 #, 5, 10]  #number of B interacting sites with A  
-#beta fraction B over As
+k = 10 #number of B interacting sites with A  
+
+
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= True     
+protein_B= True #False 
 
 
 #Time parameters
@@ -50,15 +50,14 @@ number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
 #Energy parameters 
 
-#E_ad_values = np.arange(0, 4, 1)
-E_ad_values = [1]
-E_aa_values = [2]
+E_ad_values = [1]#[0,1,3]
+E_aa_values = [0]#[0,2]
 
 
 #B parameters 
 if protein_B:
-    #E_ab = 7
-    E_ba_values = [4]
+  
+    E_ba_values = [0,1,2,4] #Effect that the A has on B unbinding
     L_values = [10] 
     
 else: #put these same parameters to 0 
@@ -71,35 +70,39 @@ else: #put these same parameters to 0
 
 ###PLOTS' TAGS ### - select the plots by putting the corresponding value to true 
 
-#For each combination of Eaa and Ead
-if protein_B== False  :
-    average_B_fraction = False #plot to identify the average (over time steps sampled) of the fraction of bound sites for each B protein
-    plot_B_bound_final_time_step = False #do also another time steps 
-else: 
-    average_B_fraction = True
-    plot_B_bound_final_time_step =  True 
-    
+#PLOTS- A
+
 plot_never_unbind = False #plot to identify the time at which the TFs that never leave the DNA bind
-#histogram_never_unbind = False #histogram to identify the distribution of Binding Times of the TFs that never leave the DNA
-#plot_cluster_sizes_over_time = False #To plot the mean cluster size at each time step, with error bars with the corresponding standard deviation 
 histogram_mean_residence_time = True # To plot the corresponding distribution of mean residence times of the transcription factors
 scatter_plot_std = False #To plot the standard deviation of the residence times of each transcription factors 
 scatter_plot_mean = False #To plot the mean of the residence times of each transcription factors
 histogram_binding_events = True #To plot the distribution of binding events of the transcription factors 
 histogram_cluster_size = True #To plot the distribution of cluster sizes 
 
-#For each E_aa
+
 plot_nA_bound = True #Plot the number of transcription factors bound in time
 plot_inverse = False #Plot the inverse of the number of transcription factors vs the inverse of the corresponding time steps 
-#histogram_binding_events_E_aa = False #Plot the distribution of binding events of the transcription factors for each E_aa
 plot_mean_cluster_size_max_cluster_size = False #Plot Mean Cluster Size vs Max Cluster size
 plot_mean_cluster_size_E_ad = False #Mean Cluster Size vs. E_ad 
 plot_mean_cluster_size_max_cluster_size = False #Mean Cluster Size vs Max Cluster size
 
-#Comparison between different E_aa
+
 plot_log_mean_residence_time = True #Plot for different E_aa the ln of Mean Residence Time vs E_ad values 
-plot_stdv_residence_time = False #Plot for different E_aa the Standard Deviation vs E_ad values 
+plot_stdv_residence_time = True #Plot for different E_aa the Standard Deviation vs E_ad values 
 plot_ratio_mean_var = True  #Plot for different E_aa the ratio of Mean Residence Time and Standard Deviation vs E_ad values 
+
+
+
+#PLOTS- B
+if protein_B== False  :
+    average_B_fraction = False #plot to identify the average (over time steps sampled) of the fraction of bound sites for each B protein
+    plot_B_bound_final_time_step = False #do also another time steps 
+    plot_gaps_width_B = False 
+else: 
+    average_B_fraction = True
+    plot_B_bound_final_time_step =  True 
+    plot_gaps_width_B = False 
+    
 
 
 ###CREATING FOLDERS###
@@ -251,6 +254,7 @@ for L  in L_values:
                                             plt.savefig(f'{subfolder_path}/{saving_name}')
                                             plt.show()
                                             plt.close()
+                                            del idx_DNA_B_bound_final_time_step, colors_for_bins
                                      
                                         
 
@@ -518,52 +522,44 @@ for L  in L_values:
                     
                     general_functions.comparison_plots_different_E_aa(ratio_mean_stdev, E_aa_values, E_ad_values, x_label_E_aa_comparison, ylabel_ratio,title_ratio,legend,subfolder_path,saving_name_ratio)
             
-# import matplotlib.pyplot as plt
-# from collections import defaultdict
-# # Group results by parameters (E_ba, E_aa, E_ad) while keeping track of L
-
-# main_folder = 'Simulations_proteins_A_B'
-# subfolder =  f'alfa_{alfa}'
-# full_folder_path = os.path.join(folder_name, subfolder)
-
-
-
-# grouped_results = defaultdict(list)
-# for key, value in results_dict_B.items():
-#     # Extract parameters
-#     params = key.split(", ")
-#     L = int(params[0].split(" = ")[1])  # Extract L value
-#     E_ba = params[1]
-#     E_aa = params[2]
-#     E_ad = params[3]
+if plot_gaps_width_B: 
+    # Group results by parameters (E_ba, E_aa, E_ad) while keeping track of L
+    grouped_results = defaultdict(list)
+    for key, value in results_dict_B.items():
+        
+        # Extract parameters
+        params = key.split(", ")
+        L = int(params[0].split(" = ")[1])  # Extract L value
+        E_ba = params[1]
+        E_aa = params[2]
+        E_ad = params[3]
+        
+        # Group data
+        parameter_combination = f"{E_ba}, {E_aa}, {E_ad}"
+        grouped_results[parameter_combination].append((L, value["Mean number of consecutives B"], value["Mean width of the gaps between the Bs"]))
     
-#     # Group data
-#     parameter_combination = f"{E_ba}, {E_aa}, {E_ad}"
-#     grouped_results[parameter_combination].append((L, value["Mean number of consecutives B"], value["Mean width of the gaps between the Bs"]))
-
-
-# # Plot for each combination
-# for params, data in grouped_results.items():
-#     # Sort data by L for consistent plotting
-#     data.sort(key=lambda x: x[0])  # Sort by L
-#     L_values = [item[0] for item in data]
-#     ncons_values = [item[1] for item in data]
-#     ngaps_values = [item[2] for item in data]
     
-#     # Create a plot for ncons vs L
-#     plt.figure(figsize=(8, 6))
-#     plt.plot(L_values, ncons_values, label="Mean Consecutive", marker="o")
-#     plt.plot(L_values, ngaps_values, label="Mean Gaps", marker="s", linestyle="--")
-#     plt.title(f"Mean Consecutive and Gaps vs L\nParameters: {params}")
-#     plt.xlabel("L")
-#     plt.ylabel("Mean Values")
-#     plt.legend()
-#     plt.grid(True)
-#     plt.tight_layout()
-    
-#     # Save the plot in the specified folder
-#     safe_params = params.replace(", ", "_").replace(" = ", "_")  # Make filename safe
-#     plot_path = os.path.join(full_folder_path, f"width_gaps_vsL_k_{k}_{safe_params}.png")
-#     plt.savefig(plot_path)
-#     plt.show()
-#     plt.close()  # Close the plot to avoid memory issues
+    # Plot for each combination
+    for params, data in grouped_results.items():
+        # Sort data by L for consistent plotting
+        data.sort(key=lambda x: x[0])  # Sort by L
+        L_values = [item[0] for item in data]
+        ncons_values = [item[1] for item in data] #Consecutive Bs
+        ngaps_values = [item[2] for item in data] #Gaps
+        
+        plt.figure(figsize=(8, 6))
+        plt.plot(L_values, ncons_values, label="Mean Consecutive", marker="o")
+        plt.plot(L_values, ngaps_values, label="Mean Gaps", marker="s", linestyle="--")
+        plt.title(f"Mean Consecutive and Gaps vs L\nParameters: {params}")
+        plt.xlabel("L")
+        plt.ylabel("Mean Values")
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        
+        
+        safe_params = params.replace(", ", "_").replace(" = ", "_")
+        plot_path = os.path.join(subfolder_path, f"width_gaps_vsL_k_{k}_{safe_params}.png")
+        plt.savefig(plot_path)
+        plt.show()
+        plt.close()  # Close the plot to avoid memory issues
