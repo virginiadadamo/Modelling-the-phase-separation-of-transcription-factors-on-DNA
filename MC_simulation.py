@@ -9,7 +9,8 @@ import numpy as np
 import os
 import steps_MC_simulations
 import general_functions
-
+import matplotlib.cm as cm
+import matplotlib.pyplot as plt
 
 '''
 ASSUMPTIONS:
@@ -40,7 +41,6 @@ protein_B= True
 stop_time = 2000000
 ignoring_steps = 1000000
 m = 50
-
 number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
 if (stop_time - ignoring_steps) % m != 0 :
@@ -74,14 +74,14 @@ else: #put these same parameters to 0
 #For each combination of Eaa and Ead
 if protein_B== False  :
     average_B_fraction = False #plot to identify the average (over time steps sampled) of the fraction of bound sites for each B protein
-    plot_B_bound_final_time_step = False 
+    plot_B_bound_final_time_step = False #do also another time steps 
 else: 
     average_B_fraction = True
     plot_B_bound_final_time_step =  True 
     
 plot_never_unbind = False #plot to identify the time at which the TFs that never leave the DNA bind
-histogram_never_unbind = False #histogram to identify the distribution of Binding Times of the TFs that never leave the DNA
-plot_cluster_sizes_over_time = False #To plot the mean cluster size at each time step, with error bars with the corresponding standard deviation 
+#histogram_never_unbind = False #histogram to identify the distribution of Binding Times of the TFs that never leave the DNA
+#plot_cluster_sizes_over_time = False #To plot the mean cluster size at each time step, with error bars with the corresponding standard deviation 
 histogram_mean_residence_time = True # To plot the corresponding distribution of mean residence times of the transcription factors
 scatter_plot_std = False #To plot the standard deviation of the residence times of each transcription factors 
 scatter_plot_mean = False #To plot the mean of the residence times of each transcription factors
@@ -91,7 +91,7 @@ histogram_cluster_size = True #To plot the distribution of cluster sizes
 #For each E_aa
 plot_nA_bound = True #Plot the number of transcription factors bound in time
 plot_inverse = False #Plot the inverse of the number of transcription factors vs the inverse of the corresponding time steps 
-histogram_binding_events_E_aa = False #Plot the distribution of binding events of the transcription factors for each E_aa
+#histogram_binding_events_E_aa = False #Plot the distribution of binding events of the transcription factors for each E_aa
 plot_mean_cluster_size_max_cluster_size = False #Plot Mean Cluster Size vs Max Cluster size
 plot_mean_cluster_size_E_ad = False #Mean Cluster Size vs. E_ad 
 plot_mean_cluster_size_max_cluster_size = False #Mean Cluster Size vs Max Cluster size
@@ -199,16 +199,61 @@ for L  in L_values:
                                     if protein_B:
                                         time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times, does_B_bind = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, E_ad, E_aa, E_ba, residence_times, times_variables, does_B_bind, k)
                                         
-                                        if time_step == stop_time: #last time step
-                                            print('Final time step', time_step) 
-                                            # print ('List_A', list_A)
-                                            # print ('List_B', list_B)
-                                            # print ('List_DNA', list_DNA)
+                                        if time_step == stop_time or time_step == int((stop_time - ignoring_steps)/2):  # last time step or middle one
+                                            
+                                            print (time_step)
+                                            print ('List A', list_A)
                                             indices = np.where(list_A[:, 1] != -1)[0]
-                                            idx_DNA_B_bound_final_time_step = []
-                                            #print ('Indices', indices)
+                                            print ('Indices', indices) 
+                                            unique_values = np.unique(list_A[indices, 1])
+
+                                            num_unique_values = len(unique_values)
+                                            colormap = cm.viridis(np.linspace(0, 1, num_unique_values))  # Using the 'viridis' colormap
+                                            
+                                            # Mapping each unique value of 'B' to a specific color
+                                            value_to_color = {val: colormap[i] for i, val in enumerate(unique_values)}
+                                            print (value_to_color)
+                                            # Prepare data for plotting (for a single time step)
+                                            idx_DNA_B_bound_final_time_step = []  # List to store data for the selected time step
+                                
+
+                                            colors_for_bins = []  # List to store the corresponding colors for each bin
+                                            
+                                            # Collect data and corresponding colors
                                             for idx in indices:
-                                                idx_DNA_B_bound_final_time_step.append(list_A[idx, 0])
+                                                idx_DNA_B_bound_final_time_step.append(list_A[idx, 0])  # Collect data for time step
+                                                value = list_A[idx, 1]  # Get the value of list_A[:, 1] for the current index
+                                                color = value_to_color[value]  # Get the color for this value
+                                                colors_for_bins.append(color)  # Store the corresponding color
+                                            
+                                            # Create a plot for the one time step
+                                            plt.figure(figsize=(10, 6))
+                                            
+                                            # Get the min and max value of the data for binning
+                                            min_value = min(idx_DNA_B_bound_final_time_step)
+                                            max_value = max(idx_DNA_B_bound_final_time_step)
+                                            
+                                            # Create bins with width 1, from min to max + 1
+                                            bins = range(min_value, max_value + 2)
+                                            
+                                            # Plot each value with its corresponding color
+                                            for i, val in enumerate(idx_DNA_B_bound_final_time_step):
+                                                color = colors_for_bins[i]  # Get the color for this specific value
+                                                plt.hist(val, bins=bins, color=color, alpha=0.7)  # Plot each value with the corresponding color
+                                            
+                                            # Add labels, title, and legend
+                                            plt.xlabel('DNA site')
+                                            plt.ylabel('Frequency')
+                                            plt.title(f'B bound at time step {time_step} (E_aa={E_aa}, E_ad={E_ad})')
+                                            
+                                            # Save and display the plot
+                                            saving_name = f'nA_{nA}_n_{N}_B_bound_time_step_{time_step}_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}_L_{L}_k_{k}.png'
+                                            plt.savefig(f'{subfolder_path}/{saving_name}')
+                                            plt.show()
+                                            plt.close()
+                                     
+                                        
+
                                 
                                     else:
                                         time_step, list_DNA, list_A, list_empty_DNA, times_variables,residence_times = steps_MC_simulations.step_MC_protein_A(time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad, E_aa, E_ab, residence_times, times_variables)
@@ -317,19 +362,10 @@ for L  in L_values:
                                         "Mean number of consecutives B": np.mean(consecutive_B),
                                         "Mean width of the gaps between the Bs": np.mean (gaps)
                                     }
-                                    
-                                    # Optionally log or print progress
-                                    print(f"Processed {key}: ncons = {np.mean(consecutive_B)}, ngaps = {np.mean (gaps)}")
+                                
 
                                 
-                                if plot_B_bound_final_time_step: 
-                                    bin_width_values = [1,5,10]
-                                    for bin_width in bin_width_values: 
-                                        xlabel_plot_B_bound_final_time_step = 'DNA site'
-                                        title_plot_B_bound_final_time_step = f'B bound at the last time step (E_aa={E_aa}, E_ad={E_ad})'
-                                        saving_name_plot_B_bound_final_time_step = f'nA_{nA}_n_{N}_B_bound_last_time_step_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}_L_{L}_k_{k}_bin_width_{bin_width}.png' 
-                                        general_functions.plot_histogram(idx_DNA_B_bound_final_time_step, title_plot_B_bound_final_time_step, legend, subfolder_path, xlabel_plot_B_bound_final_time_step, 'Frequency', saving_name_plot_B_bound_final_time_step, time_step_sampled, False, bin_width=bin_width) 
-                                        
+                                    
                                 if average_B_fraction :
                                     
                                     plot_average_B_fraction_title = f'Avarage over time of occupied sites for each B(E_aa={E_aa}, E_ad={E_ad})'
@@ -351,20 +387,20 @@ for L  in L_values:
                                     general_functions.plot_figure (index_never_unbind,times_never_unbind, x_label_plot_never_unbind ,y_label_plot_never_unbind,plot_never_unbind_title,subfolder_path,saving_never_unbind_name)
                                 
                                
-                                if histogram_never_unbind :
-                                    histogram_never_unbind_title = f'Histogram for binding times for TFs that bind but never unbind (E_aa={E_aa}, E_ad={E_ad})'
-                                    saving_histogram_never_unbind_name = f'nA_{nA}_n_{N}_histo_never_unbind_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}_L_{L}_k_{k}.png'
-                                    x_label_histogram_never_unbind = 'Binding Times'
-                                    y_label_histogram_never_unbind = 'Frequency'
-                                    general_functions.plot_histogram(times_never_unbind, histogram_never_unbind_title, legend, subfolder_path, x_label_histogram_never_unbind, 'Frequency', saving_histogram_never_unbind_name, time_step_sampled, False, 100) 
+                                # if histogram_never_unbind :
+                                #     histogram_never_unbind_title = f'Histogram for binding times for TFs that bind but never unbind (E_aa={E_aa}, E_ad={E_ad})'
+                                #     saving_histogram_never_unbind_name = f'nA_{nA}_n_{N}_histo_never_unbind_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}_L_{L}_k_{k}.png'
+                                #     x_label_histogram_never_unbind = 'Binding Times'
+                                #     y_label_histogram_never_unbind = 'Frequency'
+                                #     general_functions.plot_histogram(times_never_unbind, histogram_never_unbind_title, legend, subfolder_path, x_label_histogram_never_unbind, 'Frequency', saving_histogram_never_unbind_name, time_step_sampled, False, 100) 
                                 
-                                if plot_cluster_sizes_over_time :
-                                    plot_cluster_size_title = f'Mean Cluster size over time (E_aa={E_aa}, E_ad={E_ad})'
-                                    saving_cluster_size_name = f'nA_{nA}_n_{N}_mean_cluster_size_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}_L_{L}_k_{k}.png'
-                                    x_label_plot_cluster_size = 'Time_step'
-                                    y_label_plot_cluster_size = 'Mean Cluster size'
+                                # if plot_cluster_sizes_over_time :
+                                #     plot_cluster_size_title = f'Mean Cluster size over time (E_aa={E_aa}, E_ad={E_ad})'
+                                #     saving_cluster_size_name = f'nA_{nA}_n_{N}_mean_cluster_size_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}_L_{L}_k_{k}.png'
+                                #     x_label_plot_cluster_size = 'Time_step'
+                                #     y_label_plot_cluster_size = 'Mean Cluster size'
                                     
-                                    general_functions.plot_figure (time_step_sampled[0],average_cluster_sizes[0],x_label_plot_cluster_size,y_label_plot_cluster_size,plot_cluster_size_title,subfolder_path,saving_cluster_size_name, stdv_cluster_sizes[0], True)
+                                #     general_functions.plot_figure (time_step_sampled[0],average_cluster_sizes[0],x_label_plot_cluster_size,y_label_plot_cluster_size,plot_cluster_size_title,subfolder_path,saving_cluster_size_name, stdv_cluster_sizes[0], True)
                                     
                                     
                                 
@@ -439,14 +475,14 @@ for L  in L_values:
                         general_functions.plot_different_Ead_in_time (nA_bound_for_different_energies, E_ad_values, time_step_sampled[0], xlabel_lineweaver_burk, ylabel_lineweaver_burk,title_lineweaver_burk,legend,subfolder_path,saving_name_lineweaver_burk, True)
                         del nA_bound_for_different_energies
                     
-                    if histogram_binding_events_E_aa:
-                        xlabel_binding_events = 'Binding Events'
-                        ylabel_binding_events = 'Frequency'
-                        title_binding_events = f'Histogram of Distribution of Binding Events for different E_ad (E_aa={E_aa})'
-                        saving_name_binding_events = f'nA_{nA}_n_{N}_combined_histo_binding_events_E_ba_{E_ba}.png'
+                    # if histogram_binding_events_E_aa:
+                    #     xlabel_binding_events = 'Binding Events'
+                    #     ylabel_binding_events = 'Frequency'
+                    #     title_binding_events = f'Histogram of Distribution of Binding Events for different E_ad (E_aa={E_aa})'
+                    #     saving_name_binding_events = f'nA_{nA}_n_{N}_combined_histo_binding_events_E_ba_{E_ba}.png'
                       
-                        general_functions.plot_histogram_distribution_different_E_ad (binding_events_lists,E_ad_values, E_aa, xlabel_binding_events, ylabel_binding_events,title_binding_events,legend,subfolder_path,saving_name_binding_events)
-                        del binding_events_lists
+                    #     general_functions.plot_histogram_distribution_different_E_ad (binding_events_lists,E_ad_values, E_aa, xlabel_binding_events, ylabel_binding_events,title_binding_events,legend,subfolder_path,saving_name_binding_events)
+                    #     del binding_events_lists
                     
                     if plot_mean_cluster_size_max_cluster_size:
                         general_functions.plot_figure (max_residence_times,mean_cluster_sizes,'Max residence times','Mean Cluster Size','Max Residence Time vs Max Cluster size (E_aa={E_aa})',subfolder_path,f'nA_{nA}_n_{N}_max_rt_mean_cluster_size.png') 

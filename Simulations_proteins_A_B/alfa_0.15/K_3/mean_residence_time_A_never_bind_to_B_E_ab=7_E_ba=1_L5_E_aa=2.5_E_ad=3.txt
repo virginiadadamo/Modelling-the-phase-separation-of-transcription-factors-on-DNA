@@ -1,0 +1,2 @@
+Index 1: Mean Residence Time = 4435.0
+Index 3: Mean Residence Time = 2424.0

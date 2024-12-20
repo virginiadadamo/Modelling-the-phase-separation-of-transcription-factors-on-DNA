@@ -1,0 +1,5 @@
+Index 57: Mean Residence Time = 195.0
+Index 213: Mean Residence Time = 14.0
+Index 517: Mean Residence Time = 164.0
+Index 1543: Mean Residence Time = 463.0
+Index 1580: Mean Residence Time = 93.0
