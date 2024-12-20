@@ -1,4 +1,0 @@
-Index 871: Mean Residence Time = 651.0
-Index 1505: Mean Residence Time = 519.0
-Index 1814: Mean Residence Time = 298.0
-Index 1957: Mean Residence Time = 535.0

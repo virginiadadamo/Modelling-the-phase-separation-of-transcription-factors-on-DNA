@@ -1,4 +1,0 @@
-Index 332: Mean Residence Time = 207.0
-Index 1121: Mean Residence Time = 16.0
-Index 118: Mean Residence Time = 96.0
-Index 1307: Mean Residence Time = 400.0

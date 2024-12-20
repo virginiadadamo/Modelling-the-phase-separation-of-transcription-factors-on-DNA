@@ -1,4 +1,0 @@
-Index 360: Mean Residence Time = 122.0
-Index 1285: Mean Residence Time = 11.0
-Index 1632: Mean Residence Time = 208.0
-Index 1703: Mean Residence Time = 328.0

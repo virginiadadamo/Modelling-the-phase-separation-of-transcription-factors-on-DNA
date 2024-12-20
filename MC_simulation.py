@@ -12,6 +12,8 @@ import general_functions
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 from collections import defaultdict
+import gc
+
 
 '''
 ASSUMPTIONS:
@@ -38,8 +40,8 @@ protein_B= True #False
 
 
 #Time parameters
-stop_time = 2000000
-ignoring_steps = 1000000
+stop_time = 2000#2000000
+ignoring_steps = 1000#1000000
 m = 50
 number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
@@ -200,65 +202,48 @@ for L  in L_values:
                                 while time_step < stop_time:
                                     
                                     if protein_B:
-                                        time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times, does_B_bind = steps_MC_simulations.step_MC_proteins_A_B(time_step, list_DNA, list_A, list_B, list_empty_DNA, L, E_ad, E_aa, E_ba, residence_times, times_variables, does_B_bind, k)
+                                        time_step, list_DNA, list_A, list_B, list_empty_DNA, times_variables, residence_times, does_B_bind = steps_MC_simulations.step_MC_proteins_A_B(
+                                            time_step, list_DNA, list_A, list_B, list_empty_DNA, L, E_ad, E_aa, E_ba, residence_times, times_variables, does_B_bind, k)
                                         
-                                        if time_step == stop_time or time_step == int((stop_time - ignoring_steps)/2):  # last time step or middle one
+                                        if time_step == stop_time or time_step == int((stop_time - ignoring_steps) / 2):  # last or middle time step
+                                
+                                            indices = np.where(list_A[:, 1] != -1)[0]  # Get indices where B is bound
+                                            unique_values = np.unique(list_A[indices, 1])  # Unique values of B bound
                                             
-                                            print (time_step)
-                                            print ('List A', list_A)
-                                            indices = np.where(list_A[:, 1] != -1)[0]
-                                            print ('Indices', indices) 
-                                            unique_values = np.unique(list_A[indices, 1])
-
                                             num_unique_values = len(unique_values)
-                                            colormap = cm.viridis(np.linspace(0, 1, num_unique_values))  # Using the 'viridis' colormap
-                                            
+                                            colormap = cm.viridis(np.linspace(0, 1, num_unique_values))  # Using 'viridis' colormap
+                                
                                             # Mapping each unique value of 'B' to a specific color
                                             value_to_color = {val: colormap[i] for i, val in enumerate(unique_values)}
-                                            print (value_to_color)
-                                            # Prepare data for plotting (for a single time step)
-                                            idx_DNA_B_bound_final_time_step = []  # List to store data for the selected time step
                                 
-
-                                            colors_for_bins = []  # List to store the corresponding colors for each bin
-                                            
-                                            # Collect data and corresponding colors
-                                            for idx in indices:
-                                                idx_DNA_B_bound_final_time_step.append(list_A[idx, 0])  # Collect data for time step
-                                                value = list_A[idx, 1]  # Get the value of list_A[:, 1] for the current index
-                                                color = value_to_color[value]  # Get the color for this value
-                                                colors_for_bins.append(color)  # Store the corresponding color
-                                            
-                                            # Create a plot for the one time step
+                                            # Collect data and plot each value with its corresponding color
                                             plt.figure(figsize=(10, 6))
-                                            
-                                            # Get the min and max value of the data for binning
-                                            min_value = min(idx_DNA_B_bound_final_time_step)
-                                            max_value = max(idx_DNA_B_bound_final_time_step)
-                                            
-                                            # Create bins with width 1, from min to max + 1
-                                            bins = range(min_value, max_value + 2)
-                                            
-                                            # Plot each value with its corresponding color
-                                            for i, val in enumerate(idx_DNA_B_bound_final_time_step):
-                                                color = colors_for_bins[i]  # Get the color for this specific value
-                                                plt.hist(val, bins=bins, color=color, alpha=0.7)  # Plot each value with the corresponding color
-                                            
-                                            # Add labels, title, and legend
-                                            plt.xlabel('DNA site')
-                                            plt.ylabel('Frequency')
-                                            plt.title(f'B bound at time step {time_step} (E_aa={E_aa}, E_ad={E_ad})')
-                                            
-                                            # Save and display the plot
-                                            saving_name = f'nA_{nA}_n_{N}_B_bound_time_step_{time_step}_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}_L_{L}_k_{k}.png'
-                                            plt.savefig(f'{subfolder_path}/{saving_name}')
-                                            plt.show()
-                                            plt.close()
-                                            del idx_DNA_B_bound_final_time_step, colors_for_bins
-                                     
-                                        
-
                                 
+                                            # Prepare bins and colors
+                                            min_value = min(list_A[indices, 0])
+                                            max_value = max(list_A[indices, 0])
+                                            bins = range(min_value, max_value + 2)
+                                
+                                            # # Plot data with corresponding colors
+                                            # for idx in indices:
+                                            #     value = list_A[idx, 1]  # Get the B value for the current index
+                                            #     color = value_to_color[value]  # Get the corresponding color for B
+                                            #     plt.hist(list_A[idx, 0], bins=bins, color=color, alpha=0.7)
+                                
+                                            # # Add labels, title, and legend
+                                            # plt.xlabel('DNA site')
+                                            # plt.ylabel('Frequency')
+                                            # plt.title(f'B bound at time step {time_step} (E_aa={E_aa}, E_ad={E_ad})')
+                                
+                                            # # Save and display the plot
+                                            # saving_name = f'nA_{nA}_n_{N}_B_bound_time_step_{time_step}_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}_L_{L}_k_{k}.png'
+                                            # plt.savefig(f'{subfolder_path}/{saving_name}')
+                                            # plt.show()
+                                            # plt.close()
+                                
+                                            # # Clean up memory
+                                            # gc.collect()
+                                                                
                                     else:
                                         time_step, list_DNA, list_A, list_empty_DNA, times_variables,residence_times = steps_MC_simulations.step_MC_protein_A(time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad, E_aa, E_ab, residence_times, times_variables)
                                 
@@ -355,17 +340,17 @@ for L  in L_values:
                                 if protein_B: 
                                     average_occupied_B_fraction_over_time = np.mean(fraction_occupied_sites, axis=0)
                                     
-                                    ### PLOTS FOR EACH COMBINATION OF PARAMETERS ###
+                                    # ### PLOTS FOR EACH COMBINATION OF PARAMETERS ###
                                     
-                                    consecutive_B, gaps = general_functions.gaps_and_consecutives(sorted(idx_DNA_B_bound_final_time_step))
+                                    # consecutive_B, gaps = general_functions.gaps_and_consecutives(sorted(idx_DNA_B_bound_final_time_step))
                                     
-                                    key = f"L = {L}, E_ba = {E_ba}, E_aa = {E_aa}, E_ad = {E_ad}"
+                                    # key = f"L = {L}, E_ba = {E_ba}, E_aa = {E_aa}, E_ad = {E_ad}"
                     
-                                    # Store results in the dictionary
-                                    results_dict_B[key] = {
-                                        "Mean number of consecutives B": np.mean(consecutive_B),
-                                        "Mean width of the gaps between the Bs": np.mean (gaps)
-                                    }
+                                    # # Store results in the dictionary
+                                    # results_dict_B[key] = {
+                                    #     "Mean number of consecutives B": np.mean(consecutive_B),
+                                    #     "Mean width of the gaps between the Bs": np.mean (gaps)
+                                    # }
                                 
 
                                 
