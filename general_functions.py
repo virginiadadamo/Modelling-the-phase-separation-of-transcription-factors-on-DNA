@@ -16,37 +16,42 @@ from scipy.stats import norm, expon, gamma  # Import common distributions
 
 
 def create_folders(folder_name, alfa, nB, k, L):
+    
+    """
+    Creates a hierarchical folder structure for simulations and returns the path to the innermost folder.
+    
+    The function first creates a subfolder named `Final_simulations_alfa_{alfa}` inside the specified 
+    `folder_name`. Then, within this subfolder, it creates another folder named `nB_{nB}_K_{k}_L_{L}`. 
+    If the folders already exist, they are not recreated (to avoid overwriting).
+    
+    Args:
+        folder_name (str): The root folder where the folder structure will be created.
+        alfa (float or int): A parameter used to name the first-level subfolder.
+        nB (int): A parameter used to name the second-level subfolder.
+        k (int): A parameter used to name the second-level subfolder.
+        L (int): A parameter used to name the second-level subfolder.
+    
+    Returns:
+        str: The path to the innermost folder `nB_{nB}_K_{k}_L_{L}`.
+    """
 
-    # Create the subfolder named 'alfa_{alfa}'
-    subfolder_name = f'alfa_{alfa}_new'
+    # Create the subfolder 
+    subfolder_name = f'Final_simulations_alfa_{alfa}'
     subfolder_path = os.path.join(folder_name, subfolder_name)
     
     # Create the subfolder if it doesn't already exist
     os.makedirs(subfolder_path, exist_ok=True)
     
-    # Now create a subfolder inside 'alfa_{alfa}' named after nB
-    L_folder_name = f'nB_{nB}_K_{k}_L_{L}_trying_identification_B'  
+    # Now create a subfolder inside 'alfa_{alfa}'
+    L_folder_name = f'nB_{nB}_K_{k}_L_{L}'  
     L_folder_path = os.path.join(subfolder_path, L_folder_name)
-    
-    # Create the L folder inside 'alfa_{alfa}'
+
     os.makedirs(L_folder_path, exist_ok=True)
     
     # Return the path to the L folder
     return L_folder_path
 
-def create_txt_parameters (subfolder_path, alfa, stop_time, ignoring_steps):
-
-    txt_filename = os.path.join(subfolder_path, 'simulation_parameters.txt')
-
-    with open(txt_filename, 'a') as f:
-        f.write("# Simulation Parameters\n")
-        f.write(f"alfa = {alfa}  # Ratio between nA and N\n")
-        f.write(f"stop_time = {stop_time}  # Simulation stop time\n")
-        f.write(f"ignoring_steps = {ignoring_steps}  # Steps to ignore\n")
-    return txt_filename
-        
     
-
 ### SAMPLING FUNCTIONS ###
 
 def count_consecutive_ones(DNA_list, return_only_nA= True):
@@ -101,12 +106,41 @@ def count_consecutive_ones(DNA_list, return_only_nA= True):
     else:
         return group_sizes, max_count, clusters, sum (group_sizes)
     
-def count_A (list_A):
-    return len([x for x in list_A[0,:] if x != (-1)])
-
 
 def gaps_and_consecutives(idx_B_on_DNA):
-    print ('Idx B on the DNA', idx_B_on_DNA)
+    
+    """
+    Analyzes a list representing the DNA sites with B bound to them.
+    
+    This function takes a list of indices (`idx_B_on_DNA`) and:
+        
+    1. Identifies groups of consecutives DNA sites.
+    2. Measures the lengths of these groups (ignoring groups of length 1).
+    3. Calculates the gaps (the number of positions) between groups.
+    
+    Args:
+        idx_B_on_DNA (list[int]): A list of integer indices representing positions on DNA.
+    
+    Returns:
+        tuple:
+            - consecutive_B (list[int]): A list of lengths of consecutive groups of indices 
+              (groups of length 1 are ignored).
+            - gaps (list[int]): A list of gap sizes between consecutive groups of indices.
+    
+    Example:
+        >>> idx_B_on_DNA = [1, 2, 3, 7, 8, 12]
+        >>> gaps_and_consecutives(idx_B_on_DNA)
+        ([3, 2], [3, 3])
+        
+        Explanation:
+        - There are two consecutive groups: [1, 2, 3] (length 3) and [7, 8] (length 2).
+        - There are two gaps: 7 - 3 - 1 = 3 and 12 - 8 - 1 = 3.
+    
+    Notes:
+        - A group is defined as a sequence of consecutive indices.
+        - A gap is the difference between two non-consecutive indices, minus 1.
+    """
+    
     consecutive_B = []
     gaps = []
     start = 0
@@ -132,6 +166,22 @@ def gaps_and_consecutives(idx_B_on_DNA):
 
 
 def count_fraction_occupied_sites_B(B_list):
+    
+    """
+    Calculate the fraction of occupied sites (non -1 entries) for B in the input array (corresponding to the B matrix).
+    
+    This function takes a 2D array (B_list), where each row represents a set of sites, and 
+    counts the fraction of sites that are not marked as -1. It returns a 1D array containing 
+    the fraction of non -1 entries for each row.
+    
+    Parameters:
+    B_list (numpy.ndarray): A 2D NumPy array where each row contains site data, 
+                             with -1 indicating an unoccupied site and other values indicating occupied sites.
+    
+    Returns:
+    numpy.ndarray: A 1D array where each element corresponds to the fraction of occupied sites 
+                    (i.e., entries that are not -1) in the respective row of B_list.
+    """
    
     count = np.count_nonzero(B_list != -1, axis=1)
     count = count / B_list.shape[1]
@@ -139,7 +189,41 @@ def count_fraction_occupied_sites_B(B_list):
     return np.reshape (count, ((1, B_list.shape[0] )))
 
 
-def take_sample (time_step,list_DNA, list_A, nA_bound_snapshots, average_cluster_sizes, stdv_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled):
+def take_sample (time_step,list_DNA, nA_bound_snapshots, average_cluster_sizes, stdv_cluster_sizes, max_cluster_sizes, rate_counter, all_group_sizes_histogram, number_previously_sampled, time_step_sampled):
+    
+    """
+    Takes a sample of the system's state at a given time step, calculating various properties
+    of the clusters formed by the DNA sequences, and updates several statistics.
+    
+    This function computes the group sizes, the maximum group size, and the number of bound 'nA' sites, 
+    and updates the provided arrays that track these values over time. It also updates the overall group sizes 
+    histogram, as well as the statistics (average, standard deviation, maximum) for cluster sizes.
+    
+    Parameters:
+    time_step (int): The current time step of the simulation.
+    list_DNA (list): A list of DNA sequences representing the state of the system at the current time step
+    nA_bound_snapshots (numpy.ndarray): A 2D array to store the number of bound 'nA' sites at each sampled time step.
+    average_cluster_sizes (numpy.ndarray): A 2D array to store the average cluster size at each sampled time step.
+    stdv_cluster_sizes (numpy.ndarray): A 2D array to store the standard deviation of cluster sizes at each sampled time step.
+    max_cluster_sizes (numpy.ndarray): A 2D array to store the maximum cluster size at each sampled time step.
+    rate_counter (int): A counter tracking the sampling, reset each time a sample is taken.
+    all_group_sizes_histogram (list): accumulates the sizes of all groups encountered.
+    number_previously_sampled (int): used to index the snapshots.
+    time_step_sampled (numpy.ndarray): A 2D array to store the time steps when samples were taken.
+    
+    Returns:
+    tuple: A tuple containing updated values for:
+        - group_sizes (list): The sizes of the groups (clusters) found at the current time step.
+        - max_count (int): The size of the largest group.
+        - nA_bound_snapshots (numpy.ndarray): The updated array of 'nA' site counts over time.
+        - average_cluster_sizes (numpy.ndarray): The updated array of average cluster sizes over time.
+        - stdv_cluster_sizes (numpy.ndarray): The updated array of standard deviation of cluster sizes over time.
+        - max_cluster_sizes (numpy.ndarray): The updated array of maximum cluster sizes over time.
+        - rate_counter (int): Reset rate counter (set to 0).
+        - all_group_sizes_histogram (list): The updated histogram of group sizes.
+        - number_previously_sampled (int): The updated number of previously sampled time steps.
+        - time_step_sampled (numpy.ndarray): The updated array of sampled time steps.
+    """
     
     return_only_nA= False #we want to take samples of all the variables
     
@@ -178,7 +262,6 @@ def plot_histogram(
     bin_edges = np.arange(min_value, max_value + bin_width, bin_width)
     
     counts, bins = np.histogram(list_to_plot, bins=bin_edges)
-    print (counts, bins)
     
     if mean:
         if len(time_step_sampled) > 0:
@@ -229,11 +312,17 @@ def plot_histogram(
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.title(title)
-    plt.legend(loc='best')
+    plt.legend(loc='best')  
     
-    # Add legend text as an annotation
-    plt.text(1, 1, legend, horizontalalignment='left', verticalalignment='top', 
-             transform=plt.gca().transAxes)
+    # Add legend text (annotation) at the bottom of the figure
+    plt.text(
+    0.5, -0.11, legend,  # Position text below the plot
+    horizontalalignment='center',
+    verticalalignment='center',
+    transform=plt.gcf().transFigure,
+    fontsize=10
+)
+
     
     # Save plot
     plot_filename = os.path.join(subfolder_path, name_to_save + '.png')
@@ -349,7 +438,7 @@ def plot_histogram_distribution_different_E_ad (list_to_plot,E_ad_values, E_aa, 
 
 def comparison_plots_different_E_aa(list_to_plot, E_aa_values, E_ad_values, xlabel,ylabel,title,legend,subfolder_path,saving_name):
     cmap = plt.get_cmap('viridis')
-    plt.figure(figsize=(12,8))
+    plt.figure(figsize=(8,6))
     
     for i, (element, E_aa) in enumerate(zip(list_to_plot, E_aa_values)):
     
@@ -368,8 +457,13 @@ def comparison_plots_different_E_aa(list_to_plot, E_aa_values, E_ad_values, xlab
     
     
     
-    plt.text(0.5, 0.95, legend, 
-              horizontalalignment='center', verticalalignment='top', transform=plt.gca().transAxes)
+    plt.text(
+    0.5, -0.06, legend,  # Position text below the plot
+    horizontalalignment='center',
+    verticalalignment='center',
+    transform=plt.gcf().transFigure,
+    fontsize=10
+)
     
     plt.legend(loc='best')
     plot_filename = os.path.join(subfolder_path, saving_name)
@@ -379,9 +473,9 @@ def comparison_plots_different_E_aa(list_to_plot, E_aa_values, E_ad_values, xlab
     
     plt.close()
 
-def plot_figure (x,y,xlabel,ylabel,title,subfolder_path,saving_name, stdv = None, yerr = False) :
+def plot_figure (x,y,xlabel,ylabel,title,subfolder_path,saving_name, legend, stdv = None, yerr = False) :
     
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(8, 6))
     if yerr :
        
         plt.errorbar(x[::1000], y[::1000], yerr=stdv[::1000], fmt='o', capsize=5, linestyle='-', color='b', label='Data with error bars')
@@ -391,6 +485,14 @@ def plot_figure (x,y,xlabel,ylabel,title,subfolder_path,saving_name, stdv = None
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
+    # Add legend text (annotation) at the bottom of the figure
+    plt.text(
+    0.5, -0.02, legend,  # Position text below the plot
+    horizontalalignment='center',
+    verticalalignment='center',
+    transform=plt.gcf().transFigure,
+    fontsize=10
+)
     plot_filename = os.path.join(subfolder_path, saving_name)
     plt.savefig(plot_filename)
     plt.grid(True)
