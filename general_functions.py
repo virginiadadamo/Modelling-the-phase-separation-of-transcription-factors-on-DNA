@@ -12,7 +12,7 @@ import cluster_class
 from scipy.stats import norm, expon, gamma  # Import common distributions
 
 
-###FUNCTIONS CREATE FOLDERS AND TXT FILES ###
+###FUNCTIONS CREATE FOLDERS###
 
 
 def create_folders(folder_name, alfa, nB, k, L):
@@ -256,6 +256,59 @@ def plot_histogram(
     name_to_save, time_step_sampled, mean=False, bin_width=1, 
     fit_distribution=None  
 ):
+    """
+    Plots a histogram from a given list of data, optionally overlays a fitted probability 
+    distribution, and saves the plot and the corresponding data to specified files.
+
+    This function creates a histogram based on the input list of values, with an optional mean 
+    normalization if multiple time steps are provided. Additionally, it can fit and overlay 
+    a probability distribution (normal, exponential, or gamma) on the histogram. The plot 
+    is saved as an image, and the x and y values are saved to a text file.
+
+    Parameters:
+    ----------
+    list_to_plot : list or numpy.ndarray
+        The data to be plotted as a histogram.
+    title : str
+        The title of the plot.
+    legend : str
+        A legend or description to annotate below the plot.
+    subfolder_path : str
+        The directory where the plot image and data file will be saved.
+    x_label : str
+        Label for the x-axis of the plot.
+    y_label : str
+        Label for the y-axis of the plot.
+    name_to_save : str
+        Name of the file (without extension) used to save the plot and data.
+    time_step_sampled : list or numpy.ndarray
+        A list of sampled time steps, used for normalizing the histogram if `mean=True`.
+    mean : bool, optional
+        If True, normalizes the histogram by the number of time steps sampled. Default is False.
+    bin_width : int or float, optional
+        The width of each bin in the histogram. Default is 1.
+    fit_distribution : str or None, optional
+        The type of distribution to fit and overlay on the histogram. Supported values are:
+        - 'normal': Fits a normal (Gaussian) distribution.
+        - 'exponential': Fits an exponential distribution.
+        - 'gamma': Fits a gamma distribution.
+        If None, no distribution is fitted. Default is None.
+
+    Raises:
+    ------
+    ValueError
+        If an unsupported distribution is specified in `fit_distribution`.
+
+    Saves:
+    ------
+    - A histogram plot image (.png) with the specified name in `subfolder_path`.
+    - A text file (.txt) containing the x and y data of the histogram and the fitted PDF 
+      (if applicable) in `subfolder_path`.
+
+    Returns:
+    -------
+    None
+    """
     max_value = max(list_to_plot)+1
     min_value = min(list_to_plot)
     
@@ -270,6 +323,7 @@ def plot_histogram(
             
     
     # Plot histogram
+    plt.figure(figsize=(10, 6))
     plt.stairs(counts, bins, fill=True)
 
     x_data = bin_edges
@@ -303,6 +357,7 @@ def plot_histogram(
         
         # Plot PDF
         plt.plot(x_vals, pdf_vals, label=label, color="red", linewidth=2)
+        plt.legend(loc='best')
 
         # Save PDF values along with histogram if fit_distribution is specified
         x_data = np.concatenate((x_data, x_vals))  # Combine histogram and fit x values
@@ -312,17 +367,15 @@ def plot_histogram(
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.title(title)
-    plt.legend(loc='best')  
     
-    # Add legend text (annotation) at the bottom of the figure
+    
     plt.text(
-    0.5, -0.11, legend,  # Position text below the plot
-    horizontalalignment='center',
+    0.92, 0.5, legend,  # Position outside the figure on the right
+    horizontalalignment='left',
     verticalalignment='center',
-    transform=plt.gcf().transFigure,
+    transform=plt.gcf().transFigure,  # Use figure coordinates
     fontsize=10
-)
-
+    )
     
     # Save plot
     plot_filename = os.path.join(subfolder_path, name_to_save + '.png')
@@ -341,6 +394,43 @@ def plot_histogram(
 
 
 def scatter_plot (x,y, legend, subfolder_path, x_label, y_label, title, saving_name):
+    
+    """
+    Creates a scatter plot of the given x and y data, saves the plot as an image file, 
+    and exports the data points to a text file.
+    
+    This function plots the data as red scatter points with optional legends and axis labels. 
+    It saves the plot as a PNG file in the specified directory and writes the x and y data 
+    to a text file in the same location.
+    
+    Parameters:
+    ----------
+    x : list or numpy.ndarray
+        The data for the x-axis of the scatter plot.
+    y : list or numpy.ndarray
+        The data for the y-axis of the scatter plot.
+    legend : str
+        A legend or description to annotate in the top-right corner of the plot.
+    subfolder_path : str
+        The directory where the plot image and data file will be saved.
+    x_label : str
+        Label for the x-axis of the plot.
+    y_label : str
+        Label for the y-axis of the plot.
+    title : str
+        The title of the scatter plot.
+    saving_name : str
+        The base name of the files (without extension) for saving the plot and data.
+    
+    Saves:
+    ------
+    - A scatter plot image (.png) with the specified name in `subfolder_path`.
+    - A text file (.txt) containing the x and y data in `subfolder_path`.
+    
+    Returns:
+    -------
+    None
+    """
     plt.scatter(x, y, color='r', s=5) 
    
     #mean_y = np.mean(y)
@@ -354,9 +444,14 @@ def scatter_plot (x,y, legend, subfolder_path, x_label, y_label, title, saving_n
     #          horizontalalignment='left', verticalalignment='top', 
     #          transform=plt.gca().transAxes, fontsize=10, color='blue')
     
-    plt.text(1, 1, legend, 
-         horizontalalignment='right', verticalalignment='top', 
-         transform=plt.gca().transAxes)
+    plt.text(
+    0.92, 0.5, legend,  # Position outside the figure on the right
+    horizontalalignment='left',
+    verticalalignment='center',
+    transform=plt.gcf().transFigure,  # Use figure coordinates
+    fontsize=10
+    )
+    
     
     plot_filename = os.path.join(subfolder_path, saving_name  + '.png' )
     plt.savefig(plot_filename)
@@ -373,9 +468,57 @@ def scatter_plot (x,y, legend, subfolder_path, x_label, y_label, title, saving_n
             f.write(f"{x_val}\t{y_val}\n")
             
 def plot_different_Ead_in_time (element_for_different_energies, E_ad_values, time_step_sampled, xlabel, ylabel,title,legend,subfolder_path,saving_name, inverse = False):
+    
+    """
+    Plots the evolution of a variable over time for different adsorption energy values (E_ad) 
+    and optionally applies an inverse transformation to both the data and time.
+  
+    This function generates a line plot where each series represents the evolution of a given 
+    variable for a energy value. The plot can optionally display the inverse 
+    of the variable and time. Each series is colored using a colormap for better distinction, and 
+    the plot is saved to the specified location.
+  
+    Parameters:
+    ----------
+    element_for_different_energies : list or numpy.ndarray
+        A list or 2D array where each row represents the values of the variable over time for a 
+        specific adsorption energy value (E_ad).
+    E_ad_values : list or numpy.ndarray
+        A list of energy values corresponding to the rows in `element_for_different_energies`
+    time_step_sampled : list or numpy.ndarray
+        The time steps corresponding to the data points in `element_for_different_energies`.
+    xlabel : str
+        Label for the x-axis of the plot.
+    ylabel : str
+        Label for the y-axis of the plot.
+    title : str
+        The title of the plot.
+    legend : str
+        A legend or description to annotate in the bottom-right corner of the plot.
+    subfolder_path : str
+        The directory where the plot will be saved.
+    saving_name : str
+        The name of the file (including extension) to save the plot.
+    inverse : bool, optional
+        If True, the inverse of both the data and the time is plotted. Default is False.
+  
+    Saves:
+    ------
+    - A line plot image file with the specified name in `subfolder_path`.
+  
+    Notes:
+    ------
+    - Each series is plotted with a distinct color derived from the 'viridis' colormap.
+    - If `inverse` is True, the inverse of the variable and time are calculated as 1/element 
+      and 1/time_step_sampled, respectively.
+  
+    Returns:
+    -------
+    None
+    """
         
     cmap = plt.get_cmap('viridis')
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(10, 6))
     #print(len (element_for_different_energies))
     #print(len (element_for_different_energies[0]))
     time_step_sampled = time_step_sampled.flatten()
@@ -397,18 +540,73 @@ def plot_different_Ead_in_time (element_for_different_energies, E_ad_values, tim
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
-    plt.text(0.95, 0.05, legend, 
-              horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+    
+    plt.text(
+    0.92, 0.5, legend,  # Position outside the figure on the right
+    horizontalalignment='left',
+    verticalalignment='center',
+    transform=plt.gcf().transFigure,  # Use figure coordinates
+    fontsize=10
+    )
+    
     plt.legend(loc='best')
+    
     plot_filename = os.path.join(subfolder_path,saving_name)
-    plt.savefig(plot_filename)
+    plt.savefig(plot_filename) 
     plt.show()
     plt.clf()
     plt.close()
     
 def plot_histogram_distribution_different_E_ad (list_to_plot,E_ad_values, E_aa, xlabel, ylabel,title,legend,subfolder_path,saving_name):
+    
+    """
+    Plots and compares histograms of distributions for different adsorption energy values (E_ad) 
+    and a fixed associative energy value (E_aa).
+    
+    This function generates histograms for multiple datasets, each corresponding to a specific 
+    adsorption energy value (E_ad). The histograms are color-coded for distinction, and the plot 
+    is annotated with a legend that includes the associative energy (E_aa) and the corresponding 
+    E_ad value for each dataset. The resulting plot is saved to a specified location.
+    
+    Parameters:
+    ----------
+    list_to_plot : list of lists or list of numpy.ndarrays
+        A collection of datasets, where each dataset corresponds to a specific 
+        energy value (E_ad).
+    E_ad_values : list or numpy.ndarray
+        A list of energy values, each associated with a dataset in `list_to_plot`.
+    E_aa : float
+        The associative energy value, common to all datasets, included in the legend.
+    xlabel : str
+        Label for the x-axis of the plot.
+    ylabel : str
+        Label for the y-axis of the plot.
+    title : str
+        The title of the plot.
+    legend : str
+        A legend or description to annotate in the bottom-right corner of the plot.
+    subfolder_path : str
+        The directory where the plot will be saved.
+    saving_name : str
+        The name of the file (including extension) to save the plot.
+    
+    Saves:
+    ------
+    - A histogram plot image file with the specified name in `subfolder_path`.
+    
+    Notes:
+    ------
+    - Each histogram is constructed using a bin width of 1.
+    - Histograms are visually distinct due to color coding derived from the 'viridis' colormap.
+    - The plot legend combines the values of E_aa and E_ad for clarity.
+    
+    Returns:
+    -------
+    None
+    """
 
-    plt.figure(figsize=(8, 6))
+
+    plt.figure(figsize=(10, 6))
     cmap = plt.get_cmap('viridis')
 
     
@@ -423,12 +621,19 @@ def plot_histogram_distribution_different_E_ad (list_to_plot,E_ad_values, E_aa, 
         plt.stairs(counts, bins, fill=True, color=color, label = f'E_aa={E_aa}, E_ad={E_ad}')
     
     plt.title(title)
-    plt.text(0.95, 0.05, legend, 
-              horizontalalignment='right', verticalalignment='bottom', transform=plt.gca().transAxes)
+    
+    plt.text(
+    0.92, 0.5, legend,  # Position outside the figure on the right
+    horizontalalignment='left',
+    verticalalignment='center',
+    transform=plt.gcf().transFigure,  # Use figure coordinates
+    fontsize=10
+    )
     
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.legend(loc='best')
+    
     
     plot_filename = os.path.join(subfolder_path, saving_name)
     plt.savefig(plot_filename)
@@ -437,8 +642,53 @@ def plot_histogram_distribution_different_E_ad (list_to_plot,E_ad_values, E_aa, 
     plt.close()
 
 def comparison_plots_different_E_aa(list_to_plot, E_aa_values, E_ad_values, xlabel,ylabel,title,legend,subfolder_path,saving_name):
+    
+    """
+    Generates comparison plots to analyze the relationship between E_ad 
+    and a variable for different E_aa.
+    
+    This function plots a line for each E_aa, showing the corresponding 
+    variable's values across a range E_ad. Each line is annotated with 
+    its specific data points and is color-coded for clarity. The resulting plot is saved as an image.
+    
+    Parameters:
+    ----------
+    list_to_plot : list of lists or numpy.ndarray
+        A collection of data series, where each series corresponds to a specific associative 
+        energy value (E_aa) and contains values for different E_ad.
+    E_aa_values : list or numpy.ndarray
+        A list of different E_aa values, each associated with a series in `list_to_plot`.
+    E_ad_values : list or numpy.ndarray
+        A list of E_ad energy values, common to all series, representing the x-axis.
+    xlabel : str
+        Label for the x-axis of the plot.
+    ylabel : str
+        Label for the y-axis of the plot.
+    title : str
+        The title of the plot.
+    legend : str
+        A legend or description to annotate below the plot.
+    subfolder_path : str
+        The directory where the plot will be saved.
+    saving_name : str
+        The name of the file (including extension) to save the plot.
+    
+    Saves:
+    ------
+    - A comparison plot image file with the specified name in `subfolder_path`.
+    
+    Notes:
+    ------
+    - Each series is visually distinct due to color coding from the 'viridis' colormap.
+    - Data points along each line are annotated with their y-values (formatted to three decimal places).
+    - The plot legend highlights the corresponding E_aa value for each line.
+    
+    Returns:
+    -------
+    None
+    """
     cmap = plt.get_cmap('viridis')
-    plt.figure(figsize=(8,6))
+    plt.figure(figsize=(10,6))
     
     for i, (element, E_aa) in enumerate(zip(list_to_plot, E_aa_values)):
     
@@ -458,12 +708,12 @@ def comparison_plots_different_E_aa(list_to_plot, E_aa_values, E_ad_values, xlab
     
     
     plt.text(
-    0.5, -0.06, legend,  # Position text below the plot
-    horizontalalignment='center',
+    0.92, 0.5, legend,  # Position outside the figure on the right
+    horizontalalignment='left',
     verticalalignment='center',
-    transform=plt.gcf().transFigure,
+    transform=plt.gcf().transFigure,  # Use figure coordinates
     fontsize=10
-)
+    )
     
     plt.legend(loc='best')
     plot_filename = os.path.join(subfolder_path, saving_name)
@@ -471,11 +721,56 @@ def comparison_plots_different_E_aa(list_to_plot, E_aa_values, E_ad_values, xlab
     plt.show()
     plt.clf()
     
+    
     plt.close()
 
 def plot_figure (x,y,xlabel,ylabel,title,subfolder_path,saving_name, legend, stdv = None, yerr = False) :
     
-    plt.figure(figsize=(8, 6))
+    """
+    Plots a figure with an option to include error bars and saves it to a specified location.
+    
+    This function creates a line plot of the provided data and optionally includes error bars to 
+    represent standard deviations. The figure is annotated with a legend and saved as an image file.
+    
+    Parameters:
+    ----------
+    x : list or numpy.ndarray
+        Data for the x-axis.
+    y : list or numpy.ndarray
+        Data for the y-axis.
+    xlabel : str
+        Label for the x-axis.
+    ylabel : str
+        Label for the y-axis.
+    title : str
+        Title of the plot.
+    subfolder_path : str
+        The directory where the plot will be saved.
+    saving_name : str
+        The name of the file (including extension) to save the plot.
+    legend : str
+        A legend or description to annotate below the plot.
+    stdv : list or numpy.ndarray, optional
+        Standard deviations for y-values, used as error bars if `yerr` is True. Default is None.
+    yerr : bool, optional
+        If True, includes error bars using the values in `stdv`. Default is False.
+    
+    Saves:
+    ------
+    - A plot image file with the specified name in `subfolder_path`.
+    
+    Notes:
+    ------
+    - If `yerr` is True, error bars are plotted for every 1000th data point.
+    - The plot includes a grid for better readability.
+    - The legend text is positioned below the plot.
+    
+    Returns:
+    -------
+    None
+    """
+    
+    plt.figure(figsize=(10, 6))
     if yerr :
        
         plt.errorbar(x[::1000], y[::1000], yerr=stdv[::1000], fmt='o', capsize=5, linestyle='-', color='b', label='Data with error bars')
@@ -487,15 +782,16 @@ def plot_figure (x,y,xlabel,ylabel,title,subfolder_path,saving_name, legend, std
     plt.title(title)
     # Add legend text (annotation) at the bottom of the figure
     plt.text(
-    0.5, -0.02, legend,  # Position text below the plot
-    horizontalalignment='center',
+    0.92, 0.5, legend,  # Position outside the figure on the right
+    horizontalalignment='left',
     verticalalignment='center',
-    transform=plt.gcf().transFigure,
+    transform=plt.gcf().transFigure,  # Use figure coordinates
     fontsize=10
-)
+    )
     plot_filename = os.path.join(subfolder_path, saving_name)
     plt.savefig(plot_filename)
     plt.grid(True)
+    
     plt.show()
     plt.clf()
     plt.close()

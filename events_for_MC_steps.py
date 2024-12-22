@@ -11,6 +11,63 @@ import random
 
 def add_A (list_DNA, empty_random_site, list_A , random_A, residence_times, list_empty_DNA, times_variables, time_step):
     
+    """
+    Simulates the binding of A to an empty site along the DNA.
+
+    This function handles the process of binding an entity from `list_A` to an available site 
+    in `list_DNA`. If the selected entity (A) is free, it binds to the specified empty site, 
+    updates the relevant data structures, and tracks the binding event.
+
+    Parameters:
+    ----------
+    list_DNA : numpy.ndarray (1xN)
+        Array that simulate the DNA where a value of `1` indicates a bound site and `0` 
+        indicates a free site.
+    empty_random_site : int
+        The index of the empty site in `list_DNA` to which A will bind.
+    list_A : numpy.ndarray (nA x 2)
+        An array representing As. A value of `-1` in the first column indicates a free entity, 
+        while a positive integer indicates the index of the site to which the entity is bound.
+    random_A : int
+        The index of the randomly selected A from `list_A` attempting to bind.
+    residence_times : numpy.ndarray
+        A 1D array tracking the time steps at which A was last bound.
+    list_empty_DNA : list
+        A list of indices representing currently empty sites in `list_DNA`.
+    times_variables : dict
+        A dictionary tracking various event counts and times for each A, such as 
+        the number of binding events.
+    time_step : int
+        The current simulation time step.
+
+    Updates:
+    -------
+    - `list_DNA`: Marks the specified site as bound (`1`).
+    - `list_A`: Updates the binding state of the selected entity to the site index.
+    - `residence_times`: Records the current time step for the binding event.
+    - `list_empty_DNA`: Removes the bound site from the list of empty sites.
+    - `times_variables`: Increments the binding event counter for the selected entity.
+
+    Returns:
+    -------
+    tuple:
+        - list_DNA : numpy.ndarray
+            Updated representation of DNA-like sites.
+        - list_A : numpy.ndarray
+            Updated state of entities (A).
+        - residence_times : numpy.ndarray
+            Updated residence times array.
+        - list_empty_DNA : list
+            Updated list of empty sites.
+        - times_variables : dict
+            Updated event tracking dictionary.
+
+    Notes:
+    ------
+    - Binding is always successful if the selected entity (A) is free (`-1`).
+    - The function assumes `empty_random_site` and `random_A` are valid indices.
+    """
+    
     if list_A[random_A,0] == (-1): #A is free
         list_DNA [0,empty_random_site] = 1  #always add because it lowers the energy 
         list_A [random_A,0] = empty_random_site #change the value in list A, instead of (-1) to the site where A is bound 
@@ -22,13 +79,69 @@ def add_A (list_DNA, empty_random_site, list_A , random_A, residence_times, list
         
     return list_DNA,list_A, residence_times, list_empty_DNA, times_variables
     
-def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_times, times_variables, E_ad, E_aa, time_step, k= 0):
+def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_times, times_variables, E_ad, E_aa, time_step):
+    
+    """
+    Simulates the removal of A from a site on the DNA.
+    
+    Parla delle energie
+
+    Parameters:
+    ----------
+    list_DNA : numpy.ndarray (1xN)
+        Array that simulate the DNA where a value of `1` indicates a bound site and `0` 
+        indicates a free site. 
+    list_empty_DNA : list
+        A list of indices representing currently empty sites in `list_DNA`.
+    
+    list_A : numpy.ndarray (nA x 2)
+        An array representing As. A value of `-1` in the first column indicates a free entity, 
+        while a positive integer indicates the index of the site to which the entity is bound.
+    random_A : int
+        The index of the randomly selected A from `list_A` for removal.
+    residence_times : numpy.ndarray
+        A 1D array tracking the time steps at which A was last bound..
+    times_variables : dict
+        A dictionary tracking various event counts and times for each A, such as 
+        the number of binding events.
+    E_ad : int 
+        Represent the binding energy of an A to the DNA 
+    E_aa: int  
+        Energy that reflects the influence of neighboring A molecules on the selected A being removed.
+    k: int (default set to 0)
+    time_step : int
+        The current simulation time step.
+
+    Updates:
+    -------
+    - `list_DNA`: Marks the specified site as bound (`1`).
+    - `list_A`: Updates the binding state of the selected entity to the site index.
+    - `residence_times`: Records the current time step for the binding event.
+    - `list_empty_DNA`: Removes the bound site from the list of empty sites.
+    - `times_variables`: Increments the binding event counter for the selected entity.
+
+    Returns:
+    -------
+    tuple:
+        - list_DNA : numpy.ndarray
+            Updated representation of DNA-like sites.
+        - list_A : numpy.ndarray
+            Updated state of entities (A).
+        - residence_times : numpy.ndarray
+            Updated residence times array.
+        - list_empty_DNA : list
+            Updated list of empty sites.
+
+    Notes:
+    ------
+    - 
+    """
 
     random_binding = np.random.random()  #draw a random number between 0 and 1
     A = list_A [random_A,:] 
     if A[0] != (-1):  #if A is not free 
     
-        energy = energy_function_unbinding_A (list_DNA,list_A, A, list_B, E_ad, E_aa, k)#compute unbinding energy
+        energy = energy_function_unbinding_A (list_DNA,list_A, A, list_B, E_ad, E_aa)#compute unbinding energy
         
         if random_binding < 1/np.exp(energy): #if energy condition then it will remove
             
@@ -45,7 +158,62 @@ def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_tim
     return list_DNA, list_A, random_A,list_empty_DNA,residence_times 
 
 
-def remove_A_from_DNA_site (list_DNA, list_A, random_A,list_empty_DNA,residence_times,time_step, times_variables):  #CHANG ETHE NAME (RESET)
+def remove_A_from_DNA_site (list_DNA, list_A, random_A,list_empty_DNA,residence_times,time_step, times_variables):  
+
+    """
+    Handles the removal of an A from the DNA and updates associated data structures.
+
+    This function removes a specified A from its bound site in `list_DNA`, marks the site 
+    as empty, and computes the residence time of the entity. The residence time is recorded, and 
+    the state of the entity is reset for future binding events.
+
+    Parameters:
+    ----------
+    list_DNA : numpy.ndarray (1xN)
+        Array that simulate the DNA where a value of `1` indicates a bound site and `0` 
+        indicates a free site.
+    list_A : numpy.ndarray (nA x 2)
+        An array representing As. A value of `-1` in the first column indicates a free entity, 
+        while a positive integer indicates the index of the site to which the entity is bound.
+    random_A : int
+        The index of the A being removed from its bound site.
+    list_empty_DNA : list
+        A list of indices representing currently empty sites in `list_DNA`.
+    residence_times : numpy.ndarray
+        A 1D array tracking the time steps at which each A was last bound.
+    time_step : int
+        The current simulation time step.
+    times_variables : dict
+        A dictionary tracking various event counts and times for each A, including residence times.
+
+    Updates:
+    -------
+    - `list_DNA`: Marks the previously occupied site as empty (`0`).
+    - `list_A`: Sets the state of the specified entity to unbound (`-1`).
+    - `list_empty_DNA`: Adds the unbound site to the list of empty sites.
+    - `residence_times`: Computes and records the residence time for the entity.
+    - `times_variables`: Appends the residence time to the entity's history and resets its tracking.
+
+    Returns:
+    -------
+    tuple:
+        - list_DNA : numpy.ndarray
+            Updated representation of DNA-like sites.
+        - list_A : numpy.ndarray
+            Updated state of As.
+        - list_empty_DNA : list
+            Updated list of empty sites.
+        - residence_times : numpy.ndarray
+            Updated residence times array.
+        - times_variables : dict
+            Updated event tracking dictionary.
+
+    Notes:
+    ------
+    - Residence time is calculated as the difference between the current time step and the time 
+      the entity was bound.
+    - The function assumes `random_A` corresponds to a valid bound entity in `list_A`.
+    """
     
     
     list_DNA [0,list_A [random_A, 0]] = 0 #A is removed 
@@ -64,6 +232,65 @@ def remove_A_from_DNA_site (list_DNA, list_A, random_A,list_empty_DNA,residence_
     
             
 def add_B_event ( list_DNA, list_A, list_B, random_B, L, does_B_bind):
+
+    """
+    Handles the event of adding a B protein to the DNA, updating the relevant data structures.
+
+    This function determines whether a B protein can bind to the DNA. If the selected B protein is free,
+    it randomly chooses a binding site. If the B protein is partially bound, it selects a free site 
+    within a defined region around an already bound site for binding.
+
+    Parameters:
+    ----------
+    list_DNA : numpy.ndarray
+        A representation of the DNA where binding events can occur. A value of `1` indicates a bound site, 
+        and `0` indicates a free site.
+    list_A : numpy.ndarray (nA x 2)
+        A matrix tracking the state of A proteins. Contains the indices of the DNA sites where each A is bound.
+    list_B : numpy.ndarray
+        A matrix tracking the state of B proteins. Rows correspond to individual B proteins, and columns represent
+        their multiple binding sites. A value of `-1` indicates a free binding site.
+    random_B : int
+        The index of the B protein selected for the binding event.
+    L : int
+        The range around a bound DNA site to consider for additional B bindings.
+    does_B_bind : 
+        
+
+    Updates:
+    -------
+    - `list_A`: Updates the DNA binding states of A proteins if B proteins interact with sites already bound by A.
+    - `list_B`: Updates the binding states of the selected B protein, marking the new site as bound.
+    - `list_DNA`: Tracks the DNA sites occupied as a result of the binding event.
+    - `does_B_bind`: Indicates whether the B protein successfully bound during the current event.
+
+    Returns:
+    -------
+    tuple:
+        - list_DNA : numpy.ndarray
+            Updated DNA representation.
+        - list_A : numpy.ndarray
+            Updated state of A proteins.
+        - list_B : numpy.ndarray
+            Updated state of B proteins.
+        - does_B_bind : bool
+            Indicates if the binding event was successful.
+
+    Logic:
+    ------
+    1. If the selected B protein is entirely free, a random site is chosen for binding.
+    2. If the B protein has some binding sites already occupied:
+        - A random bound site is selected, and its position determines the region (`L`) for a new binding.
+        - A random free site is selected within the defined region for the binding event.
+    3. The `add_B_to_DNA_site` function is called to execute the actual binding logic and update structures.
+
+    Notes:
+    ------
+    - The function assumes that the dimensions of `list_DNA`, `list_A`, and `list_B` are consistent with
+      the intended modeling.
+    - Binding events consider the spatial constraints defined by `L`, limiting new bindings to a neighborhood
+      of already bound sites.
+    """
     
     #print ('Adding B event selected', random_B)
     
@@ -190,7 +417,7 @@ def energy_unbind_function_B_adjacent (list_DNA, list_A, A_corresponding_B_to_un
     return energy
 
 
-def energy_function_unbinding_A (list_DNA, list_A, A, list_B, E_ad, E_aa, k): 
+def energy_function_unbinding_A (list_DNA, list_A, A, list_B, E_ad, E_aa): 
     DNA_site_index = A[0] #find the index to which A is bound 
     if A[1] != (-1 ): #There is a B bound to that A
             #B = list_B[A[1],:] #all binding sites for that B 

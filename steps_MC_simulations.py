@@ -48,7 +48,7 @@ def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L
              list_DNA,list_A, residence_times, list_empty_DNA, times_variables = events_for_MC_steps.add_A (list_DNA, empty_random_site, list_A , random_A, residence_times, list_empty_DNA, times_variables, time_step)
     else: 
          #Removing event is selected 
-        list_DNA, list_A, random_A,list_empty_DNA,residence_time  = events_for_MC_steps.remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_times, times_variables, E_ad, E_aa, time_step, k)
+        list_DNA, list_A, random_A,list_empty_DNA,residence_time  = events_for_MC_steps.remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_times, times_variables, E_ad, E_aa, time_step)
     
     # ### B PART ###
     random_B = np.random.randint(0, list_B.shape[0])#choose random B means choosing one between the rows of the nB x K matrix representing Bs  

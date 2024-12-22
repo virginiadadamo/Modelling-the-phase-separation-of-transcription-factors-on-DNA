@@ -145,7 +145,7 @@ for L  in L_values:
                                 legend = (
                                     f"n = {N}, alfa = {alfa}\n"
                                     f"E_aa = {E_aa}, E_ad = {E_ad}, E_ba = {E_ba} \n"
-                                    f"nB = {nB}, L = {L},k = {k} \n"
+                                    f"nB = {nB}, L = {L}, k = {k} \n"
                     
                                     f"stop time = {stop_time}\n"
                                     f"ignoring steps = {ignoring_steps}"
@@ -242,7 +242,7 @@ for L  in L_values:
                                             if plot_B_bound_time_step :
         
                                                 plot_B_bound_time_step_title = f'B bound at time step = {time_step}'
-                                                saving_B_bound_time_step_name = f'nA_{nA}_n_{N}_av_frac_bound_sites_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}_L_{L}_k_{k}.png'
+                                                saving_B_bound_time_step_name = f'nA_{nA}_n_{N}_av_frac_bound_sites_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}_L_{L}_k_{k}_time_step_{time_step}.png'
                                                 x_label_B_bound_time_step = 'DNA Site'
                                                 general_functions.plot_histogram(idx_bound_B_DNA, plot_B_bound_time_step_title, legend, subfolder_path,x_label_B_bound_time_step,'Frequency', saving_B_bound_time_step_name, time_step_sampled[0], False, 1)
                                                             
