@@ -323,7 +323,7 @@ def plot_histogram(
             
     
     # Plot histogram
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(16, 6))
     plt.stairs(counts, bins, fill=True)
 
     x_data = bin_edges
@@ -518,7 +518,7 @@ def plot_different_Ead_in_time (element_for_different_energies, E_ad_values, tim
     """
         
     cmap = plt.get_cmap('viridis')
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(16, 6))
     #print(len (element_for_different_energies))
     #print(len (element_for_different_energies[0]))
     time_step_sampled = time_step_sampled.flatten()
@@ -606,7 +606,7 @@ def plot_histogram_distribution_different_E_ad (list_to_plot,E_ad_values, E_aa, 
     """
 
 
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(16, 6))
     cmap = plt.get_cmap('viridis')
 
     
@@ -688,7 +688,7 @@ def comparison_plots_different_E_aa(list_to_plot, E_aa_values, E_ad_values, xlab
     None
     """
     cmap = plt.get_cmap('viridis')
-    plt.figure(figsize=(12,6))
+    plt.figure(figsize=(16,6))
     
     for i, (element, E_aa) in enumerate(zip(list_to_plot, E_aa_values)):
     
@@ -770,7 +770,7 @@ def plot_figure (x,y,xlabel,ylabel,title,subfolder_path,saving_name, legend, std
     None
     """
     
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(16, 6))
     if yerr :
        
         plt.errorbar(x[::1000], y[::1000], yerr=stdv[::1000], fmt='o', capsize=5, linestyle='-', color='b', label='Data with error bars')
