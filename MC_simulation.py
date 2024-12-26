@@ -143,12 +143,16 @@ for L  in L_values:
                                 
                                 #Write all the parameters to a legend to add to the side of the figure 
                                 legend = (
-                                    f"n = {N}, alfa = {alfa}\n"
-                                    f"E_aa = {E_aa}, E_ad = {E_ad}, E_ba = {E_ba} \n"
-                                    f"nB = {nB}, L = {L}, k = {k} \n"
+                                    f"n = {N}\n"
+                                    f"alfa = {alfa}\n"
+                                    f"E_aa = {E_aa}\n"
+                                    f"E_ad = {E_ad}\n"
+                                    f"E_ba = {E_ba} \n"
+                                    f"nB = {nB}\n"
+                                    f"L = {L}, k = {k} \n"
                     
-                                    f"stop time = {stop_time}\n"
-                                    f"ignoring steps = {ignoring_steps}"
+                                    f"stop = {stop_time}\n"
+                                    f"ign steps = {ignoring_steps}"
                                     )
                                 
                                 ### PARAMETERS FOR THE INITIAL STATE###
@@ -368,7 +372,7 @@ for L  in L_values:
                                     saving_histogram_name = f'nA_{nA}_n_{N}_histo_mean_resident_times_Eaa_{E_aa}_Ead_{E_ad}_E_ba_{E_ba}_L_{L}_k_{k}'
                                     x_label_histogram_mean = 'Mean Residence Time'
                                     
-                                    general_functions.plot_histogram(mean_each_tf, histogram_title_mean, legend, subfolder_path, x_label_histogram_mean, 'Frequency', saving_histogram_name, time_step_sampled, False, 100, 'normal')
+                                    general_functions.plot_histogram(mean_each_tf, histogram_title_mean, legend, subfolder_path, x_label_histogram_mean, 'Frequency', saving_histogram_name, time_step_sampled, False, 50, 'normal')
                                 
                                 unique_idx = np.unique(index_tfs)
                                 
