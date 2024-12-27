@@ -36,7 +36,7 @@ def create_folders(folder_name, alfa, nB, k, L):
     """
 
     # Create the subfolder 
-    subfolder_name = f'Final_simulations_alfa_{alfa}'
+    subfolder_name = f'Final_simulations_alfa_{alfa}_6000'
     subfolder_path = os.path.join(folder_name, subfolder_name)
     
     # Create the subfolder if it doesn't already exist
