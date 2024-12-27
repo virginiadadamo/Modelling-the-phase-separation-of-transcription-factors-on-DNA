@@ -25,12 +25,12 @@ ASSUMPTIONS:
 
 ###PARAMETERS###
 
-alfa = 0.3#0.3 #ratio between nA/N 
-N = 3000 #total number of binding sites in the DNA
+alfa = 0.15 #ratio between nA/N 
+N = 6000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
 
-nB = 100 #number of Bs 
+nB = 200 #number of Bs 
 k = 10#number of B interacting sites with A  
 
 
@@ -39,8 +39,8 @@ protein_B= True
 
 
 #Time parameters
-stop_time = 2000000
-ignoring_steps = 1000000
+stop_time = 4000000
+ignoring_steps = 2000000
 m = 50
 number_of_time_steps_sampled = int ((stop_time - ignoring_steps) /m)
 
@@ -50,14 +50,14 @@ if (stop_time - ignoring_steps) % m != 0 :
 
 #Energy parameters 
 
-E_ad_values = [0,1,3]
-E_aa_values = [0,2]
+E_ad_values = [1]
+E_aa_values = [2]
 
 
 #B parameters 
 if protein_B:
   
-    E_ba_values = [0,1,2,4] #Effect that the A has on B unbinding
+    E_ba_values = [0,4] #Effect that the A has on B unbinding
     L_values = [10] 
     
 else: #put these same parameters to 0 
