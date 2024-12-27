@@ -35,7 +35,7 @@ k = 10 #number of B interacting sites with A
 
 
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= True #False 
+protein_B= False
 
 
 #Time parameters
