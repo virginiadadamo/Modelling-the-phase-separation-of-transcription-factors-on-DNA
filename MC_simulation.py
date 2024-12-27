@@ -25,7 +25,7 @@ ASSUMPTIONS:
 
 ###PARAMETERS###
 
-alfa = 0.15 #0.3 #ratio between nA/N 
+alfa = 0.3#0.3 #ratio between nA/N 
 N = 3000 #total number of binding sites in the DNA
 nA = int (N*alfa) #number of As
 
