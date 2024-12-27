@@ -31,11 +31,11 @@ nA = int (N*alfa) #number of As
 
 
 nB = 100 #number of Bs 
-k = 10 #number of B interacting sites with A  
+k = 2 #number of B interacting sites with A  
 
 
 #Adding protein B in the simulation (True if you want to add, False otherwise)
-protein_B= False
+protein_B= True
 
 
 #Time parameters
