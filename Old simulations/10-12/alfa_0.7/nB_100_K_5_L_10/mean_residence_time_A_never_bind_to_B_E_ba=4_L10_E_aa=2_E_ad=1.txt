@@ -1,9 +1,0 @@
-Index 622: Mean Residence Time = 138354.25
-Index 703: Mean Residence Time = 80543.04347826086
-Index 1280: Mean Residence Time = 283553.0
-Index 1345: Mean Residence Time = 122324.0
-Index 1438: Mean Residence Time = 192167.3
-Index 1504: Mean Residence Time = 105948.93333333333
-Index 1574: Mean Residence Time = 134786.0
-Index 1897: Mean Residence Time = 250304.42857142858
-Index 1902: Mean Residence Time = 208606.55555555556
