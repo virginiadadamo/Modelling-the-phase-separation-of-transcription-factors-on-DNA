@@ -39,28 +39,6 @@ The goal is to **predict the distribution of protein A clusters** on DNA using a
 
 ---
 
-## Project Structure  
-
-### Simulation Files:
-- **`MC_simulation.py`** - Main script for running the simulation.
-- **`steps_MC_simulation.py`** - Defines Monte Carlo simulation steps.
-- **`events_for_MC_steps.py`** - Contains event-handling functions.
-- **`general_functions.py`** - Utility functions for data processing.
-
-### Results Organization:
-Simulation outputs are systematically stored in directories for easy access:
-
-- **`Simulations_protein_A/`** - Simulations with only protein A.
-- **`Simulations_proteins_A_B/`** - Simulations with both proteins A and B.
-- **Subfolder Categorization**:
-  - By **α (protein density)**.
-  - By **DNA length** (3000 or 6000 sites).
-  - For **protein B**, additional categorization by **K (binding interaction sites)**.
-
-Each simulation result is saved with filenames that include **key parameters** to prevent overwriting. Figures contain legends specifying the conditions used in the simulation.
-
----
-
 ## Simulation Parameters  
 
 | **Parameter** | **Description** | **Values Investigated** | **Comments** |
@@ -102,29 +80,53 @@ Each simulation result is saved with filenames that include **key parameters** t
 
 📂 TF_DNA  
 ├── 📁 MC # Monte Carlo simulation 
+
 │   ├── 📄 MC_simulation.py # Main file to run with the general structure of the simulation
+
 │   ├── 📄 steps_MC_simulation.py #File with the steps of the MC simulation (step fpr the case with only protein A or both proteins)
+
 │   ├── 📄 events_for_MC_steps.py # File with the specific events called in the steps
+
 │   ├── 📄 general_functions.py # File with the functions used for plots or creating files 
+
 │   ├── 📄 cluster_class.py # Started doing a cluster class- incomplete 
+
 │   ├── 📁 Simulations_protein_A  #Results for just the A case 
-│   │   ├── 📁 α_0.15  
+
+│   │   ├── 📁 α_0.15 
+ 
 │   │   ├── 📁 α_0.3  
+
 │   ├── 📁 Simulations_proteins_A_B  #Results for both A and B case 
+
 │   │   ├── 📁 α_0.15  
+
 │   │   │   ├── 📁 N_3000
+
 │   │   │   │   ├── 📁 nB_100_K_0_L_0
+
 │   │   │   │   ├── 📁 nB_100_K_2_L_10
+
 │   │   │   │   ├── 📁 nB_100_K_5_L_10
+
 │   │   │   │   ├── 📁 nB_100_K_10_L_10
+
 │   │   │   ├── 📁 N_6000
+
 │   │   │   │   ├── 📁 nB_200_K_2_L_10
+
 │   │   │   │   ├── 📁 nB_200_K_10_L_10
+
 │   │   ├── 📁 α_0.3  
+
 │   │   │   ├── 📁 nB_100_K_2_L_10
+
 │   │   │   ├── 📁 nB_100_K_5_L_10
+
 │   │   │   ├── 📁 nB_100_K_10_L_10
+
 ├── 📄 report.pdf                 # Detailed discussion of results  
+
 ├── 📄 README.md                  # Project documentation
 
 
