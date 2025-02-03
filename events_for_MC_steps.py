@@ -17,7 +17,7 @@ def add_A (list_DNA, empty_random_site, list_A , random_A, residence_times, list
     This function handles the process of binding an entity from `list_A` to an available site 
     in `list_DNA`. If the selected entity (A) is free, it binds to the specified empty site, 
     updates the relevant data structures, and tracks the binding event.
-
+    If the A is free it is added otherwhise the move is ignored 
     Parameters:
     ----------
     list_DNA : numpy.ndarray (1xN)
@@ -83,8 +83,9 @@ def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_tim
     
     """
     Simulates the removal of A from a site on the DNA.
-    
-    Parla delle energie
+    If the A is free the move is ignored, otherwise there is a probalistic condition depending on an energy condition (computed by the function energy_function_unbinding_A)
+    If the energy condition is met then remove_A_from_DNA_site is called.
+    If a B is bound to an A, and an A is removed also the corresponding B is removed.
 
     Parameters:
     ----------
@@ -97,6 +98,7 @@ def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_tim
     list_A : numpy.ndarray (nA x 2)
         An array representing As. A value of `-1` in the first column indicates a free entity, 
         while a positive integer indicates the index of the site to which the entity is bound.
+        The second column is set to -1 if the A is not bound to a B, or the index of the corresponding B (the row in the matrix list_B) otherwise 
     random_A : int
         The index of the randomly selected A from `list_A` for removal.
     residence_times : numpy.ndarray
@@ -108,17 +110,12 @@ def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_tim
         Represent the binding energy of an A to the DNA 
     E_aa: int  
         Energy that reflects the influence of neighboring A molecules on the selected A being removed.
-    k: int (default set to 0)
     time_step : int
         The current simulation time step.
 
     Updates:
     -------
-    - `list_DNA`: Marks the specified site as bound (`1`).
-    - `list_A`: Updates the binding state of the selected entity to the site index.
-    - `residence_times`: Records the current time step for the binding event.
-    - `list_empty_DNA`: Removes the bound site from the list of empty sites.
-    - `times_variables`: Increments the binding event counter for the selected entity.
+    The variables are updtated in the function 'remove_A_from_DNA_site'
 
     Returns:
     -------
@@ -133,12 +130,14 @@ def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_tim
             Updated list of empty sites.
 
     Notes:
-    ------
+    It should be noted that the energy of unbinding if the A is bound to a B is now set to infinity, making it impossible
+    for an A to unbind if it is bound to a B. If in future this assumption is to be removed, you can only change the energy of unbinding
     - 
     """
 
     random_binding = np.random.random()  #draw a random number between 0 and 1
     A = list_A [random_A,:] 
+    
     if A[0] != (-1):  #if A is not free 
     
         energy = energy_function_unbinding_A (list_DNA,list_A, A, list_B, E_ad, E_aa)#compute unbinding energy
@@ -239,17 +238,17 @@ def add_B_event ( list_DNA, list_A, list_B, random_B, L, does_B_bind):
     This function determines whether a B protein can bind to the DNA. If the selected B protein is free,
     it randomly chooses a binding site. If the B protein is partially bound, it selects a free site 
     within a defined region around an already bound site for binding.
-
+    
     Parameters:
     ----------
     list_DNA : numpy.ndarray
         A representation of the DNA where binding events can occur. A value of `1` indicates a bound site, 
         and `0` indicates a free site.
     list_A : numpy.ndarray (nA x 2)
-        A matrix tracking the state of A proteins. Contains the indices of the DNA sites where each A is bound.
+        A matrix tracking the state of A proteins. Contains the indices of the DNA sites where each A is bound in the first column and if the A is bound to a B in the second column.
     list_B : numpy.ndarray
         A matrix tracking the state of B proteins. Rows correspond to individual B proteins, and columns represent
-        their multiple binding sites. A value of `-1` indicates a free binding site.
+        their multiple binding sites. A value of `-1` indicates a free binding site, othetwhise the index (row) of the corresponding A is tracked
     random_B : int
         The index of the B protein selected for the binding event.
     L : int
@@ -259,11 +258,8 @@ def add_B_event ( list_DNA, list_A, list_B, random_B, L, does_B_bind):
 
     Updates:
     -------
-    - `list_A`: Updates the DNA binding states of A proteins if B proteins interact with sites already bound by A.
-    - `list_B`: Updates the binding states of the selected B protein, marking the new site as bound.
-    - `list_DNA`: Tracks the DNA sites occupied as a result of the binding event.
-    - `does_B_bind`: Indicates whether the B protein successfully bound during the current event.
-
+    The updates are done by the function add_B_to_DNA_site
+    
     Returns:
     -------
     tuple:
@@ -331,7 +327,45 @@ def add_B_event ( list_DNA, list_A, list_B, random_B, L, does_B_bind):
     return list_DNA, list_A, list_B, does_B_bind
 
 def add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, random_binding_site, random_B, does_B_bind ):
+    """
+    Attempts to bind a B protein to a DNA site that is already occupied by an A protein, updating the binding states accordingly.
     
+    Parameters:
+    ----------
+    list_A : numpy.ndarray
+        A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
+        and the second column stores the B protein it is bound to (-1 if unbound).
+    list_B : numpy.ndarray
+        A 2D array where each row represents a B protein, and the columns store the binding state of each B.
+    list_DNA : numpy.ndarray
+        A 1D array representing the DNA strand, where 1 indicates an A protein is bound and 0 means unoccupied.
+    starting_site : int
+        The start index of the DNA region where B attempts to bind.
+    ending_site : int
+        The end index of the DNA region where B attempts to bind.
+    random_binding_site : int
+        A randomly chosen binding site within the possible binding region.
+    random_B : int
+        The index of the B protein attempting to bind.
+    does_B_bind : numpy.ndarray
+        A 2D array that tracks whether a B protein has successfully bound to an A protein.
+    
+    Returns:
+    -------
+    list_A : numpy.ndarray
+        Updated array reflecting A proteins that have been bound by B.
+    list_B : numpy.ndarray
+        Updated array reflecting B proteins that have successfully bound to A.
+    does_B_bind : numpy.ndarray
+        Updated binding state indicating which A proteins have been bound by B.
+    
+    Notes:
+    ------
+    - The function first checks for A proteins already bound within the specified DNA region.
+    - If an A protein in this region is already bound to another B, it is ignored.
+    - If one or more unbound A proteins are found, a random one is selected for binding.
+    - The binding updates the corresponding entries in `list_A`, `list_B`, and `does_B_bind`.
+    """
     #print ('Starting site', starting_site)
     #print ('Ending site', ending_site)
     
@@ -371,28 +405,92 @@ def add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, ran
     
         
 def remove_B_event (list_DNA, list_A, list_B,random_B, L, Eba):
+    
+     """
+    Attempts to remove a B protein from its bound DNA site based on an energy-dependent probability.
+    
+    Parameters:
+    ----------
+    list_DNA : numpy.ndarray
+        A 1D array representing the DNA strand, indicating which sites are occupied.
+    list_A : numpy.ndarray
+        A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
+        and the second column stores the B protein it is bound to (-1 if unbound).
+    list_B : numpy.ndarray
+        A 2D array where each row represents a B protein, and the columns store the binding state of each B.
+    random_B : int
+        The index of the B protein attempting to unbind.
+    L : int
+        The interaction range used to calculate energy adjustments.
+    Eba : float
+        The binding energy between A and B, used to determine the unbinding probability.
+    
+    Returns:
+    -------
+    list_A : numpy.ndarray
+        Updated array reflecting the removal of B proteins from A.
+    list_B : numpy.ndarray
+        Updated array reflecting the unbound state of B proteins.
+    
+    Notes:
+    ------
+    - The function first identifies the sites where the selected B protein is bound.
+    - A random site among the bound locations is chosen for the unbinding attempt.
+    - An unbinding probability is calculated using an energy-based function.
+    - If the unbinding condition is met, the B protein is removed from the A protein it was bound to.
+    - The removal updates the corresponding entries in `list_A` and `list_B`.
+      """
 #def remove_B_event (list_A, list_B,random_B, Eba):
  #print ('Removing B event')
- bound_B_sites =np.where (list_B[random_B, :] != -1)[0] #get the binding sites that are bound to the DNA
- #print ('Bound B sites', bound_B_sites)
- # randomly choose one index within the bound sites 
- random_B_bound_site = random.choice(bound_B_sites) #pick randomly one of the bound sites 
- #print ('Random B bound site', random_B_bound_site )
- random_binding = np.random.random()  #draw a random number between 0 and 1
- #energy = energy_unbind_function_B (list_B[random_B, :], Eba)#compute unbinding energy
- DNA_site_to_which_A_bound = list_A[list_B[random_B, random_B_bound_site], 0]
- energy = energy_unbind_function_B_adjacent (list_DNA, list_A, DNA_site_to_which_A_bound, L, Eba)
+     bound_B_sites =np.where (list_B[random_B, :] != -1)[0] #get the binding sites that are bound to the DNA
+     #print ('Bound B sites', bound_B_sites)
+     # randomly choose one index within the bound sites 
+     random_B_bound_site = random.choice(bound_B_sites) #pick randomly one of the bound sites 
+     #print ('Random B bound site', random_B_bound_site )
+     random_binding = np.random.random()  #draw a random number between 0 and 1
+     #energy = energy_unbind_function_B (list_B[random_B, :], Eba)#compute unbinding energy
+     DNA_site_to_which_A_bound = list_A[list_B[random_B, random_B_bound_site], 0]
+     energy = energy_unbind_function_B_adjacent (list_DNA, list_A, DNA_site_to_which_A_bound, L, Eba)
  
  
- if random_binding < 1/np.exp(energy): #if energy condition succeed then it will remove
-     #print ('Removal succeeded')
-     #print ('List A and B before removing', list_A, list_B)
-     list_A, list_B=remove_B_from_DNA_site(random_B_bound_site, list_A, list_B, random_B)
-     #print ('List A and B after removing', list_A, list_B)
-     
- return list_A, list_B
+     if random_binding < 1/np.exp(energy): #if energy condition succeed then it will remove
+         #print ('Removal succeeded')
+         #print ('List A and B before removing', list_A, list_B)
+         list_A, list_B=remove_B_from_DNA_site(random_B_bound_site, list_A, list_B, random_B)
+         #print ('List A and B after removing', list_A, list_B)
+         
+     return list_A, list_B
     
 def remove_B_from_DNA_site (random_B_bound_site, list_A, list_B, random_B):
+    
+    """
+    Removes a B protein from its bound DNA site, updating the binding states of both A and B proteins.
+    
+    Parameters:
+    ----------
+    random_B_bound_site : int
+        The specific site where the B protein is currently bound.
+    list_A : numpy.ndarray
+        A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
+        and the second column stores the B protein it is bound to (-1 if unbound).
+    list_B : numpy.ndarray
+        A 2D array where each row represents a B protein, and the columns store the binding state of each B.
+    random_B : int
+        The index of the B protein being removed.
+    
+    Returns:
+    -------
+    list_A : numpy.ndarray
+        Updated array reflecting that the A protein is no longer bound to B.
+    list_B : numpy.ndarray
+        Updated array indicating that the B protein is now unbound.
+    
+    Notes:
+    ------
+    - The function identifies the A protein that was bound to the selected B.
+    - It updates `list_A` to mark the A protein as unbound.
+    - It updates `list_B` to indicate that the B protein is now free.
+    """
 
     index_bound_A = list_B[random_B,random_B_bound_site]
     #print (index_bound_A)
@@ -401,7 +499,34 @@ def remove_B_from_DNA_site (random_B_bound_site, list_A, list_B, random_B):
     
     return list_A, list_B
 
+###ENERGY FUNCTIONS 
+'''
+Below there are the functions used to compute the energies. For the unbinding of B two energies functions have been investigated.
+The energy effect of an A to the unbiding of a B is denoted Eba 
+1. A first approach was to compute the energy unbinding of the B proportional to the number of site bound of that same B
+2. Then, to investigate more the 'clustering effect of the B' we computed the energy proportional to the number of bound B within a distance |L|
+
+'''
+
 def energy_unbind_function_B (B, Eba): 
+    
+    '''
+    Function to compute the energy binding for the unbinding of a B, proportional to the number of site bound of that same B
+    The function compute_energy_B_binding is called for computing the energy value
+    
+    Parameters:
+    ----------
+    B : list
+        The B (all the binding sites) for which the energy must be computed
+    Eba : int
+        energy effect of an A on the unbinding of a B
+    
+    Returns:
+    -------
+    energy: int 
+        total energy value used for compute if the removing event of a B succeeds 
+    
+    '''
     
     #computing the number of sites in B protein that are bound
     energy = compute_energy_B_binding (B, Eba)
@@ -411,6 +536,40 @@ def energy_unbind_function_B (B, Eba):
 
 def energy_unbind_function_B_adjacent (list_DNA, list_A, A_corresponding_B_to_unbind, L, Eba): 
     
+    
+    '''
+    Function to compute the energy associated with the unbinding of a B protein, proportional to the number of B proteins bound 
+    within a distance |L|. It calls the `compute_energy_B_binding_adjacent` function to calculate the energy value.
+
+    Parameters:
+    ----------
+    list_DNA : numpy.ndarray
+        A 1D array representing the DNA strand, where each element indicates whether a site is occupied or not.
+        
+    list_A : numpy.ndarray
+        A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
+        and the second column stores the index of the B protein it is bound to (-1 if unbound).
+        
+    A_corresponding_B_to_unbind : int
+        The index of the A protein corresponding to the B protein that is attempting to unbind.
+        
+    L : int
+        The maximum distance within which the influence of other B proteins is considered in the energy calculation.
+        
+    Eba : float
+        The binding energy between an A protein and a B protein used in the energy calculation.
+
+    Returns:
+    -------
+    energy : float
+        The total energy value that determines whether the unbinding event of the B protein succeeds.
+    
+    Notes:
+    ------
+    - The function computes the energy for unbinding based on the number of B proteins bound within the range |L|.
+    - The function depends on the `compute_energy_B_binding_adjacent` function to compute the energy value.
+    '''
+    
     #computing the number of sites in B protein that are bound
     energy = compute_energy_B_binding_adjacent (list_DNA, list_A, A_corresponding_B_to_unbind, L, Eba) 
     #print ('energy unbind B', B, energy  )
@@ -418,6 +577,45 @@ def energy_unbind_function_B_adjacent (list_DNA, list_A, A_corresponding_B_to_un
 
 
 def energy_function_unbinding_A (list_DNA, list_A, A, list_B, E_ad, E_aa): 
+    
+    """
+    Computes the energy required for unbinding an A protein from a DNA site, considering its interactions with B proteins and DNA.
+    
+    Parameters:
+    ----------
+    list_DNA : numpy.ndarray
+        A 1D array representing the DNA strand, where each element indicates whether a site is occupied.
+    
+    list_A : numpy.ndarray
+        A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
+        and the second column stores the index of the B protein it is bound to (-1 if unbound).
+    
+    A : numpy.ndarray
+        A 1D array representing a single A protein, where:
+        - `A[0]` is the DNA site index to which A is bound.
+        - `A[1]` is the index of the B protein it is bound to (-1 if unbound).
+    
+    list_B : numpy.ndarray
+        A 2D array where each row represents a B protein, with columns storing its binding states.
+    
+    E_ad : float
+        Energy contribution from A binding directly to DNA.
+    
+    E_aa : float
+        Energy contribution from A-A interactions in the system.
+    
+    Returns:
+    -------
+    total_energy : float
+        The total energy required for A to unbind from the DNA site.
+    
+    Notes:
+    ------
+    - If A is bound to a B protein, the energy is set to NaN (effectively preventing unbinding).
+    - Otherwise, the unbinding energy is computed as the sum of:
+      - `compute_energy_A_binding()`, which accounts for A-DNA and A-A interactions.
+      - A B-related energy term (set to 0 if A is not bound to any B protein).
+    """
     DNA_site_index = A[0] #find the index to which A is bound 
     if A[1] != (-1 ): #There is a B bound to that A
             #B = list_B[A[1],:] #all binding sites for that B 
@@ -442,10 +640,36 @@ def energy_function_unbinding_A (list_DNA, list_A, A, list_B, E_ad, E_aa):
 
 
 def compute_energy_A_binding (index, list_DNA, E_ad, E_aa):
-    '''
-    Functions to compute the energy of a As protein on the DNA
-    The energy is equal to E_ad for the site to which the TF binds, E_aa to account for the energy contribution of the neighbours 
-    '''
+    """
+    Computes the binding energy of an A protein at a given DNA site, considering both direct DNA binding 
+    and contributions from neighboring sites.
+
+    Parameters:
+    ----------
+    index : int
+        The DNA site index where the A protein is bound.
+    
+    list_DNA : numpy.ndarray
+        A 2D array representing the DNA strand, where the first row (`list_DNA[0, :]`) indicates site occupancy.
+    
+    E_ad : float
+        The energy contribution from the direct binding of A to its DNA site.
+    
+    E_aa : float
+        The energy contribution from neighboring A proteins at adjacent sites.
+
+    Returns:
+    -------
+    energy : float
+        The total energy associated with the A protein at the specified DNA site.
+
+    Notes:
+    ------
+    - If the A protein is at the first site (`index == 0`), only the right neighbor contributes.
+    - If the A protein is at the last site, only the left neighbor contributes.
+    - Otherwise, both left and right neighbors contribute.
+    - The direct binding energy (`E_ad`) is always included in the calculation.
+    """
     if index == 0: #first site
         energy = list_DNA[0, index + 1] * E_aa + list_DNA [0, index]*E_ad
         
@@ -468,6 +692,10 @@ def compute_energy_B_binding (B, energy):
 
 
 def compute_energy_B_binding_adjacent (list_DNA, list_A, DNA_site, L, energy):
+    '''
+    Functions to compute the energy of a B protein
+    Assumption: this energy is directly proportional proportional to the number of bound B within a distance |L|
+    '''
     
     if DNA_site-L < 0:
         starting_site = 0
