@@ -21,27 +21,28 @@ def step_MC_protein_A (time_step, list_DNA, list_A, list_B, list_empty_DNA, E_ad
     time_step : int
         The current simulation time step.
     
-    list_DNA : numpy.ndarray
+    list_DNA : numpy.ndarray (1xN)
         A 1D array representing the DNA strand, where each element indicates whether a site is occupied.
     
-    list_A : numpy.ndarray
+    list_A : numpy.ndarray (nAx2)
         A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
         and the second column stores the index of the B protein it is bound to (-1 if unbound).
     
-    list_B : numpy.ndarray
-        A 2D array where each row represents a B protein, with columns storing its binding states.
+    list_B : numpy.ndarray (nBxk)
+        A 2D array where each row represents a B protein, with columns storing its binding states 
+        (the index of the A where it's bound, the corresponding row in list_A').
     
     list_empty_DNA : list
         A list of DNA site indices that are currently unoccupied by A proteins.
     
-    E_ad : float
+    E_ad : int
         The energy contribution from A binding directly to DNA.
     
-    E_aa : float
+    E_aa : int
         The energy contribution from A-A interactions in the system.
     
-    E_ab : float
-        The energy contribution from A-B interactions in the system.
+    E_ab : int
+        The energy contribution from B-A interactions in the system. (energy effect of B on A)
     
     residence_times : numpy.ndarray
         An array tracking the residence times of A proteins on DNA.
@@ -115,16 +116,15 @@ def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L
     time_step : int
         The current simulation time step.
     
-    list_DNA : numpy.ndarray
+    list_DNA : numpy.ndarray (1xN)
         A 1D array representing the DNA strand, where each element indicates whether a site is occupied.
     
-    list_A : numpy.ndarray
+    list_A : numpy.ndarray (nAx2)
         A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
         and the second column stores the index of the B protein it is bound to (-1 if unbound).
     
-    list_B : numpy.ndarray
-        A 2D array where each row represents a B protein, with columns storing its binding states (-1 if unbound).
-    
+    list_B : numpy.ndarray (nBxk)
+        A 2D array where each row represents a B protein, with columns storing its binding states (the index of the A where it's bound, the corresponding row in list_A, -1 if free).    
     list_empty_DNA : list
         A list of DNA site indices that are currently unoccupied by A proteins.
     
@@ -138,7 +138,7 @@ def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L
         The energy contribution from A-A interactions in the system.
     
     E_ba : float
-        The energy contribution from B binding to A.
+        The energy contribution from B-A interactions in the system. (energy effect of B on A)
     
     residence_times : numpy.ndarray
         An array tracking the residence times of A proteins on DNA.
@@ -150,7 +150,7 @@ def step_MC_proteins_A_B (time_step, list_DNA, list_A, list_B, list_empty_DNA, L
         A 2D array indicating whether B proteins successfully bind during each event.
     
     k : int
-        A parameter related to the number of possible binding sites for B.
+        A parameter related to the number of total binding sites for B.
     
     Returns:
     -------

@@ -7,8 +7,6 @@ Created on Fri Oct 25 13:45:42 2024
 import numpy as np
 import random
 
-
-
 def add_A (list_DNA, empty_random_site, list_A , random_A, residence_times, list_empty_DNA, times_variables, time_step):
     
     """
@@ -21,13 +19,13 @@ def add_A (list_DNA, empty_random_site, list_A , random_A, residence_times, list
     Parameters:
     ----------
     list_DNA : numpy.ndarray (1xN)
-        Array that simulate the DNA where a value of `1` indicates a bound site and `0` 
-        indicates a free site.
+        A 1D array representing the DNA strand, where each element indicates whether a site is occupied.
+        (1 for bound, 0 for free)
     empty_random_site : int
         The index of the empty site in `list_DNA` to which A will bind.
-    list_A : numpy.ndarray (nA x 2)
-        An array representing As. A value of `-1` in the first column indicates a free entity, 
-        while a positive integer indicates the index of the site to which the entity is bound.
+    list_A : numpy.ndarray (nAx2)
+        A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
+        and the second column stores the index of the B protein it is bound to (-1 if unbound).
     random_A : int
         The index of the randomly selected A from `list_A` attempting to bind.
     residence_times : numpy.ndarray
@@ -90,15 +88,13 @@ def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_tim
     Parameters:
     ----------
     list_DNA : numpy.ndarray (1xN)
-        Array that simulate the DNA where a value of `1` indicates a bound site and `0` 
-        indicates a free site. 
+        A 1D array representing the DNA strand, where each element indicates whether a site is occupied.
+        (1 for bound, 0 for free) 
     list_empty_DNA : list
         A list of indices representing currently empty sites in `list_DNA`.
-    
-    list_A : numpy.ndarray (nA x 2)
-        An array representing As. A value of `-1` in the first column indicates a free entity, 
-        while a positive integer indicates the index of the site to which the entity is bound.
-        The second column is set to -1 if the A is not bound to a B, or the index of the corresponding B (the row in the matrix list_B) otherwise 
+    list_A : numpy.ndarray (nAx2)
+        A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
+        and the second column stores the index of the B protein it is bound to (-1 if unbound). 
     random_A : int
         The index of the randomly selected A from `list_A` for removal.
     residence_times : numpy.ndarray
@@ -106,10 +102,10 @@ def remove_A (list_DNA, list_empty_DNA, list_A , random_A, list_B, residence_tim
     times_variables : dict
         A dictionary tracking various event counts and times for each A, such as 
         the number of binding events.
-    E_ad : int 
-        Represent the binding energy of an A to the DNA 
+    E_ad : int
+        The energy contribution from A binding directly to DNA.
     E_aa: int  
-        Energy that reflects the influence of neighboring A molecules on the selected A being removed.
+        The energy contribution from A-A interactions in the system.
     time_step : int
         The current simulation time step.
 
@@ -169,11 +165,11 @@ def remove_A_from_DNA_site (list_DNA, list_A, random_A,list_empty_DNA,residence_
     Parameters:
     ----------
     list_DNA : numpy.ndarray (1xN)
-        Array that simulate the DNA where a value of `1` indicates a bound site and `0` 
-        indicates a free site.
-    list_A : numpy.ndarray (nA x 2)
-        An array representing As. A value of `-1` in the first column indicates a free entity, 
-        while a positive integer indicates the index of the site to which the entity is bound.
+        A 1D array representing the DNA strand, where each element indicates whether a site is occupied.
+        (1 for bound, 0 for free)
+    list_A : numpy.ndarray (nAx2)
+        A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
+        and the second column stores the index of the B protein it is bound to (-1 if unbound).
     random_A : int
         The index of the A being removed from its bound site.
     list_empty_DNA : list
@@ -241,19 +237,21 @@ def add_B_event ( list_DNA, list_A, list_B, random_B, L, does_B_bind):
     
     Parameters:
     ----------
-    list_DNA : numpy.ndarray
-        A representation of the DNA where binding events can occur. A value of `1` indicates a bound site, 
-        and `0` indicates a free site.
-    list_A : numpy.ndarray (nA x 2)
-        A matrix tracking the state of A proteins. Contains the indices of the DNA sites where each A is bound in the first column and if the A is bound to a B in the second column.
-    list_B : numpy.ndarray
-        A matrix tracking the state of B proteins. Rows correspond to individual B proteins, and columns represent
-        their multiple binding sites. A value of `-1` indicates a free binding site, othetwhise the index (row) of the corresponding A is tracked
+    list_DNA : numpy.ndarray (1xN)
+        A 1D array representing the DNA strand, where each element indicates whether a site is occupied.
+        (1 for bound, 0 for free)
+    list_A : numpy.ndarray (nAx2)
+        A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
+        and the second column stores the index of the B protein it is bound to (-1 if unbound).
+    list_B : numpy.ndarray (nBxk)
+        A 2D array where each row represents a B protein, with columns storing its binding states 
+        (the index of the A where it's bound, the corresponding row in list_A').
     random_B : int
         The index of the B protein selected for the binding event.
     L : int
         The range around a bound DNA site to consider for additional B bindings.
-    does_B_bind : 
+    does_B_bind : numpy.ndarray
+        Array indicating whether B proteins successfully bind during each event. 
         
 
     Updates:
@@ -269,8 +267,8 @@ def add_B_event ( list_DNA, list_A, list_B, random_B, L, does_B_bind):
             Updated state of A proteins.
         - list_B : numpy.ndarray
             Updated state of B proteins.
-        - does_B_bind : bool
-            Indicates if the binding event was successful.
+        - does_B_bind : numpy.ndarray
+           Updated state of B proteins.
 
     Logic:
     ------
@@ -332,23 +330,25 @@ def add_B_to_DNA_site (list_A, list_B, list_DNA, starting_site, ending_site, ran
     
     Parameters:
     ----------
-    list_A : numpy.ndarray
+    list_A : numpy.ndarray (nAx2)
         A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
-        and the second column stores the B protein it is bound to (-1 if unbound).
-    list_B : numpy.ndarray
-        A 2D array where each row represents a B protein, and the columns store the binding state of each B.
-    list_DNA : numpy.ndarray
-        A 1D array representing the DNA strand, where 1 indicates an A protein is bound and 0 means unoccupied.
+        and the second column stores the index of the B protein it is bound to (-1 if unbound).
+    list_B : numpy.ndarray (nBxk)
+        A 2D array where each row represents a B protein, with columns storing its binding states 
+        (the index of the A where it's bound, the corresponding row in list_A).
+    list_DNA : numpy.ndarray (1xN)
+        A 1D array representing the DNA strand, where each element indicates whether a site is occupied.
+        (1 for bound, 0 for free)
     starting_site : int
         The start index of the DNA region where B attempts to bind.
     ending_site : int
         The end index of the DNA region where B attempts to bind.
     random_binding_site : int
-        A randomly chosen binding site within the possible binding region.
+        A randomly chosen binding site for the B. (column in list_B)
     random_B : int
-        The index of the B protein attempting to bind.
+        The index (row in list_B) of the B protein attempting to bind.
     does_B_bind : numpy.ndarray
-        A 2D array that tracks whether a B protein has successfully bound to an A protein.
+        Array that tracks whether a B protein has successfully bound to an A protein.
     
     Returns:
     -------
@@ -411,19 +411,21 @@ def remove_B_event (list_DNA, list_A, list_B,random_B, L, Eba):
     
     Parameters:
     ----------
-    list_DNA : numpy.ndarray
-        A 1D array representing the DNA strand, indicating which sites are occupied.
-    list_A : numpy.ndarray
+    list_DNA : numpy.ndarray (1xN)
+        A 1D array representing the DNA strand, where each element indicates whether a site is occupied.
+        (1 for bound, 0 for free)
+    list_A : numpy.ndarray (nAx2)
         A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
-        and the second column stores the B protein it is bound to (-1 if unbound).
-    list_B : numpy.ndarray
-        A 2D array where each row represents a B protein, and the columns store the binding state of each B.
+        and the second column stores the index of the B protein it is bound to (-1 if unbound).
+    list_B : numpy.ndarray (nBxk)
+        A 2D array where each row represents a B protein, with columns storing its binding states 
+        (the index of the A where it's bound, the corresponding row in list_A').
     random_B : int
         The index of the B protein attempting to unbind.
     L : int
         The interaction range used to calculate energy adjustments.
-    Eba : float
-        The binding energy between A and B, used to determine the unbinding probability.
+    Eba : int
+        Effect of A on B unbinding, used to determine the unbinding probability.
     
     Returns:
     -------
@@ -470,11 +472,12 @@ def remove_B_from_DNA_site (random_B_bound_site, list_A, list_B, random_B):
     ----------
     random_B_bound_site : int
         The specific site where the B protein is currently bound.
-    list_A : numpy.ndarray
+    list_A : numpy.ndarray (nAx2)
         A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
-        and the second column stores the B protein it is bound to (-1 if unbound).
-    list_B : numpy.ndarray
-        A 2D array where each row represents a B protein, and the columns store the binding state of each B.
+        and the second column stores the index of the B protein it is bound to (-1 if unbound).
+    list_B : numpy.ndarray (nBxk)
+        A 2D array where each row represents a B protein, with columns storing its binding states 
+        (the index of the A where it's bound, the corresponding row in list_A').
     random_B : int
         The index of the B protein being removed.
     
@@ -543,10 +546,11 @@ def energy_unbind_function_B_adjacent (list_DNA, list_A, A_corresponding_B_to_un
 
     Parameters:
     ----------
-    list_DNA : numpy.ndarray
-        A 1D array representing the DNA strand, where each element indicates whether a site is occupied or not.
+    list_DNA : numpy.ndarray (1xN)
+        A 1D array representing the DNA strand, where each element indicates whether a site is occupied.
+        (1 for bound, 0 for free)
         
-    list_A : numpy.ndarray
+    list_A : numpy.ndarray (nAx2)
         A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
         and the second column stores the index of the B protein it is bound to (-1 if unbound).
         
@@ -556,12 +560,12 @@ def energy_unbind_function_B_adjacent (list_DNA, list_A, A_corresponding_B_to_un
     L : int
         The maximum distance within which the influence of other B proteins is considered in the energy calculation.
         
-    Eba : float
-        The binding energy between an A protein and a B protein used in the energy calculation.
+    Eba : int
+        Effect on A on B unbinding
 
     Returns:
     -------
-    energy : float
+    energy : int
         The total energy value that determines whether the unbinding event of the B protein succeeds.
     
     Notes:
@@ -583,10 +587,11 @@ def energy_function_unbinding_A (list_DNA, list_A, A, list_B, E_ad, E_aa):
     
     Parameters:
     ----------
-    list_DNA : numpy.ndarray
+    list_DNA : numpy.ndarray (1xN)
         A 1D array representing the DNA strand, where each element indicates whether a site is occupied.
-    
-    list_A : numpy.ndarray
+        (1 for bound, 0 for free)
+        
+    list_A : numpy.ndarray (nAx2)
         A 2D array where each row represents an A protein. The first column contains the DNA site bound by A, 
         and the second column stores the index of the B protein it is bound to (-1 if unbound).
     
@@ -595,18 +600,18 @@ def energy_function_unbinding_A (list_DNA, list_A, A, list_B, E_ad, E_aa):
         - `A[0]` is the DNA site index to which A is bound.
         - `A[1]` is the index of the B protein it is bound to (-1 if unbound).
     
-    list_B : numpy.ndarray
-        A 2D array where each row represents a B protein, with columns storing its binding states.
-    
-    E_ad : float
+    list_B : numpy.ndarray (nBxk)
+        A 2D array where each row represents a B protein, with columns storing its binding states 
+        (the index of the A where it's bound, the corresponding row in list_A').
+    E_ad : int
         Energy contribution from A binding directly to DNA.
     
-    E_aa : float
+    E_aa : int
         Energy contribution from A-A interactions in the system.
     
     Returns:
     -------
-    total_energy : float
+    total_energy : int
         The total energy required for A to unbind from the DNA site.
     
     Notes:
@@ -649,18 +654,19 @@ def compute_energy_A_binding (index, list_DNA, E_ad, E_aa):
     index : int
         The DNA site index where the A protein is bound.
     
-    list_DNA : numpy.ndarray
-        A 2D array representing the DNA strand, where the first row (`list_DNA[0, :]`) indicates site occupancy.
-    
-    E_ad : float
+    list_DNA : numpy.ndarray (1xN)
+        A 1D array representing the DNA strand, where each element indicates whether a site is occupied.
+        (1 for bound, 0 for free)
+        
+    E_ad : int
         The energy contribution from the direct binding of A to its DNA site.
     
-    E_aa : float
+    E_aa : int
         The energy contribution from neighboring A proteins at adjacent sites.
 
     Returns:
     -------
-    energy : float
+    energy : int
         The total energy associated with the A protein at the specified DNA site.
 
     Notes:
@@ -738,6 +744,7 @@ def compute_energy_B_binding_adjacent (list_DNA, list_A, DNA_site, L, energy):
     return B_energy
 
 
+#The following functions are not used in the final version 
 def compute_probability_removal (k_bound):
 #function that takes the number of B bound sites and computes the probability of removal event for B 
 #We want to be 0 if all the sites are free and 1 if all the sites are occupied 
