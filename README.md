@@ -129,4 +129,10 @@ The goal is to **predict the distribution of protein A clusters** on DNA using a
 
 ├── 📄 README.md                  # Project documentation
 
+## Installation
 
+1. **Clone the repository**:
+2. **Install dependencies**:
+pip install -r requirements.txt
+3. **Run the script**: 
+python MC_simulation.py
